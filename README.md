@@ -8,14 +8,21 @@ review rules, skills, subagent definitions.
 
 ```
 claude-code/
-├── CLAUDE.md, RTK.md   — root instructions
-├── rules/              — always-on behavioral rules
+├── CLAUDE.md, RTK.md   — root instructions (always-on, every project)
+├── rules/              — always-on behavioral rules (auto-loaded every project)
+├── conventions/        — opt-in, project-dependent conventions (NOT auto-loaded — pull into
+│                          a project's own CLAUDE.md when it fits, e.g. file/doc organization
+│                          patterns that don't suit every repo)
 ├── skills/             — own skills (symlinks dereferenced)
 ├── agents/             — subagent definitions
 └── plugins/<name>/     — installed plugin skills/agents/commands/docs (source excluded)
 
 cursor/
-└── skills-cursor/      — Cursor skills (mostly built-in; custom rules land in cursor/rules/)
+├── rules/              — includes both alwaysApply: true (always-on) and alwaysApply: false
+│                          (opt-in, attach manually per project) rules — Cursor supports this
+│                          distinction natively in each .mdc file's frontmatter
+├── skills/             — own skills, ported from claude-code/skills
+└── skills-cursor/      — Cursor's built-in skills (mirrored read-only, not ours)
 ```
 
 ## Sync (local → repo)

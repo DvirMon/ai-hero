@@ -1,29 +1,9 @@
 @RTK.md
 
-# Docs by Responsibility — Architectural Strategy
-
-Code and docs are colocated by domain, not gathered centrally. A **domain** = the public API boundary (a component, feature, package, or app).
-
-**Pattern:**
-```
-src/design-system/components/Button/
-├── Button.tsx
-├── Button.module.css
-└── docs/
-    ├── spec.md              ← implementation spec (from /to-spec skill)
-    ├── narrative.md         ← design intent / why this domain exists
-    └── decisions.md         ← local decisions, links to shared ADRs
-```
-
-**Rationale:** A domain owns everything needed to understand and implement it. No bouncing between central docs and code. Scales: as the codebase grows, you can find Button's spec by finding Button's code. Inner helpers are documented as part of the parent domain's spec.
-
-**Key rules:**
-- Each domain has its own `docs/` folder colocated with source
-- `spec.md` + `narrative.md` + `decisions.md` live together
-- Cross-domain decisions (glossary, architectural ADRs) stay centralized (`CONTEXT.md`, `docs/adr/`)
-- Skills (`/grill-with-docs`, `/to-spec`) write outputs to domain folders, not central locations
-
-See `docs/agents/skill-component-workflow.md` for how the workflow splits ticket bundles across domain folders.
+Project-dependent conventions (not always-on — opt in per project, see `~/.claude/conventions/`):
+- `docs-by-responsibility.md` — colocate docs with the code domain they describe, instead of a
+  central docs folder. Pull into a project's own CLAUDE.md when it fits; skip for projects with
+  a different doc convention.
 
 ---
 

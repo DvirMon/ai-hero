@@ -25,6 +25,9 @@ rsync -aL --delete "$CLAUDE_DIR/skills/" "$REPO_DIR/claude-code/skills/"
 # --- Claude Code: agents ---
 rsync -a --delete "$CLAUDE_DIR/agents/" "$REPO_DIR/claude-code/agents/"
 
+# --- Claude Code: opt-in / project-dependent conventions (NOT auto-loaded, unlike rules/) ---
+[ -d "$CLAUDE_DIR/conventions" ] && rsync -a --delete "$CLAUDE_DIR/conventions/" "$REPO_DIR/claude-code/conventions/"
+
 # --- Claude Code: installed plugin skills/agents/commands/docs only (not full plugin source) ---
 PLUGIN_EXCLUDES=(--exclude='.git' --exclude='dist' --exclude='node_modules' --exclude='bin' \
   --exclude='tests' --exclude='benchmarks' --exclude='evals' --exclude='src' \

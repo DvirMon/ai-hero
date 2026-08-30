@@ -62,6 +62,7 @@ install_claude_code() {
   [ -d "$REPO_DIR/claude-code/rules" ] && rsync -a "$REPO_DIR/claude-code/rules/" "$dest/rules/" && echo "synced rules/"
   [ -d "$REPO_DIR/claude-code/skills" ] && rsync -a "$REPO_DIR/claude-code/skills/" "$dest/skills/" && echo "synced skills/"
   [ -d "$REPO_DIR/claude-code/agents" ] && rsync -a "$REPO_DIR/claude-code/agents/" "$dest/agents/" && echo "synced agents/"
+  [ -d "$REPO_DIR/claude-code/conventions" ] && rsync -a "$REPO_DIR/claude-code/conventions/" "$dest/conventions/" && echo "synced conventions/ (opt-in, not auto-loaded — pull into a project's CLAUDE.md when it fits)"
 
   install_claude_code_plugins "$dest"
 }

@@ -16,6 +16,7 @@ session history, or credentials (mcp.json, settings.json with tokens). Only:
 - `~/.claude/rules/` → `claude-code/rules/`
 - `~/.claude/skills/` (symlinks dereferenced) → `claude-code/skills/`
 - `~/.claude/agents/` → `claude-code/agents/`
+- `~/.claude/conventions/` (opt-in / project-dependent — NOT auto-loaded like `rules/` is) → `claude-code/conventions/`
 - `~/.claude/plugins/marketplaces/*/{skills,agents,commands,docs}` → `claude-code/plugins/<marketplace>/`
   (excludes `.git`, `dist`, `node_modules`, `bin`, `tests`, `benchmarks`, `evals`, `src`,
   `.github`, `.changeset`, `.codex`, `.out-of-scope` — those are the plugin's own source/build
