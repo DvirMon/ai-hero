@@ -1,0 +1,32 @@
+---
+description: Never run builds, dev servers, installs/scaffolds, or tests without explicit user confirmation first — don't even offer to, just report what's worth verifying.
+alwaysApply: true
+---
+
+# Never build, serve, install, or test unprompted
+
+Never run builds, dev servers, installs/scaffolds, or tests without explicit confirmation first
+— this covers install/scaffold commands, build commands, serve/dev-server/storybook commands, and
+test/Playwright runs. Running tests is explicitly included, not treated as a safe exception.
+Read-only inspection (`ls`, `git status`, package-view commands, `cat`) is unaffected — this is
+about mutating/installing/running actions.
+
+**Why:** the user wants control over when long-running or resource-heavy processes start in their
+environment, and runs these themselves. Stated repeatedly after unprompted runs were interrupted
+mid-task or called out as wasted effort: an unprompted docs-build run interrupted mid-task; an
+unprompted test run "to verify" after a refactor; an unprompted dev-server start (including
+killing/restarting it hunting for a free port); a scaffold command stopped mid-session ("do not
+run the project by yourself. All scripts running and building of the projects are always doing
+manually by me").
+
+**How to apply:** Write the code, run cheap static checks that don't start a process (type
+checking, lint), then state what's worth verifying and let the user run it. Don't just ask first
+— don't even *offer* to build/serve/test as a next step; say what's worth verifying and stop
+there. Rely on diagnostics/type-checker feedback instead of running the suite for
+self-verification. If a run seems genuinely necessary to make progress, ask first and wait for a
+clear yes — but treat "ask" as the floor, not the target.
+
+**Narrow, explicitly-granted exception:** initial project scaffolding was once explicitly carved
+out by the user as delegable — confirmed narrow (scaffold-only, not a blanket override) via
+follow-up question. Treat any such carve-out as scoped to the specific ask it was granted in, not
+a standing default.

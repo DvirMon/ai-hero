@@ -1,0 +1,23 @@
+---
+description: When comparing libraries/deps, score against the user's stated requirements first — don't let first-party/stability heuristics silently override them.
+alwaysApply: true
+---
+
+# Weight stated requirements over stability bias when comparing libraries
+
+When choosing between competing libraries/deps, score candidates against the user's explicitly
+stated requirements first. Don't let institutional-stability heuristics ("first-party", "backed
+by the framework team") silently outweigh them.
+
+**Why:** a first-party option was once recommended on stability grounds when the alternative was
+better on most stated requirements and worse on none — the user challenged it and the challenge
+was correct.
+
+**How to apply:**
+- Build the requirement-by-requirement scoring table *before* forming a recommendation.
+- Ask whether third-party churn actually reaches the consumer — if the work wraps the dependency
+  behind an owned API layer, blast radius is contained, which deflates pre-1.0 risk considerably.
+- Consider trajectory: which dependency covers what's needed *next*, under one vocabulary.
+- "First-party" is not automatically "stable" — check for recent breaking renames.
+- Verify factual claims about a library's API from installed published packages, not reading
+  source off an unreleased/next branch.

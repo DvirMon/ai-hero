@@ -48,7 +48,9 @@ bash scripts/install.sh --harness=claude-code # non-interactive
 bash scripts/install.sh --harness=all --yes-plugins  # also imports mirrored plugin skills, no prompts
 ```
 
-Installs `CLAUDE.md`/`RTK.md`, `rules/`, `skills/`, `agents/` for the chosen harness(es).
+Installs `CLAUDE.md`/`RTK.md`, `rules/`, `conventions/`, `skills/`, `agents/` for the chosen
+harness(es). `conventions/` is copied but never auto-applied — same opt-in contract as on the
+source machine.
 
 **Plugins are never auto-installed.** `claude-code/plugins/<name>/` is a static, partial mirror
 (skills/agents/commands/docs only — source/build trees excluded) of installed marketplace

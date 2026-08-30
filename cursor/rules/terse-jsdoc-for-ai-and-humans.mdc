@@ -1,0 +1,21 @@
+---
+description: JSDoc/docstrings must be terse and IDE-readable, not narrative — they serve both developers and LLMs reading the code.
+alwaysApply: true
+---
+
+# JSDoc: terse, not narrative — serves developers and LLMs alike
+
+JSDoc/docstrings on functions and components should be terse and IDE-readable, not narrative.
+Aim for under ~50 words on a function/component doc comment; props/interface docs stay
+prop-level and terse too.
+
+**Why:** JSDoc serves two readers — developers in IDE hover/autocomplete, and LLMs
+context-reading the code. Verbose multi-line narrative comments bloat the context window without
+adding signal; type signatures and identifiable structure already convey most of it.
+
+**How to apply:**
+- Don't describe layout/composition/structure that's already visible in the code.
+- Do mark only what's non-obvious from reading the code: semantic constraints, non-obvious
+  behavior, scope/reusability boundaries, or links to the decision that produced a constraint.
+- Skip `@example` unless usage is genuinely ambiguous.
+- One line for "what this renders/does + purpose" is often enough.

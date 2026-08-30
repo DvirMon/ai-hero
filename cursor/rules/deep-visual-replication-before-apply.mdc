@@ -1,0 +1,24 @@
+---
+description: When replicating a reference site's UI into a codebase, do a full feature inventory (nav, TOC, tabs, controls) before touching CSS — not just top-level color/radius tokens.
+alwaysApply: true
+---
+
+# Deep visual replication before applying UI changes
+
+When asked to "apply"/"replicate" a reference site's UI/design system into a codebase, a shallow
+token pass (background color, radius, font) is not enough — do a full feature inventory before
+touching CSS: side nav and any "on this page" TOC, tab controls, per-block action buttons, and
+full-surface theme sync across every affected component, not just the shell.
+
+**Why:** a tokens-only pass was once called out as "a very shallow replica" — it missed a TOC,
+missed action-button chrome, and left child components (e.g. tables) unsynced with a new dark
+theme. A narrow pass that's correct for research/analysis is not automatically correct for the
+*apply* step — research can stay narrow, implementation must cover every visible surface changed.
+
+**How to apply:**
+1. Enumerate every distinct chrome element visible in reference screenshots — don't stop at
+   colors/radius/font.
+2. Search the target app for every component/file whose styling is affected by the change (not
+   just the shell file) before calling a theme/style change "applied."
+3. If a reference feature has no natural equivalent in the target, say so explicitly and ask
+   rather than silently omitting it.
