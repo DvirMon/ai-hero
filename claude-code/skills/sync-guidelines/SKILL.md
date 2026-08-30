@@ -1,0 +1,44 @@
+---
+name: sync-guidelines
+description: Mirror general (non-project-specific) code-generation guidelines — CLAUDE.md, rules, skills, agents, and installed plugin skills — from ~/.claude (and ~/.cursor) into the ai-coding-guidelines GitHub repo. Manual trigger only. Use when the user says "sync guidelines", "/sync-guidelines", or asks to update the guideline mirror repo.
+---
+
+# sync-guidelines
+
+Mirrors general, non-project-specific coding guidance from local AI harness configs into
+`~/repos/ai-coding-guidelines` (GitHub: `DvirMon/ai-coding-guidelines`, private), then commits
+and pushes.
+
+**Scope — general guidance only.** Never sync per-project CLAUDE.md files, project memory,
+session history, or credentials (mcp.json, settings.json with tokens). Only:
+
+- `~/.claude/CLAUDE.md`, `~/.claude/RTK.md` → `claude-code/`
+- `~/.claude/rules/` → `claude-code/rules/`
+- `~/.claude/skills/` (symlinks dereferenced) → `claude-code/skills/`
+- `~/.claude/agents/` → `claude-code/agents/`
+- `~/.claude/plugins/marketplaces/*/{skills,agents,commands,docs}` → `claude-code/plugins/<marketplace>/`
+  (excludes `.git`, `dist`, `node_modules`, `bin`, `tests`, `benchmarks`, `evals`, `src`,
+  `.github`, `.changeset`, `.codex`, `.out-of-scope` — those are the plugin's own source/build
+  tree, not guideline docs, and already live upstream)
+- `~/.cursor/skills-cursor/`, `~/.cursor/rules/` (if present) → `cursor/`
+
+## Steps
+
+1. Run the sync script:
+   ```bash
+   bash ~/.claude/skills/sync-guidelines/sync.sh
+   ```
+2. `cd ~/repos/ai-coding-guidelines && git status` — review the diff before committing. If
+   nothing changed, stop (no empty commits).
+3. `git add -A`
+4. Commit with a message summarizing what changed (e.g. "sync: update rules/, add new ds-* skills").
+5. **Ask the user before `git push`** — pushing updates a shared/remote repo, confirm each time
+   unless the user has said to always push automatically.
+
+## Notes
+
+- The script is idempotent — safe to re-run any time.
+- If `~/.cursor` has no custom rules yet (only built-in `skills-cursor/`), the `cursor/` folder
+  will be sparse. That's expected until custom Cursor rules exist.
+- Do not add new source paths to `sync.sh` without checking they don't contain secrets or
+  project-specific content first.
