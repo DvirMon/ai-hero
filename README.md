@@ -21,9 +21,11 @@ cursor/
 ├── rules/              — includes both alwaysApply: true (always-on) and alwaysApply: false
 │                          (opt-in, attach manually per project) rules — Cursor supports this
 │                          distinction natively in each .mdc file's frontmatter
-├── skills/             — own skills, ported from claude-code/skills
-└── skills-cursor/      — Cursor's built-in skills (mirrored read-only, not ours)
+└── skills/             — own skills, ported from claude-code/skills
 ```
+
+Not mirrored: `~/.cursor/skills-cursor/` — Cursor's own built-in skill bundle, ships with every
+Cursor install automatically, not authored by you.
 
 ## Sync (local → repo)
 

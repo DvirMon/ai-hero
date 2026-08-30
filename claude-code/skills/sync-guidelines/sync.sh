@@ -56,11 +56,6 @@ if [ -d "$CURSOR_DIR/skills" ]; then
   rsync -a --delete "$CURSOR_DIR/skills/" "$REPO_DIR/cursor/skills/"
 fi
 
-# --- Cursor: built-in skills-cursor (Cursor's own bundled skills, mirrored read-only) ---
-if [ -d "$CURSOR_DIR/skills-cursor" ]; then
-  rsync -a --delete --exclude='.sync-manifest.json' "$CURSOR_DIR/skills-cursor/" "$REPO_DIR/cursor/skills-cursor/"
-fi
-
 # --- Cursor: rules ---
 if [ -d "$CURSOR_DIR/rules" ]; then
   rsync -a --delete "$CURSOR_DIR/rules/" "$REPO_DIR/cursor/rules/"

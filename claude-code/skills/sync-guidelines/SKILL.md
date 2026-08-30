@@ -22,8 +22,10 @@ session history, or credentials (mcp.json, settings.json with tokens). Only:
   `.github`, `.changeset`, `.codex`, `.out-of-scope` — those are the plugin's own source/build
   tree, not guideline docs, and already live upstream)
 - `~/.cursor/skills/` (own ported skills) → `cursor/skills/`
-- `~/.cursor/skills-cursor/` (Cursor's built-in skills, mirrored read-only) → `cursor/skills-cursor/`
 - `~/.cursor/rules/` (if present) → `cursor/rules/`
+
+Never syncs `~/.cursor/skills-cursor/` — that's Cursor's own built-in skill bundle, ships with
+every Cursor install, not authored by you.
 
 ## Steps
 
