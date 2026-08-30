@@ -1,9 +1,7 @@
 @RTK.md
 
-Project-dependent conventions (not always-on — opt in per project, see `~/.claude/conventions/`):
-- `docs-by-responsibility.md` — colocate docs with the code domain they describe, instead of a
-  central docs folder. Pull into a project's own CLAUDE.md when it fits; skip for projects with
-  a different doc convention.
+Opt-in, project-dependent conventions (not always-on) live in `~/.claude/conventions/` — pull
+into a project's own CLAUDE.md when one fits.
 
 ---
 

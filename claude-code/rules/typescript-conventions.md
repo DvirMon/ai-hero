@@ -1,0 +1,68 @@
+# TypeScript conventions
+
+Framework-agnostic TypeScript rules. For Angular-specific reactivity/DI/component patterns, see the `angular-developer` skill instead — don't duplicate those here.
+
+## Explicit return types
+
+Always specify explicit return types for functions, methods, and arrow functions.
+
+```ts
+function getUser(id: string): User {
+  return userService.findById(id);
+}
+```
+
+Exception: concise expressions where the type is obvious/trivial — computed-style single-expression arrows, or `void`-prefixed handlers.
+
+## Naming
+
+- Interfaces: PascalCase, no `I` prefix — `UserProfile`, not `IUserProfile`.
+- Classes, enums: PascalCase.
+- Variables/properties: camelCase (or UPPER_CASE for constants). Leading underscore allowed for private members.
+- Methods: camelCase. Leading underscore allowed for private methods.
+
+## Import organization
+
+Group and alphabetize within each group:
+1. External/framework packages
+2. Internal aliased packages (monorepo path aliases)
+3. Relative imports (`../`, `./`)
+
+## Avoid `any` — use `unknown` + type guards
+
+```ts
+// not this
+function processData(data: any): void {
+  console.log(data.user.name);
+}
+
+// this
+function processData(data: unknown): void {
+  if (isUserData(data)) {
+    console.log(data.user.name);
+  }
+}
+
+function isUserData(obj: unknown): obj is UserData {
+  return typeof obj === 'object' && obj !== null && 'user' in obj;
+}
+```
+
+## Avoid `as` type assertions — use type guards
+
+`as` and angle-bracket assertions bypass the type checker with no runtime check. Prefer:
+
+- Built-in guards: `instanceof`, `typeof`, `Array.isArray`.
+- A custom type guard (`function isX(v: unknown): v is X`) when the built-ins aren't enough.
+
+```ts
+// not this
+const user = response as User;
+
+// this
+if (isUser(response)) {
+  const user = response; // narrowed, type safe
+}
+```
+
+This is a strong preference, not an absolute — an assertion immediately after a runtime check that TypeScript can't itself narrow (e.g. a validated DOM query) is acceptable; a bare unchecked cast is not.
