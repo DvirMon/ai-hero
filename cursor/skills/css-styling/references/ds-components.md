@@ -1,0 +1,9 @@
+# DS Components — Stricter Rules
+
+Components in a shared design-system library (published for reuse across the app, not a one-off feature component) follow stricter versions of the general rules ([tokens.md](tokens.md), [override-api.md](override-api.md), [encapsulation.md](encapsulation.md)):
+
+- **Root element/class is the styling root** — never wrap the component's DOM in an extra element purely for styling. Style the framework's native root selector directly (see `styles.angular.md` / `styles.react.md`).
+- **Zero tolerance on encapsulation piercing** — a DS component never reaches into a child's internal styles, not even through a framework escape hatch that's otherwise allowed for app-level code. Expose a CSS custom property instead. See the framework file's DS-scoped subsection for exact syntax.
+- **Token sourcing** — DS component tokens should come from the project's design-token layer (or Material fallback) exclusively; never introduce a one-off hex/px value inside a DS component.
+- If the project has design assets (Figma, etc.) with a token-path naming convention (e.g. `fill/brand/bold`), map `/` to `-` and prefix with `--`: `fill/brand/bold` → `var(--fill-brand-bold)`. This is illustrative — use the project's actual mapping convention if one is documented.
+- **Separate rules by concern, not just by component** — group selectors so structural rules (layout, box model), state/metadata rules (`:invalid`, `:checked`, `aria-*` attribute selectors), interaction rules (`:hover`, `:focus-visible`, `:active`), and cosmetic/texture rules (shadows, gradients, decorative borders) aren't tangled in one undifferentiated block. Matters most here because DS components are consumed by teams who didn't write them — untangled concern layers make override intent legible without reading the whole ruleset.

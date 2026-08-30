@@ -48,10 +48,17 @@ if [ -d "$CLAUDE_DIR/plugins/marketplaces" ]; then
   find "$REPO_DIR/claude-code/plugins" -maxdepth 1 -type d -empty -delete 2>/dev/null || true
 fi
 
-# --- Cursor: custom rules / skills (built-in skills-cursor mirrored as-is if present) ---
+# --- Cursor: own personal skills (ported from Claude Code) ---
+if [ -d "$CURSOR_DIR/skills" ]; then
+  rsync -a --delete "$CURSOR_DIR/skills/" "$REPO_DIR/cursor/skills/"
+fi
+
+# --- Cursor: built-in skills-cursor (Cursor's own bundled skills, mirrored read-only) ---
 if [ -d "$CURSOR_DIR/skills-cursor" ]; then
   rsync -a --delete --exclude='.sync-manifest.json' "$CURSOR_DIR/skills-cursor/" "$REPO_DIR/cursor/skills-cursor/"
 fi
+
+# --- Cursor: rules ---
 if [ -d "$CURSOR_DIR/rules" ]; then
   rsync -a --delete "$CURSOR_DIR/rules/" "$REPO_DIR/cursor/rules/"
 fi

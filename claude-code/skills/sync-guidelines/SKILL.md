@@ -20,7 +20,9 @@ session history, or credentials (mcp.json, settings.json with tokens). Only:
   (excludes `.git`, `dist`, `node_modules`, `bin`, `tests`, `benchmarks`, `evals`, `src`,
   `.github`, `.changeset`, `.codex`, `.out-of-scope` — those are the plugin's own source/build
   tree, not guideline docs, and already live upstream)
-- `~/.cursor/skills-cursor/`, `~/.cursor/rules/` (if present) → `cursor/`
+- `~/.cursor/skills/` (own ported skills) → `cursor/skills/`
+- `~/.cursor/skills-cursor/` (Cursor's built-in skills, mirrored read-only) → `cursor/skills-cursor/`
+- `~/.cursor/rules/` (if present) → `cursor/rules/`
 
 ## Steps
 

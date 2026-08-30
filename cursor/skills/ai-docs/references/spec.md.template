@@ -1,0 +1,96 @@
+# [Component name] Spec
+
+## Overview
+One sentence: rendered tag + purpose.
+
+Example: "A button-like action primitive rendered as `<button>`, dispatching an `onClick` handler when clicked."
+
+## API
+
+### Props
+- `propA` (type): Purpose + constraints. Defaults to X.
+- `propB` (type): Purpose + constraints. Only meaningful when `propA='...'`.
+- `children` (ReactNode): Content projected into the component.
+
+### Slots / Projection (if applicable)
+Describe named slots, compound components, or content projection patterns.
+
+## Behavior
+
+### Default state
+- Visual appearance when no props are set
+- State of interactive elements (buttons, inputs, etc.)
+- Responsive behavior across viewport sizes
+
+### [Interaction / Behavior 1]
+Step-by-step flow. Include timing if relevant (e.g., "animation takes 300ms").
+
+### [Edge case: Null / Empty / Large content]
+How does it behave with edge inputs?
+
+### Responsive
+- Below 600px: stacked layout, single column, etc.
+- Above 600px: multi-column, side-by-side, etc.
+- Animation / motion: freeze or adapt below 600px? (check `prefers-reduced-motion`)
+
+## Accessibility
+
+### Semantic HTML
+- Rendered tag(s): e.g., `<button>`, `<fieldset>`, `<nav>`
+- Implicit roles: e.g., Button renders `<button role="button">` (implicit, no redundant ARIA)
+
+### ARIA (if needed)
+- `aria-label`: When present? What does it announce?
+- `aria-describedby`: Links to description or hint text
+- `aria-expanded`: Collapsible content?
+- `aria-invalid` / `aria-required`: Form fields?
+- Live regions (`aria-live`, `aria-atomic`): Notifications, status updates?
+
+### Keyboard
+- Is it focusable? Tab order?
+- Does it respond to arrow keys, Enter, Esc?
+- Focus management: focus trap? Focus return?
+
+### Screen Reader
+- What does SR announce for default state?
+- What does SR announce on interaction?
+- Is name/role/value clear?
+
+### Visual
+- Color contrast: text, icons, borders (WCAG AA minimum 4.5:1)
+- Motion: animations respect `prefers-reduced-motion`
+- Touch targets: minimum 48×48 CSS px (touch-friendly)
+
+## Acceptance Criteria
+
+- [ ] Renders correct HTML structure per spec
+- [ ] Accepts and validates all documented props
+- [ ] Handles edge cases (null, undefined, empty content, very long text)
+- [ ] Responsive behavior works below 600px and above
+- [ ] All interactions work (click, keyboard, focus)
+- [ ] Accessibility: semantic HTML, ARIA only if needed, keyboard accessible, SR announces correctly
+- [ ] WCAG 2.0 AA: contrast, motion, zoom, form labels
+- [ ] Tests pass (unit, a11y audit)
+
+## Testing Strategy
+
+### Unit tests
+- Props validation (required, type constraints)
+- Edge cases (null, undefined, empty, overflow)
+- Computed state (e.g., disabled when X)
+- Callbacks fire correctly (onChange, onClick, etc.)
+
+### Integration tests
+- Renders without crashing
+- Compound component composition (if applicable)
+
+### Visual regression tests
+- Default state
+- Prop variants (size, tone, state)
+- Responsive (600px breakpoint)
+- Dark mode (if applicable)
+
+### Accessibility tests
+- axe audit (automated)
+- Keyboard navigation (manual or keyboard testing library)
+- Screen reader announcements (manual or SR testing library)

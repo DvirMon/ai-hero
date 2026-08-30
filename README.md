@@ -18,7 +18,7 @@ cursor/
 └── skills-cursor/      — Cursor skills (mostly built-in; custom rules land in cursor/rules/)
 ```
 
-## Sync
+## Sync (local → repo)
 
 Source of truth is local (`~/.claude`, `~/.cursor`). This repo is a read-mostly mirror, updated
 manually via the `sync-guidelines` Claude Code skill:
@@ -28,3 +28,24 @@ manually via the `sync-guidelines` Claude Code skill:
 ```
 
 Runs `~/.claude/skills/sync-guidelines/sync.sh`, then review + commit + push manually.
+
+## Install (repo → a new/other local machine)
+
+```bash
+git clone https://github.com/DvirMon/ai-coding-guidelines.git
+cd ai-coding-guidelines
+bash scripts/install.sh                       # interactive: pick claude-code / cursor / all
+bash scripts/install.sh --harness=claude-code # non-interactive
+bash scripts/install.sh --harness=all --yes-plugins  # also imports mirrored plugin skills, no prompts
+```
+
+Installs `CLAUDE.md`/`RTK.md`, `rules/`, `skills/`, `agents/` for the chosen harness(es).
+
+**Plugins are never auto-installed.** `claude-code/plugins/<name>/` is a static, partial mirror
+(skills/agents/commands/docs only — source/build trees excluded) of installed marketplace
+plugins. The installer asks per plugin before copying anything from it, and copying it in is a
+one-time snapshot, not a live-updating install — for that, use
+`claude plugin marketplace add <repo>` instead.
+
+Never touches `settings.json`, `mcp.json`, or credentials — not in this repo, not copied by the
+installer.
