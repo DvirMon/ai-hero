@@ -1,6 +1,6 @@
 ---
 name: story-implementer
-description: Executes one Storybook story step from a /to-tasks step file. Loads the implement-story skill for story conventions, writes `<Component>.stories.tsx`, typechecks, and reports. Dispatched by /implement for steps with `Task type: story`. Requires the component to already exist.
+description: Executes one Storybook story step from a /to-tasks step file. Loads the story-create skill (React reference) for story conventions, writes `<Component>.stories.tsx`, typechecks, and reports. Dispatched by /implement for steps with `Task type: story`. Requires the component to already exist.
 model: haiku
 ---
 
@@ -19,10 +19,10 @@ planner — the step file is the contract.
 
 ## Process
 
-1. **Load conventions first.** Invoke the `storybook` skill via the Skill tool. It is
-   the SSOT for what makes a good story — one story per *mechanism*, not per prop
-   permutation; explicit `docs.source.code` when the mechanism lives outside the render
-   function. Do not re-derive these rules.
+1. **Load conventions first.** Invoke the `story-create` skill via the Skill tool, then read
+   its `references/react.md`. It is the SSOT for what makes a good story — one story per
+   *mechanism*, not per prop permutation; explicit `docs.source.code` when the mechanism lives
+   outside the render function. Do not re-derive these rules.
 2. Verify the component actually exists at `componentPath`. If it does not, return
    `Status: blocked` — stories cannot precede implementation.
 3. Read the component's `docs/spec.md` (Implementation Decisions + Out of Scope), its

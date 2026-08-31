@@ -1,0 +1,143 @@
+---
+name: story-plan
+description: >
+  Plan or audit which Storybook stories a feature needs by comparing a product user-stories
+  doc against the existing *-story-host component code (not just the thin .mdx wrappers).
+  Produces a minimal target story set: extend/merge existing stories via new buttons and
+  toggles, and only add a standalone new story for a mechanism large or cross-cutting enough
+  to need its own showcase. Use this whenever the user asks "do we have a story for X",
+  wants to plan/audit Storybook coverage for a feature, asks to compare stories against a
+  product/spec/PRD doc, or says something like "what stories are we missing" or "should this
+  be its own story". Also trigger proactively after writing or updating a product user-stories
+  doc that has coverage marks (✅/🟡/❌) — that doc's coverage marks are exactly what this
+  skill re-derives.
+---
+
+# Storybook story planning
+
+A product user-stories doc (organized by feature area, usually with coverage marks like
+✅/🟡/❌ or similar) describes what a person needs to be able to do. Existing Storybook
+stories are supposed to demonstrate that those things work — including the failure paths, not
+just the happy path. Over time the two drift apart: new capabilities ship without a story,
+stories get added ad hoc and start overlapping, and nobody has a table showing which product
+story maps to which `.stories.ts` file. This skill produces that table and a plan to close the
+gap, favoring the smallest number of stories that gives honest coverage.
+
+## Why read the story-host code, not the `.mdx`
+
+A Storybook `.mdx` file is almost always a thin wrapper — `<Meta>`, `<Canvas>`, a `<Source>`
+block showing the host component's own code. It rarely says what the story is *for*. The real
+answer — which mutation verbs it calls, which buttons exist, which failure paths are wired up,
+which feature flags/config it composes — lives in the story-host component
+(`*-story-host.component.ts` or equivalent, whatever the project's naming convention is). Always
+read that file directly. Treat a comment at the top of the host component (if one exists,
+labeling which product story it's proving) as the most trustworthy signal available — better
+than the mdx title, better than the file name.
+
+## The four-step process
+
+### 1. Inventory what exists
+
+For every existing story in scope, build a table with three columns:
+
+| Story | Composes / configured with | Actually demonstrates |
+
+The third column comes only from reading the host component's logic: which verbs/handlers it
+calls, what each button does, what happens on failure, what's toggled by story controls. Don't
+infer this from the story's name or folder — names drift from what a story actually tests as it
+gets extended over time.
+
+### 2. Cross-reference against the product doc
+
+Walk every user story in the product doc (a numbered list, a table with coverage marks,
+whatever shape the project uses) and classify it against the inventory from step 1:
+
+- **Covered** — an existing story exercises it, including its failure behavior if the product
+  story specifies one. A story that only shows the happy path does not fully cover a product
+  story whose acceptance criteria include a failure case.
+- **Partially covered** — the underlying mechanism exists in code (a function, a verb, a
+  feature flag) but nothing on screen lets a person see or trigger it. This is the most common
+  and most easily missed gap: a `grep` for the verb name will find it in the codebase, so it's
+  tempting to mark it "done," but the product doc is about what a *person* can do, not what
+  API surface exists.
+- **Not covered** — nothing anywhere touches it.
+
+Also flag **redundancy**: two stories that differ by one variable (timing, success vs. failure,
+one extra button) are candidates to merge into one story with a toggle, rather than staying two
+near-duplicate files.
+
+### 3. Decide the target story set
+
+Apply two constraints, in this order:
+
+**Minimize story count.** Default to folding a gap into an existing story as a new
+button/control/toggle/keybinding. Only give a mechanism its own standalone story when it is
+large or cross-cutting enough to need its own showcase on its own terms — ask "if someone opened
+only this one story, would they understand the whole mechanism, or are they missing half of
+it because it's scattered across two files?" Genuine candidates for standalone status:
+a mechanism that composes multiple features together (e.g. two plugins/behaviors combined),
+an end-to-end flow with several distinct states worth seeing in sequence (e.g. optimistic
+update: capture → in-flight → success/rollback), or a conflict/edge-case flow that would clutter
+a baseline story if bolted on. When in doubt, don't create a new file — extend an existing one
+and see if it becomes unreadable; that's the actual signal a split is warranted, not a guess in
+advance.
+
+**Mock actions as on-canvas buttons, not documentation-only artifacts.** Any story representing
+a network or async effect (save, delete, fetch, search, whatever's relevant to the domain)
+needs a button that flips local state to simulate the outcome — success, failure, latency —
+directly in the rendered story. Don't rely on the Storybook actions panel alone (it logs but
+doesn't demonstrate the resulting UI state) and don't require a real backend. If the project
+already has a pattern for this (e.g. force-failure/latency story controls, an intercepted
+`fetch`), reuse it rather than inventing a new mechanism.
+
+### 4. Write the plan
+
+Structure the output as one table per target story:
+
+| Product story covered | Covered by |
+|---|---|
+| (doc section / id) | existing — what it already does, OR **new** — what needs to be added, OR **merge <old-story> in** if this absorbs another file |
+
+Follow with two closing sections:
+
+- **Left out on purpose** — a table of `item | why not a story` for anything deliberately
+  excluded: blocked on an unbuilt dependency, would misrepresent an unsupported/edge-case
+  pattern as a first-class feature if shown as its own story, or is a recipe/doc fix rather than
+  a demonstrable mechanism.
+- **Summary** — one row per target story: name, status (existing / extend / new / merge), and
+  — only for a standalone story — a one-line reason it earned its own file rather than folding
+  into another.
+
+## Follow a project's existing story-creation conventions if one is recorded
+
+Before proposing new buttons/controls/files, check whether the project has already written down
+its own story-shape conventions (file layout, component vs. inline template, how it mocks
+network effects, naming). If one exists, the plan's "new" column should describe additions that
+fit that convention, not a generic shape. Example: `libs/shared/table/docs/3-ui/stories.md`
+records this repo's pattern for `libs/shared/table` — separate template file, `Component`-suffixed
+host class, a doc-comment naming which decision the story proves, MSW for simulated server
+round-trips vs. a plain `await` for simple pessimistic saves. If no such doc exists for the
+project in scope, say so and offer to write one alongside the plan — the plan and the
+conventions record are complementary, not the same document.
+
+## Where the output goes
+
+Don't leave this as chat-only output if the project has a docs convention for episodic planning
+work (a numbered work-folder pattern, an ADR/decision-log structure, etc.) — write it as the
+next document in that convention. Before writing, check whether a prior proposal or plan already
+exists in the same location; if so, reference it by name and describe this as the follow-up gap
+analysis rather than repeating its content. If the project has no such convention, ask where the
+user wants it, or default to returning it as a chat artifact.
+
+## Common pitfalls this process catches
+
+- A story whose `.mdx` title suggests broad coverage but whose host component only wires up the
+  happy path — the failure behavior a product story explicitly asks for is quietly missing.
+- Two stories that are 80% identical except for one timing/ordering detail, kept as separate
+  files out of habit rather than a toggle.
+- A capability that shipped in the underlying code (a new function, a new config option) with no
+  story ever added for it — easy to miss because the code review that shipped it wasn't asking
+  "does a person have a way to see this," it was asking "does the function work."
+- Treating an integration-pitfall or edge-case demo (something that exists to show a *wrong* way
+  of doing something, or a developer-facing plumbing concern) as if it were a supported
+  person-facing feature deserving equal footing with the real stories.

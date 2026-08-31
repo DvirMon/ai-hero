@@ -1,23 +1,7 @@
----
-name: storybook
-description: "Generate Storybook stories for a design-system component. SSOT for story-creation conventions — sibling to /implement (component generation), invoked after a component's implementation is done."
-disable-model-invocation: true
----
+# React — story creation
 
 Generate `<Component>.stories.tsx` for a component that already exists (implemented via
-`/implement`, following `/react-developer`). This skill owns the *conventions* for what makes
-a good story — don't re-derive them per component.
-
-> **Role in the pipeline:** knowledge SSOT, not an executor. `/implement` dispatches
-> `Task type: story` steps to the **`story-implementer` agent**, which loads this skill and
-> then writes the stories. Read it directly for ad-hoc story work.
-
-## Goal
-
-A story's job isn't "render this variant" — it's to make the *mechanism* reproducible. Someone
-reading the Docs "Show code" panel should be able to copy what they see and get the same
-behavior in their own code, without opening a second file to find a piece the story used but
-didn't show.
+`/implement`, following `/react-developer`).
 
 ## Process
 
@@ -64,6 +48,14 @@ didn't show.
 6. Run typecheck after writing (`nx run <project>:typecheck`). If asked to verify visually,
    ask before starting `npm run issa:storybook` (or the project's Storybook script) — don't
    serve unprompted.
+
+## Simulating network effects
+
+Prefer args/decorators for synchronous mock state. For a story specifically about save/fetch
+reliability (loading, error, retry), intercept a real `fetch`/API client call with MSW rather
+than stubbing a `Promise` — args exposed as Storybook controls (e.g. `forceFailure`,
+`latencyMs`) drive the mocked response so the failure/latency path is a real intercepted
+request, not a fake await.
 
 ## Reference implementation
 
