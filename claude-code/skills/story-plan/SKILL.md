@@ -68,7 +68,7 @@ near-duplicate files.
 
 ### 3. Decide the target story set
 
-Apply two constraints, in this order:
+Apply three constraints, in this order:
 
 **Minimize story count.** Default to folding a gap into an existing story as a new
 button/control/toggle/keybinding. Only give a mechanism its own standalone story when it is
@@ -81,6 +81,23 @@ update: capture → in-flight → success/rollback), or a conflict/edge-case flo
 a baseline story if bolted on. When in doubt, don't create a new file — extend an existing one
 and see if it becomes unreadable; that's the actual signal a split is warranted, not a guess in
 advance.
+
+**Scope each story's code to what it's proving.** A story's host component is what a consumer
+copies to implement the feature(s) being shown — not a sketch of a realistic app built around
+it. Before adding (or keeping) a button, control, or UI element, ask: does this serve the
+specific product story this host proves, or is it app chrome a real consumer would plausibly add
+regardless of which feature they were implementing — a confirm dialog, a toast system, a notice
+banner for an unrelated failure mode? If the latter, it doesn't belong, even if it's realistic
+and cheap to add. A story may cover several product stories at once only when they're inherent
+to the surface being shown as a whole — a "live table" story demonstrating sort + edit + delete
+together, because that's what a live table *is* — not because bundling a nearby feature was
+convenient. When auditing an existing story, check every element it renders against which
+product-doc entry it actually serves; a host's doc-comment claiming which decision it proves is
+a strong signal (per the note above) but not proof by itself — verify the claim against that
+product story's own acceptance criteria, since a comment can misattribute a flow to the wrong
+entry just as easily as it can correctly name one. Design-only stories (a component's visual
+states or layout, not a product feature) are exempt from the "copy-paste code" framing — the
+story itself is the design surface under review, not an implementation to lift.
 
 **Mock actions as on-canvas buttons, not documentation-only artifacts.** Any story representing
 a network or async effect (save, delete, fetch, search, whatever's relevant to the domain)
@@ -141,3 +158,7 @@ user wants it, or default to returning it as a chat artifact.
 - Treating an integration-pitfall or edge-case demo (something that exists to show a *wrong* way
   of doing something, or a developer-facing plumbing concern) as if it were a supported
   person-facing feature deserving equal footing with the real stories.
+- A story bolts on a flow that's realistic for a real app but proves a different (or no) product
+  story than the one its host's doc-comment claims — the comment cited the wrong acceptance
+  criteria, or none at all. Verify the claim against the product doc's actual section, don't take
+  the comment's word for it.

@@ -55,7 +55,7 @@ Generate `{prefix}-<name>.component.ts` (class + colocated types) and its templa
 - `.claude/rules/file-organization.md` (repo CLAUDE.md) — one concern per file when the component's code grows past a single class+types file
 
 ## Process
-1. Invoke the `angular-developer` skill via the Skill tool for baseline Angular conventions, then call `list_projects` and `get_best_practices` (angular-cli MCP) for this workspace — do this before touching DS-specific references, so version-specific practices are checked fresh, not assumed
+1. Invoke the `angular-developer` skill via the Skill tool for baseline Angular conventions, then call `list_projects` and `get_best_practices` (angular-cli MCP) for this workspace — do this before touching DS-specific references, so version-specific practices are checked fresh, not assumed. If `list_projects` returns no workspaces (Nx repos with `project.json`, no `angular.json`), skip `get_best_practices`, rely on the skill, and note it in the report
 2. Read `prdPath` — extract selector, Internal DS Components table, Variants & States, Component Overview (complexity, primitive)
 3. Read `apiSpec` (inline) — extract every input/output/content-slot with types and defaults
 4. Read `a11ySpec` (inline) — extract semantic element, ARIA role/attributes, keyboard map, focus contract

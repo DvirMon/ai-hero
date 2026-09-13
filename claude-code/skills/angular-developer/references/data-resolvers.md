@@ -2,6 +2,8 @@
 
 Data resolvers fetch data before a route activates, ensuring components have the necessary data upon rendering.
 
+> Angular v21+ offers a signals-based alternative — route `resources` (parallel loads, non-blocking routes, reload without navigation). See [route-resources.md](route-resources.md).
+
 ## Creating a Resolver
 
 Implement the `ResolveFn` type.

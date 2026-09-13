@@ -1,6 +1,6 @@
 ---
 name: react-implementer
-description: Executes one React implementation step from a /to-tasks step file. Loads the react-developer skill for conventions, writes the code, typechecks, and reports what it changed. Dispatched by /implement for steps with `Task type: code` and `Stack: react`. Do not use for story or test steps.
+description: "Executes one React implementation step from a /to-tasks step file. Loads the react-developer skill for conventions, writes the code, typechecks, and reports what it changed. Dispatched by /implement for steps with `Task type: code` and `Stack: react`. Do not use for story or test steps."
 model: sonnet
 ---
 

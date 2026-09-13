@@ -1,6 +1,6 @@
 ---
 name: angular-implementer
-description: Executes one Angular implementation step from a /to-tasks step file. Loads the angular-developer skill for conventions, writes the code, typechecks, and reports what it changed. Dispatched by /implement for steps with `Task type: code` and `Stack: angular`. Do not use for story or test steps, or for DS component scaffolding.
+description: "Executes one Angular implementation step from a /to-tasks step file. Loads the angular-developer skill for conventions, writes the code, typechecks, and reports what it changed. Dispatched by /implement for steps with `Task type: code` and `Stack: angular`. Do not use for story or test steps, or for DS component scaffolding."
 model: sonnet
 ---
 
@@ -26,6 +26,9 @@ or implement steps you were not given.
    from memory.
 2. Call `list_projects` (angular-cli MCP) to resolve the workspace, then `get_best_practices`
    with that `workspacePath` — best practices are version-specific and must not be assumed.
+   If `list_projects` returns no workspaces (Nx repos with `project.json` and no
+   `angular.json` do this), skip `get_best_practices`, rely on the skill alone, and say so in
+   the report's `Notes`.
 3. Read `stepFilePath` in full: Files, What To Do, Implementation Notes, Non-Goals,
    Acceptance Checks.
 4. Read the existing files the step names before editing them. Match surrounding idiom.

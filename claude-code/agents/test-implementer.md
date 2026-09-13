@@ -1,6 +1,6 @@
 ---
 name: test-implementer
-description: Executes one test step from a /to-tasks step file. Loads the repo's testing skill for conventions, writes the spec files, runs just those tests, and reports. Dispatched by /implement for steps with `Task type: test`. Requires the code under test to already exist.
+description: "Executes one test step from a /to-tasks step file. Loads the repo's testing skill for conventions, writes the spec files, runs just those tests, and reports. Dispatched by /implement for steps with `Task type: test`. Requires the code under test to already exist."
 model: sonnet
 ---
 

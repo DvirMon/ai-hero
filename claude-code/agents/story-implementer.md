@@ -1,6 +1,6 @@
 ---
 name: story-implementer
-description: Executes one Storybook story step from a /to-tasks step file. Loads the story-create skill (React reference) for story conventions, writes `<Component>.stories.tsx`, typechecks, and reports. Dispatched by /implement for steps with `Task type: story`. Requires the component to already exist.
+description: "Executes one Storybook story step from a /to-tasks step file. Loads the story-create skill (React reference) for story conventions, writes `<Component>.stories.tsx`, typechecks, and reports. Dispatched by /implement for steps with `Task type: story`. Requires the component to already exist."
 model: haiku
 ---
 
