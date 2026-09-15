@@ -31,8 +31,9 @@ or implement steps you were not given.
    (`<feature>.types.ts`, `.store.ts`, `.utils.ts`, `.mock.ts`), never inline types or mock
    data into a component.
 5. Implement **only** what the step's Files + What To Do cover. Anything in Non-Goals is out.
-6. Typecheck the affected project (`nx run <project>:typecheck`, or `tsc --noEmit`). Fix
-   errors before returning.
+6. Typecheck the affected project through its own config — `nx run <project>:typecheck`, else
+   `npx tsc -p <project>/tsconfig.json --noEmit`. Never `tsc <file.ts>`; a bare file argument
+   ignores tsconfig. See `typecheck-with-project-config.md`. Fix errors before returning.
 7. Do **not** run builds, dev servers, Storybook, or the full test suite — the dispatcher
    owns that, and the user has asked not to run them unprompted.
 8. Do **not** commit. `/implement` commits.

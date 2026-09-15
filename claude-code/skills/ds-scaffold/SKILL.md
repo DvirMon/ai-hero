@@ -29,7 +29,7 @@ If the "Task Plan" checklist item is not marked complete → tell the user to fi
 From `{componentPath}docs/phase-state.json`, load:
 - `planDir` — path to the version subfolder (e.g. `.claude/plans/NNN-atera-{name}/v1-core/`)
 - `includeStorybook`, `includeTests` — from Task Plan decisions (user may override now)
-- `researchSummaryPath` — relative path to the research summary used to source `figmaTokens` (e.g. `"docs/research-summary.md"`)
+- `discoverySummaryPath` — relative path to the discovery summary used to source `figmaTokens` (e.g. `"docs/discovery-summary.md"`)
 
 Ask if they want to confirm or change the storybook/tests choices before launching.
 
@@ -57,7 +57,7 @@ Run only after the Angular scaffolder has returned and `componentFilePath` (the 
 | Storybook scaffolder | `ds-storybook-scaffolder` | sonnet | `includeStorybook` | componentName, componentPath, prdPath, componentApiSummary, planDir |
 | Test scaffolder | `ds-test-scaffolder` | sonnet | `includeTests` | componentName, componentPath, componentFilePath, prdPath, planDir |
 
-`figmaTokens` = design tokens from `{componentPath}{researchSummaryPath}` — resolve `researchSummaryPath` from `phase-state.json` (e.g. `"docs/research-summary.md"`) and join it to `componentPath`.
+`figmaTokens` = design tokens from `{componentPath}{discoverySummaryPath}` — resolve `discoverySummaryPath` from `phase-state.json` (e.g. `"docs/discovery-summary.md"`) and join it to `componentPath`.
 
 `a11ySpec` = inline accessibility text, sourced from `{componentPath}docs/phase-state.json`:
 - If `a11ySpecText` is set (non-complex): use its value as the inline text.

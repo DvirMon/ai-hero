@@ -34,6 +34,46 @@ read that file directly. Treat a comment at the top of the host component (if on
 labeling which product story it's proving) as the most trustworthy signal available — better
 than the mdx title, better than the file name.
 
+## Gather every input before step 1 — the product doc is not the whole discovery surface
+
+A product user-stories doc is usually the *output* of upstream discovery, not the discovery
+itself. It answers what a person needs to be able to do; it rarely carries the evidence that
+decided **what affordance to render for it**. That evidence often sits in sibling discovery
+artifacts the product doc distilled and then dropped — competitor/UX capability inventories,
+community-pain writeups, internal-coverage audits.
+
+Before inventorying anything, sweep for them. Don't read one folder and treat it as the whole
+surface — discovery and product docs frequently live in different parts of a docs tree
+(a `0-product/` folder and a `work/<feature>/` folder, say):
+
+```
+find <docs-root> \( -iname "*discovery*" -o -iname "*research*" \)
+grep -rlE "^type: (discovery|research)" <docs-root>
+```
+
+Read whatever that turns up for the feature in scope. A **capability inventory across peer
+libraries** is a required input, not optional colour: it is the only source that says what a
+person actually clicks in a shipped implementation of this feature, and it is what keeps a plan
+from inventing affordances nobody uses. The two inputs do different jobs and neither substitutes
+for the other:
+
+| Input | Answers | Decides |
+|---|---|---|
+| Product user-stories doc | what a person needs to be able to do | which stories must exist, and what counts as covered |
+| Peer-library capability discovery | what affordance shipped implementations render for it | what each story's buttons/controls actually look like |
+| Community-pain discovery | what goes wrong for people in practice | which failure paths a story must demonstrate, not just the happy path |
+| Internal-coverage discovery | what this codebase already ships | corrects stale coverage marks in the product doc |
+
+When the capability discovery shows peers **converging** on one convention, that convention is
+the default a story demonstrates — deviating from it is a decision to state and justify, not a
+free choice. Where the discovery names an affordance the library deliberately does not ship,
+record it as an explicit non-goal so a story never implies an unsupported pattern is
+first-class.
+
+If no such discovery exists for the feature, say so in the plan rather than silently proceeding
+as though the product doc were the whole input — a missing capability inventory is a real gap
+in the plan's grounding, and worth naming.
+
 ## The four-step process
 
 ### 1. Inventory what exists
@@ -68,7 +108,7 @@ near-duplicate files.
 
 ### 3. Decide the target story set
 
-Apply three constraints, in this order:
+Apply four constraints, in this order:
 
 **Minimize story count.** Default to folding a gap into an existing story as a new
 button/control/toggle/keybinding. Only give a mechanism its own standalone story when it is
@@ -81,6 +121,15 @@ update: capture → in-flight → success/rollback), or a conflict/edge-case flo
 a baseline story if bolted on. When in doubt, don't create a new file — extend an existing one
 and see if it becomes unreadable; that's the actual signal a split is warranted, not a guess in
 advance.
+
+**Ground every affordance in the capability discovery.** Before writing that a story needs a
+given button, toggle or keybinding, check what shipped peer implementations actually render for
+that job (per the discovery sweep above). Where peers converge, adopt the convention — a person
+opening the story should recognise the affordance, and a consumer copying the host should get an
+interaction shape their users already know. Deviate only deliberately, and say why in the plan.
+Where no peer renders what you were about to propose, that is usually a sign the affordance was
+invented to fit the product doc's wording rather than drawn from practice. A plan whose controls
+are all invented reads plausible and demos badly.
 
 **Scope each story's code to what it's proving.** A story's host component is what a consumer
 copies to implement the feature(s) being shown — not a sketch of a realistic app built around

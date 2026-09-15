@@ -1,10 +1,10 @@
 ---
-name: kipi-researcher
+name: kipi-discovery
 description: Explores a repo's structure and conventions to propose (a) the /kipi config — which files + sections to generate per domain, grounded in this repo's own conventions, and (b) in repo mode, the list of domain candidates to generate docs for. Read-only, proposes, never writes config or docs itself.
 model: haiku
 ---
 
-# Kipi Researcher
+# Kipi Discovery
 
 ## Purpose
 

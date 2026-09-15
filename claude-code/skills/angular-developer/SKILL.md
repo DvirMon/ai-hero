@@ -59,6 +59,27 @@ When **editing a file that uses legacy syntax**:
 
 ---
 
+## Template Binding Policy (STRICT — applies to all template generation)
+
+**Never add a class method purely to compute a render value** (e.g. `isSelected(item)`,
+`getLabel(item)`). A method call in an interpolation or property/attribute binding re-runs on
+every change-detection check and hides render logic behind an opaque call site. Only methods
+triggered by an **event** binding (`(click)="activate(item)"`) belong in a template as calls.
+
+| Binding shape | Use |
+|---|---|
+| No per-item param; reused across bindings | `computed()` |
+| Per-item param inside `@for`, or reused across bindings on one row | `@let` over a signal read |
+| Trivial one-off, no reuse | inline expression — no method, no `@let` |
+
+If the helper does a per-row **lookup** (`rows().find(…)`, a filter, an index scan), calling it
+from the template is O(n²) per change detection. Derive a `Set`/`Map` once in a `computed()` and
+read `.has(id)` in the template.
+
+Full examples: [templates.md](references/templates.md).
+
+---
+
 1. Always analyze the project's Angular version before providing guidance, as best practices and available features can vary significantly between versions. If creating a new project with Angular CLI, do not specify a version unless prompted by the user.
 
 2. When generating code, follow Angular's style guide and best practices for maintainability and performance. Use the Angular CLI for scaffolding components, services, directives, pipes, and routes to ensure consistency.

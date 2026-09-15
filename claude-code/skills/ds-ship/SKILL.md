@@ -29,7 +29,7 @@ Previous phase must be `ds-review` (which runs after `ds-scaffold`). If not comp
 
 Run through this and report status for each item:
 
-- [ ] Research Summary produced — variants, states, tokens, primitive candidate, a11y role
+- [ ] Discovery Summary produced — variants, states, tokens, primitive candidate, a11y role
 - [ ] Design interview complete — `docs/decisions.md` written
 - [ ] `docs/prd.md` generated and approved
 - [ ] A11y spec defined — complex components: `docs/roles-map.md`; non-complex components: `a11ySpecText` in `phase-state.json`

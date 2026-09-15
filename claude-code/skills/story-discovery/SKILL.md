@@ -1,9 +1,9 @@
 ---
-name: story-research
+name: story-discovery
 description: >
-  Research a feature from the product side and write its user-stories doc (PRD) — what a person
+  Run product discovery on a feature and write its user-stories doc (PRD) — what a person
   needs to be able to do, what they should experience when it goes wrong, and which scenarios the
-  engineering design has not thought about yet. Runs parallel research agents (community pain,
+  engineering design has not thought about yet. Runs parallel discovery agents (community pain,
   competitor capabilities, internal coverage) and then writes the doc in the PM voice. Use this
   when the user asks for a PRD, product doc, or user stories for a feature; says "make sure we
   cover all the use cases"; wants to find features that were missed; or asks to do "the product
@@ -11,7 +11,7 @@ description: >
   this skill produces and re-derives its coverage marks against real story code.
 ---
 
-# Product user-stories research
+# Product user-stories discovery
 
 Engineering derives API from this document, not the reverse. That inversion is the whole point:
 a feature specced from the API outward covers what the API happened to make easy. A feature
@@ -65,7 +65,7 @@ Two rules that carry regardless of house shape:
 ### 2. Map the graph, then dispatch in parallel
 
 Per `decompose-by-dependency-graph`: list nodes, map edges, rank. The standard shape is three
-independent research nodes feeding one dependent writing node.
+independent discovery nodes feeding one dependent writing node.
 
 ```
 N1 community pain (web)     ─┐
@@ -73,13 +73,22 @@ N2 competitor capabilities  ─┼─→ N4 write the doc (you, in the PM role)
 N3 internal coverage audit  ─┘
 ```
 
-N1–N3 are parallel-safe — dispatch them in **one message, multiple tool calls**. Tell each agent
-explicitly: **do not spawn subagents**. An agent given a four-library survey will otherwise fan
-out one agent per library and the count multiplies past what the user agreed to.
+N1–N3 are parallel-safe — dispatch them in **one message, multiple tool calls**.
 
-Each agent writes to a **file**, not to chat; chat gets a three-line pointer. Put research files
-in whatever work folder the project uses for episodic research, alongside any engineering research
-already there.
+**Dispatch the `story-discovery` agent** (`~/.claude/agents/story-discovery.md`), once per node,
+passing `mode` (`community-pain` | `competitor-capabilities` | `internal-coverage`), `feature`,
+`outputPath`, and `competitorSet` where you have one. That agent carries the source-reliability
+notes, the citation rules and the output shape — give it the question and the constraints, not the
+method. The per-node briefs below are what it already knows; keep them here as the contract, but do
+not re-paste them into the prompt.
+
+The agent's own prompt forbids fanning out; say it anyway: **do not spawn subagents**. An agent
+given a four-library survey will otherwise fan out one agent per library and the count multiplies
+past what the user agreed to.
+
+Each agent writes to a **file**, not to chat; chat gets a three-line pointer. Put discovery files
+in whatever work folder the project uses for episodic discovery, alongside any engineering
+discovery/research docs already there.
 
 **N1 — community pain.** GitHub issues, Stack Overflow, Reddit, blog posts for the two or three
 dominant libraries in this space. Organised as themes, not a link dump. Ask specifically for:
@@ -190,7 +199,7 @@ and finding out at implementation time is the expensive way.
   is not maintained is the one someone reads.
 - **Marking a capability covered because the function exists.** Covered means a person can see it
   happen, failure path included.
-- **Letting research agents multiply.** One agent per node, no subagents, stated in the prompt.
+- **Letting discovery agents multiply.** One agent per node, no subagents, stated in the prompt.
 - **Skipping N3 because "we know our own code".** N3 is the node that keeps the doc honest, and
   it's the one whose absence shows up as a doc that contradicts a settled decision.
 - **One flat gap list.** Without the layer split, UI gaps get filed against the state spec and

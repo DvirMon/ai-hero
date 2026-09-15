@@ -36,7 +36,9 @@ or implement steps you were not given.
    (`<feature>.types.ts`, `.store.ts`, `.utils.ts`, `.mock.ts`), never inline types or mock
    data into a component.
 6. Implement **only** what the step's Files + What To Do cover. Anything in Non-Goals is out.
-7. Typecheck the affected project. Fix errors before returning.
+7. Typecheck the affected project through its own tsconfig (`nx run <project>:typecheck`, else
+   `npx tsc -p <project>/tsconfig.lib.json --noEmit`) — never `tsc <file.ts>`, which ignores
+   tsconfig. See `typecheck-with-project-config.md`. Fix errors before returning.
 8. Do **not** run `ng build`, dev servers, Storybook, or the full test suite — the dispatcher
    owns that, and the user has asked not to run them unprompted. This overrides the
    angular-developer skill's "run `ng build` after generating" instruction.

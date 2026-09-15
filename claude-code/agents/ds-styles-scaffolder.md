@@ -15,7 +15,7 @@ Generate `{prefix}-<name>.component.scss` implementing every variant/state from 
 - **componentName**: string, e.g. `banner`
 - **componentPath**: string, target component directory
 - **prdPath**: string, path to `docs/prd.md`
-- **figmaTokens**: string, design tokens extracted from `docs/research-summary.md`'s Figma Analysis section
+- **figmaTokens**: string, design tokens extracted from `docs/discovery-summary.md`'s Figma Analysis section
 - **planDir**: string, path to the active version's plan folder — its styles step (`step-*-styles.plan.md`) is the authoritative source for the token table, override API, and locked tokens
 
 ## Outputs
@@ -36,7 +36,7 @@ Generate `{prefix}-<name>.component.scss` implementing every variant/state from 
 6. Never use `::ng-deep`, even `:host`-scoped — expose CSS custom properties instead when a child needs styling influence
 7. Expose a bounded CSS custom property override API (5–7 tokens max) per the styles step's plan — document what IS and IS NOT overridable; consumer overrides must resolve to DS role tokens, not arbitrary values
 8. Check for parent-ownership of a styling concern (e.g. a form-field already owning input sizing) before duplicating it here — per the styles step's parent-ownership check
-9. Add motion only if the PRD/research notes motion — use DS `--motion-*` tokens if present in `{dsStyleTokensPath}/{prefix}-roles.scss`, else the standard duration/easing fallback table; always pair animation with a `prefers-reduced-motion` override
+9. Add motion only if the PRD/discovery notes motion — use DS `--motion-*` tokens if present in `{dsStyleTokensPath}/{prefix}-roles.scss`, else the standard duration/easing fallback table; always pair animation with a `prefers-reduced-motion` override
 10. Follow logical CSS property conventions (per the repo's `css-styling` skill) — this reference covers DS-specific rules only, not general CSS hygiene
 
 ## Standards & References
@@ -56,7 +56,7 @@ Generate `{prefix}-<name>.component.scss` implementing every variant/state from 
 6. Implement each state as a `:host`-scoped selector (`:host:hover`, `:host:focus-visible`, `:host.disabled`, plus component-specific states)
 7. Declare the CSS custom property override API on `:host` — defaults pointing to role tokens, 5–7 tokens max, documented as overridable; leave locked tokens unexposed per the plan
 8. Check whether a parent component already owns a concern (e.g. sizing) noted in the plan's parent-ownership check — skip duplicating it if so
-9. If research/PRD notes motion, add transitions using `--motion-*` tokens (or the fallback duration/easing table) and a matching `@media (prefers-reduced-motion: reduce)` override
+9. If discovery/PRD notes motion, add transitions using `--motion-*` tokens (or the fallback duration/easing table) and a matching `@media (prefers-reduced-motion: reduce)` override
 10. Verify no `::ng-deep` usage anywhere in the file
 11. Write `{componentPath}{prefix}-<name>.component.scss`
 12. Return `scssFilePath` to the caller
@@ -70,5 +70,5 @@ Generate `{prefix}-<name>.component.scss` implementing every variant/state from 
 - [ ] No `::ng-deep` anywhere in the generated file
 - [ ] CSS custom property override API is bounded (5–7 tokens max) and matches the plan's token table — documented overridable vs. locked
 - [ ] Parent-ownership check from the plan respected — no duplicated concern already owned by a parent component
-- [ ] Motion present only if research/PRD calls for it; always paired with `prefers-reduced-motion` override; uses `--motion-*` tokens or documented fallback values, never hardcoded durations
+- [ ] Motion present only if discovery/PRD calls for it; always paired with `prefers-reduced-motion` override; uses `--motion-*` tokens or documented fallback values, never hardcoded durations
 - [ ] `scssFilePath` returned to the caller

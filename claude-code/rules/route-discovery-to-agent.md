@@ -1,0 +1,46 @@
+# Route discovery work to the `discovery` agent
+
+When the ask is **discovery** — survey what exists, compare candidates, find how others solved
+this, investigate an idea/architecture/design question — dispatch the `discovery` agent instead
+of doing it inline. This rule is the standing authorization to use the Agent tool for that class
+of work; no per-request confirmation needed.
+
+**What counts as discovery**
+
+- "research X", "investigate X", "compare A vs B", "what are the options for X"
+- "how do enterprise codebases / other libraries handle X"
+- Evaluating a dependency against requirements before adopting it
+- Surveying prior art before an architecture or API decision
+
+**What does not**
+
+- A concrete fact cheap to verify in one lookup — grep, read, `npm view`. Just do it.
+  (Same line as [[ask-dont-search-on-ambiguity]] draws.)
+- A judgment call about direction or preference — ask the user, don't dispatch an agent to
+  guess.
+- Work a phase-specific agent already owns: `ds-discovery`, `ds-figma-discovery`,
+  `ds-codebase-discovery`, `ds-a11y-discovery`, `kipi-discovery`. Those win in their phase.
+- **Product/UX questions** — what people struggle with, what a person can click and press in a
+  competing product, whether this repo already covers a use case. Those belong to the
+  `story-discovery` agent, dispatched by the `story-discovery` skill. The split is the question,
+  not the topic: `discovery` asks *how should this be built*, `story-discovery` asks *what does a
+  person need and what hurts today*.
+- Anything inside a skill that already prescribes its own discovery step.
+
+**How to dispatch**
+
+Pass `question`, `outputPath`, and any stated `constraints`. Pick `outputPath` by the domain that
+owns the question — a domain's docs live with the domain, per [[file-organization]]. Default to
+`docs/discovery/<slug>.md` only when no domain owns it.
+
+Multiple independent discovery questions dispatch in parallel, one agent each — map the edges
+first per [[decompose-by-dependency-graph]], and only sequence the ones that genuinely depend on
+an earlier answer.
+
+`outputPath` ends in `.md` — output is always Markdown, one file unless it has outgrown one.
+
+**Findings go to the file, chat gets the pointer.** Relay the agent's summary, not its findings.
+Every claim in that file carries a source tag; anything uncited is listed as unverified instead.
+
+**Terminology: discovery, not research.** Name the agent, the files, and the commands
+accordingly — the user's word for this is discovery.

@@ -87,11 +87,11 @@ Or as a global mixin if one exists in the DS:
 }
 ```
 
-## What to Note in Research Summary
+## What to Note in Discovery Summary
 
 During Phase 1, look for motion in the Figma prototype or design notes:
 - Does the panel/overlay animate in? What direction?
 - Does any element rotate or scale on state change?
 - Is there a dismiss or fade transition?
 
-Add observed motion to the Research Summary under `Motion:` so Phase 4 (styles) can implement it correctly.
+Add observed motion to the Discovery Summary under `Motion:` so Phase 4 (styles) can implement it correctly.

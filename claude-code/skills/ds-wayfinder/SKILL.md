@@ -20,7 +20,7 @@ On first invocation, `ds-wayfinder` checks for `{currentProject}/.claude/ds-wayf
 
 **If exists:** Skip setup, proceed to intent router.
 
-All subsequent phases (ds-research, ds-interview, ds-spec, etc.) **walk up from component path** to find config.
+All subsequent phases (ds-discovery, ds-interview, ds-spec, etc.) **walk up from component path** to find config.
 
 ### Setup Implementation
 
@@ -99,7 +99,7 @@ AskUserQuestion({
     options: [
       {
         label: "Linear phases (Recommended)",
-        description: "research → interview → spec → plan → scaffold. Simpler, predictable. Same session — each phase ends with a /compact to drop what's no longer needed."
+        description: "discovery → interview → spec → plan → scaffold. Simpler, predictable. Same session — each phase ends with a /compact to drop what's no longer needed."
       },
       {
         label: "Wayfinder map",
@@ -112,7 +112,7 @@ AskUserQuestion({
 
 Mark "Linear phases" as `(Recommended)` by default — most components follow the same path. Wayfinder mode is opt-in for components with uncertain decisions.
 
-> **Getting started (Linear):** Just say "start" — `ds-research` collects the component name, Figma URL, and work type, then runs research. Phases stay in the **same session** — each phase ends by printing a `/compact` command with keep/drop instructions scoped to what the next phase needs, then names the next skill to invoke. Context also flows on disk via `session-handoff.md` and `phase-state.json`, so a fresh session works too if the user starts one anyway.
+> **Getting started (Linear):** Just say "start" — `ds-discovery` collects the component name, Figma URL, and work type, then runs discovery. Phases stay in the **same session** — each phase ends by printing a `/compact` command with keep/drop instructions scoped to what the next phase needs, then names the next skill to invoke. Context also flows on disk via `session-handoff.md` and `phase-state.json`, so a fresh session works too if the user starts one anyway.
 >
 > **Getting started (Wayfinder):** Say "map" or "use wayfinder" — `/wayfinder` creates a DS component map with Phase 1–7 tickets. Prototype tickets spawn as needed. Map lives in the issue tracker.
 >
@@ -122,11 +122,11 @@ Mark "Linear phases" as `(Recommended)` by default — most components follow th
 
 When user chooses wayfinder mode:
 
-1. **Setup** (same as Linear): Config discovery, component name, Figma URL, work type collection via `/ds-research` setup prompts.
+1. **Setup** (same as Linear): Config discovery, component name, Figma URL, work type collection via `/ds-discovery` setup prompts.
 
 2. **Create map** via `/wayfinder`:
    - Destination: "DS component {prefix}-{name} (work type: {workType}) specification and implementation plan complete"
-   - Notes: "Framework: {framework}. Design system: {dsName}. Reference docs: {paths}. Prototype tickets spawn mid-phase for UX/async decisions. Tickets are: Phase 1 research, Phase 2 design interview (with prototype sub-tickets), Phase 3 spec, Phase 4 plan, Phase 5+ impl."
+   - Notes: "Framework: {framework}. Design system: {dsName}. Reference docs: {paths}. Prototype tickets spawn mid-phase for UX/async decisions. Tickets are: Phase 1 discovery, Phase 2 design interview (with prototype sub-tickets), Phase 3 spec, Phase 4 plan, Phase 5+ impl."
    - Frontier tickets:
      - `wayfinder:research` — Phase 1 (Figma/primitives/codebase)
      - `wayfinder:prototype` (optional) — Pre-interview UX/behavior validation if needed
@@ -136,7 +136,7 @@ When user chooses wayfinder mode:
    - Fog: Phase 3 spec, Phase 4 plan, Phase 5+ implementation (unfold as preceding tickets close)
 
 3. **Ticket detail:**
-   - Research ticket body: "Run Phase 1 via `ds-research` — Figma research, primitive survey, codebase patterns, a11y background. Resolves with research-summary.md and decisions.md initial content."
+   - Discovery ticket body: "Run Phase 1 via `ds-discovery` — Figma discovery, primitive survey, codebase patterns, a11y background. Resolves with discovery-summary.md and decisions.md initial content."
    - Grilling ticket body: "Run Phase 2 via `ds-interview` — grill API, accessibility, edge cases. Prototype sub-tickets spawn here if UX/async uncertain. Resolves with complete decisions.md."
    - Prototype sub-ticket (if spawned): "Body: specific UX/async question. Resolves with prototype branch deleted and learnings in decisions.md."
    - Update-decisions task: "Merge prototype learnings into decisions.md. Resolves when task done."
@@ -146,14 +146,14 @@ When user chooses wayfinder mode:
 
 ## Workflow
 
-`workType` (`new` | `variant` | `modify` | `tokens`) is collected in Phase 1 (research) and persisted to `{componentPath}docs/phase-state.json` — it drives the track within the pipeline.
+`workType` (`new` | `variant` | `modify` | `tokens`) is collected in Phase 1 (discovery) and persisted to `{componentPath}docs/phase-state.json` — it drives the track within the pipeline.
 
 ### Phases
 
 | # | Skill | What it does |
 |---|---|---|
-| 1 | `ds-research` | Collects component name/Figma URL/work type, then parallel research — Figma, primitives, codebase |
-| 2 | `ds-interview` | **Design interview**: grills API/a11y/edge cases against research → writes decisions.md |
+| 1 | `ds-discovery` | Collects component name/Figma URL/work type, then parallel discovery — Figma, primitives, codebase |
+| 2 | `ds-interview` | **Design interview**: grills API/a11y/edge cases against discovery → writes decisions.md |
 | 3 | `ds-spec` | PRD + a11y spec + architecture |
 | 4 | `ds-plan` | Versioned implementation task plan |
 | 5 | `ds-scaffold` | Scaffolds real component, styles, Storybook, tests |
@@ -173,7 +173,7 @@ When user chooses wayfinder mode:
 | File | Written by |
 |---|---|
 | `docs/session-handoff.md` | All phases — current phase + next step only |
-| `docs/research-summary.md` | Phase 1 |
+| `docs/discovery-summary.md` | Phase 1 |
 | `docs/decisions.md` | Phase 2 |
 | `docs/prd.md`, `docs/roles-map.md` (only when isComplex = true), `docs/architecture.md` | Phase 3 |
 | `.claude/plans/` | Phase 4 |
@@ -186,7 +186,7 @@ All phase skills read from `.claude/skills/ds-wayfinder/references/`:
 |---|---|
 | `session-handoff-template.md` | All phases |
 | `component-api.md` | Phase 2 |
-| ~~`accessibility.md`~~ | Retired — superseded by `ds-a11y-researcher`'s live-fetched "A11y Patterns" section in `research-summary.md` (Phase 2 grounding) and `ds-a11y-speccer` (Phase 3 authoritative spec) |
+| ~~`accessibility.md`~~ | Retired — superseded by `ds-a11y-discovery`'s live-fetched "A11y Patterns" section in `discovery-summary.md` (Phase 2 grounding) and `ds-a11y-speccer` (Phase 3 authoritative spec) |
 | `architecture.md` + `architecture.{framework}.md` | Phases 2, 3 |
 | `prd.md` | Phase 3 |
 | `styles.md` + `styles.{framework}.md` | Phase 5 |

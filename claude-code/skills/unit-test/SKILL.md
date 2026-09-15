@@ -45,6 +45,15 @@ This skill answers *which tests are worth writing*. It deliberately does not dup
 If you need both — deciding *what* to cover and *how* to express it — load this skill for the
 policy and the framework developer skill for the mechanics.
 
+## Verifying a spec you just wrote
+
+Typecheck through the **spec** tsconfig (`tsc -p <project>/tsconfig.spec.json --noEmit`, or the
+project's `typecheck` target) — never `tsc <file.ts>`, which ignores tsconfig and checks a
+different program, and never `tsconfig.lib.json`, which does not include spec files. Full
+reasoning, plus the `--incremental` repeat-cost fix: `typecheck-with-project-config.md`.
+
+Then run only the spec files you wrote, not the suite.
+
 ## Other layers
 
 Sibling references exist for layers that don't have their own skill yet — create one when

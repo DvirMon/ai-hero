@@ -17,7 +17,7 @@ This skill has no built-in list of doc filenames or sections — that is entirel
 Look for `docs/agents/domain-docs.md` at repo root — it is the sole source of truth for which files get generated per domain and what sections each requires.
 
 - **Exists** → use its file list and section templates as-is. Nothing else to decide.
-- **Missing** → dispatch the `kipi-researcher` agent (`mode: config`) to read this repo's own conventions (root `CLAUDE.md`/`AGENTS.md`, any file-organization rules, any existing hand-written `docs/` folders) and propose a file/section list grounded in what this specific repo already does — not a generic default. Present the proposal to the user, let them confirm or override, then write the confirmed result to `docs/agents/domain-docs.md`.
+- **Missing** → dispatch the `kipi-discovery` agent (`mode: config`) to read this repo's own conventions (root `CLAUDE.md`/`AGENTS.md`, any file-organization rules, any existing hand-written `docs/` folders) and propose a file/section list grounded in what this specific repo already does — not a generic default. Present the proposal to the user, let them confirm or override, then write the confirmed result to `docs/agents/domain-docs.md`.
 
 **Config file format** (`docs/agents/domain-docs.md`) — illustrative schema only, names below are placeholders, not defaults:
 
@@ -39,8 +39,10 @@ Each `##` heading is a filename generated in the domain's `docs/` folder; the `S
 
 Before anything else, establish which project this run is about — don't assume repo-root scope silently.
 
-1. Check root `CONTEXT-MAP.md`. If it exists, this is a **multi-context repo**: it lists the contexts (apps/libs), each with its own `CONTEXT.md` + `docs/adr/` (per `docs/agents/domain.md`). Ask the user which project/context this run targets, unless they already named one in their argument (a path under `apps/<x>/` or `libs/<x>/` implies that context — confirm, don't just assume).
-2. If no `CONTEXT-MAP.md`, this is a **single-context repo** — one root `CONTEXT.md` + `docs/adr/` (if present) covers everything; no project question needed.
+1. Check the repo's context map — root `llms.txt` (its `## Contexts` section), falling back to `CONTEXT-MAP.md` in repos that still use one. If either exists, this is a **multi-context repo**: it lists the contexts (apps/libs), each with its own `CONTEXT.md` + `docs/adr/` (per `docs/agents/domain.md`). Ask the user which project/context this run targets, unless they already named one in their argument (a path under `apps/<x>/` or `libs/<x>/` implies that context — confirm, don't just assume).
+2. If neither exists, this is a **single-context repo** — one root `CONTEXT.md` + `docs/adr/` (if present) covers everything; no project question needed.
+
+Where `llms.txt` is generated, never edit it to add or correct a context — edit that context's `CONTEXT.md` frontmatter and regenerate.
 3. Once scope is set, read that project's `CONTEXT.md` in full — glossary and any recorded architectural decisions — before doing anything else. This vocabulary is mandatory for every doc this run generates: don't let a generated spec invent a term the project's glossary already defines differently.
 
 This scope also bounds discovery (repo mode only enumerates domains inside the chosen project, never across unrelated contexts) and gets passed to every dispatched agent as `projectContext`.
@@ -48,14 +50,14 @@ This scope also bounds discovery (repo mode only enumerates domains inside the c
 ## Process
 
 1. Resolve project scope (above).
-2. Resolve config (further above). If this is the first run in the repo, config setup happens now via `kipi-researcher`, scoped to the chosen project if relevant (a design-system lib and a backend service under the same repo may want different doc shapes — ask rather than assume one config fits both, if `CONTEXT-MAP.md` suggests they differ in kind).
+2. Resolve config (further above). If this is the first run in the repo, config setup happens now via `kipi-discovery`, scoped to the chosen project if relevant (a design-system lib and a backend service under the same repo may want different doc shapes — ask rather than assume one config fits both, if the context map suggests they differ in kind).
 
 3. Determine mode from the user's argument:
    - A specific path → **single-domain mode**, that path is the domain.
    - `all` / "whole repo" / "every domain" / no argument at all → **repo mode**, go to step 4.
    - Ambiguous → ask which mode.
 
-4. **Repo mode only — discovery.** Dispatch the `kipi-researcher` agent (`mode: discovery`, or `both` if config also needed this run) to enumerate domain candidates within the resolved project scope — folders that are genuine public API boundaries, using this repo's own structure docs (`FOLDER_STRUCTURE.md`, `CONTEXT-MAP.md`, workspace project lists) rather than blind pattern-matching. Pass it `projectContext`.
+4. **Repo mode only — discovery.** Dispatch the `kipi-discovery` agent (`mode: discovery`, or `both` if config also needed this run) to enumerate domain candidates within the resolved project scope — folders that are genuine public API boundaries, using this repo's own structure docs (`FOLDER_STRUCTURE.md`, the context map, workspace project lists) rather than blind pattern-matching. Pass it `projectContext`.
 
    Present the discovered list to the user before dispatching any writer — repo-wide generation is expensive (one agent per domain) and a bad discovery pass silently produces junk docs across the whole tree. Let them add/remove entries. Do not proceed until confirmed.
 
@@ -74,7 +76,7 @@ This scope also bounds discovery (repo mode only enumerates domains inside the c
 ## Boundaries
 
 - Never operate repo-wide without resolving project scope first in a multi-context repo — a domain in one project must never absorb another project's glossary or ADRs.
-- This skill never names or assumes doc files/sections — that's `docs/agents/domain-docs.md`'s sole responsibility, sourced from the repo itself via `kipi-researcher` on first run.
+- This skill never names or assumes doc files/sections — that's `docs/agents/domain-docs.md`'s sole responsibility, sourced from the repo itself via `kipi-discovery` on first run.
 - One domain per agent dispatch, always — even in repo mode, never ask a single agent run to cover multiple domains; that produces shallow, generic docs. Parallel agents, one per domain, is how repo mode is implemented, not a single big run.
 - Never overwrite `docs/adr/` or `CONTEXT.md` — those are cross-domain and owned by `/domain-modeling`. The writer agent is instructed the same way.
 - This skill documents what exists. It does not design new APIs or make architectural decisions — that's `/to-spec` (new work) or `/domain-modeling` (cross-domain decisions).

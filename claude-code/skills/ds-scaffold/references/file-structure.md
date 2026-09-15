@@ -52,7 +52,7 @@ Every DS component lives under:
 | `docs/design-tokens.md` | Full token mapping — Figma layer → CSS var → purpose (token-heavy only) |
 | `docs/roles-map.md` | ARIA roles, keyboard contracts, focus flow (rich a11y only) |
 | `docs/decisions.md` | All Phase 2 interview decisions and scope triage (V1–V4) |
-| `docs/session-handoff.md` | Session continuity — current phase, research findings, decisions |
+| `docs/session-handoff.md` | Session continuity — current phase, discovery findings, decisions |
 | `index.ts` | Single export point — always re-exports `public-api` |
 | `public-api.ts` | Everything a consumer needs: component(s) + all types |
 | `{prefix}-<name>.figma.ts` | Code Connect — links Figma component to the framework implementation |

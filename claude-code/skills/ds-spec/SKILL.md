@@ -21,11 +21,11 @@ Ask the user for the component name, then read `{componentPath}docs/session-hand
 
 If the "Design Interview" checklist item is not marked complete → tell the user to finish `ds-interview` first.
 
-Read `{componentPath}docs/phase-state.json` — load `isComplex`, `scopeTriage`, and `researchSummaryPath`.
-Treat `researchSummaryPath` as a path stored **relative to `{componentPath}`** (for example, `"docs/research-summary.md"`), not relative to the repo root.
-Note: `componentPath` always ends with `/` (e.g. `libs/shared/ui-core/src/lib/components/2.0/atera-button/`), so `{componentPath}{researchSummaryPath}` is always a valid joined path.
+Read `{componentPath}docs/phase-state.json` — load `isComplex`, `scopeTriage`, and `discoverySummaryPath`.
+Treat `discoverySummaryPath` as a path stored **relative to `{componentPath}`** (for example, `"docs/discovery-summary.md"`), not relative to the repo root.
+Note: `componentPath` always ends with `/` (e.g. `libs/shared/ui-core/src/lib/components/2.0/atera-button/`), so `{componentPath}{discoverySummaryPath}` is always a valid joined path.
 Read `{componentPath}docs/decisions.md` — load its **full content**.
-Read the research summary from `{componentPath}{researchSummaryPath}`.
+Read the discovery summary from `{componentPath}{discoverySummaryPath}`.
 
 ## Pre-launch: Prototype check
 
@@ -48,9 +48,9 @@ If yes:
 
 | Agent | subagent_type | model | When | Inputs |
 |---|---|---|---|---|
-| PRD writer | `ds-prd-writer` | opus | Always | componentName, componentPath, researchSummary (file content), designDecisions (full file content) |
-| A11y speccer | `ds-a11y-speccer` | sonnet | Always | componentName, componentPath, researchSummary (file content, including `ds-a11y-researcher`'s "A11y Patterns" section), designDecisions (full file content, including the "Accessibility Contract" decisions), isComplex |
-| Architect | `ds-architect` | opus | `isComplex = true` only | componentName, componentPath, researchSummary, designDecisions (full file content) |
+| PRD writer | `ds-prd-writer` | opus | Always | componentName, componentPath, discoverySummary (file content), designDecisions (full file content) |
+| A11y speccer | `ds-a11y-speccer` | sonnet | Always | componentName, componentPath, discoverySummary (file content, including `ds-a11y-discovery`'s "A11y Patterns" section), designDecisions (full file content, including the "Accessibility Contract" decisions), isComplex |
+| Architect | `ds-architect` | opus | `isComplex = true` only | componentName, componentPath, discoverySummary, designDecisions (full file content) |
 
 Pass `designDecisions` as the **full text content** of `decisions.md` inline in the prompt — not a file path.
 

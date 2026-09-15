@@ -35,7 +35,7 @@ Generate `{prefix}-<name>.component.ts` (class + colocated types) and its templa
 4. Wire variant/state classes as `host` bindings only — never inside the template
 5. Wire ARIA attributes as `host` bindings, sourced from `a11ySpec` — role, aria-* attributes, `aria-disabled` reflecting the disabled state
 6. If `srpClassification` indicates a directive-as-feature or portal/trigger+panel pattern, follow the matching pattern from `component-api.angular.md` (Pattern 1–5b) rather than defaulting to a plain component
-7. If the plan/architecture calls for a primitive (CDK or ng-primitives), inject and wire it per the import path decided in research/architecture — never substitute a different primitive
+7. If the plan/architecture calls for a primitive (CDK or ng-primitives), inject and wire it per the import path decided in discovery/architecture — never substitute a different primitive
 8. Define all public types (`<Name>Variant`, `<Name>Size`, `<Name>Color`, etc.) in the `.component.ts` file, then re-export from `public-api.ts` — never define a type only at the re-export layer
 9. Import and use every component listed in the PRD's Internal DS Components table via its exact import path — never reimplement their markup/behavior
 10. Build the template: default `ng-content` slot, named slots per PRD content slots (prefer attribute selectors), internal structural elements from Figma anatomy, `@if`/`@for` control flow for conditional regions
@@ -47,9 +47,9 @@ Generate `{prefix}-<name>.component.ts` (class + colocated types) and its templa
 - `angular-developer` skill (Skill tool) — baseline Angular conventions: signals, DI, forms, testing patterns. Load this first; DS-specific rules below override it where they conflict (e.g. DS forbids `standalone: true` explicitness, generic Angular guidance doesn't)
 - angular-cli MCP `list_projects` + `get_best_practices` (scoped to this workspace) — version-specific best practices, checked fresh each run rather than assumed from training data
 - `.claude/skills/ds-scaffold/references/file-structure.md` + `file-structure.angular.md` — exact file names, naming conventions (`{prefix}-<name>`, `{PascalPrefix}<Name>Component`), `public-api.ts` export shape
-- `.claude/skills/ds-research/references/component-class.md` + `component-class.angular.md` — required `@Component` structure, host binding rules, theme class requirement
+- `.claude/skills/ds-discovery/references/component-class.md` + `component-class.angular.md` — required `@Component` structure, host binding rules, theme class requirement
 - `.claude/skills/ds-interview/references/component-api.angular.md` + `component-api.md` — API pattern decision tree (directive-as-feature, portal, trigger+panel, composable sub-components, content projection), Figma variant → Angular input mapping, public API export shapes
-- `.claude/skills/ds-research/references/primitives.angular.md` — CDK/ng-primitives import names and wiring
+- `.claude/skills/ds-discovery/references/primitives.angular.md` — CDK/ng-primitives import names and wiring
 - `docs/prd.md` — authoritative API surface and Internal DS Components table
 - `a11ySpec` (inline) — authoritative ARIA/keyboard/focus contract
 - `.claude/rules/file-organization.md` (repo CLAUDE.md) — one concern per file when the component's code grows past a single class+types file
@@ -63,7 +63,7 @@ Generate `{prefix}-<name>.component.ts` (class + colocated types) and its templa
 6. Scaffold the `@Component` decorator per `component-class.angular.md` — selector, `OnPush`, theme class + selector class in `host`, no `standalone: true`, no `NgModule`
 7. Declare typed inputs/outputs exactly matching `apiSpec` — apply `input()`/`output()` signal APIs
 8. Wire variant/state classes and ARIA attributes as `host` bindings — never in the template
-9. If a primitive is required, inject/wire it per the import path from research/architecture
+9. If a primitive is required, inject/wire it per the import path from discovery/architecture
 10. Import every Internal DS Component listed in the PRD table using its exact import path
 11. Build the template with default + named `ng-content` slots and structural elements from Figma anatomy
 12. Write/update `public-api.ts` (component + types) and `index.ts` (barrel only)

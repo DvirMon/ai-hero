@@ -39,9 +39,18 @@ routes there instead.
    that only assert markup, CSS classes, content projection, or a prop passed straight through
    with no logic attached.
 5. One test per meaningful branch. Don't write a case that cannot fail.
-6. Run **only the spec files this step produced** (e.g. `nx test <project> --testFile=<path>`,
+6. Typecheck through the **spec** project config — `nx run <project>:typecheck` if the target
+   exists, else `npx tsc -p <project>/tsconfig.spec.json --noEmit`. Never `tsc <file.ts>`: a
+   bare file argument ignores tsconfig (no `paths`, `strict`, `lib`, `types`), so it checks a
+   different program than the project does. `tsconfig.lib.json` does not include specs — it
+   will not check what you just wrote. See `typecheck-with-project-config.md`.
+   Scope note: a spec's import graph usually reaches most of the lib, so "check only my files"
+   isn't achievable — don't spend turns trying to narrow it. If the run is slow enough to
+   matter, report it as a follow-up (add `incremental` + `tsBuildInfoFile` to the spec
+   tsconfig); do not edit the tsconfig mid-step.
+7. Run **only the spec files this step produced** (e.g. `nx test <project> --testFile=<path>`,
    or `vitest run <path>`). Not the full suite — the dispatcher runs that once at the end.
-7. Do **not** commit. `/implement` commits.
+8. Do **not** commit. `/implement` commits.
 
 ## Output
 
@@ -52,6 +61,7 @@ Step: <N> — <title>
 Status: done | blocked
 Files: <path> (created|edited), ...
 Coverage: <unit under test> — <branches covered>, ...
+Typecheck: pass | fail — <config used> — <shortest decisive line>
 Tests: <n> passed, <n> failed — <shortest decisive line if failing>
 Notes: <deviations, untested branches and why, missing testing skill>
 ```

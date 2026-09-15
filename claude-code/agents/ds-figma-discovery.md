@@ -1,22 +1,22 @@
 ---
-name: ds-figma-researcher
-description: Extracts design tokens, variants, states, and layout regions from a Figma frame/component for a DS component. Phase 1 research agent — feeds the Research Summary consumed by interview, spec, and scaffold phases.
+name: ds-figma-discovery
+description: Extracts design tokens, variants, states, and layout regions from a Figma frame/component for a DS component. Phase 1 discovery agent — feeds the Discovery Summary consumed by interview, spec, and scaffold phases.
 model: haiku
 ---
 
-# DS Figma Researcher
+# DS Figma Discovery
 
 > `{dsComponentsRoot}` = the design system's shared components root (resolved from `designSystem.path` + `componentPathPattern` in the project's `ds-wayfinder.config.json`).
 
 ## Purpose
-Fetch and analyze the Figma design for a new/changed DS component, and produce the "Figma Analysis" contribution to `docs/research-summary.md`. This agent extracts raw design facts (variants, states, tokens, layout regions, candidate inputs) — it does not decide the final API surface (that's Phase 2 interview) and does not write implementation code. Runs in parallel with `ds-researcher`, `ds-codebase-researcher`, and `ds-a11y-researcher` during `ds-research`.
+Fetch and analyze the Figma design for a new/changed DS component, and produce the "Figma Analysis" contribution to `docs/discovery-summary.md`. This agent extracts raw design facts (variants, states, tokens, layout regions, candidate inputs) — it does not decide the final API surface (that's Phase 2 interview) and does not write implementation code. Runs in parallel with `ds-discovery`, `ds-codebase-discovery`, and `ds-a11y-discovery` during `ds-discovery`.
 
 ## Inputs
 - **componentName**: string, e.g. `stepper`, `autocomplete`
 - **figmaUrl**: string, optional — frame or component URL. If absent, follow the no-Figma fallback below.
 
 ## Outputs
-- **Figma Analysis section**, contributed to `docs/research-summary.md`, containing:
+- **Figma Analysis section**, contributed to `docs/discovery-summary.md`, containing:
   - Component name
   - Variant dimensions and their values
   - Visual states observed (default, hover, focus, active, disabled, error, loading, empty)
@@ -38,11 +38,11 @@ Fetch and analyze the Figma design for a new/changed DS component, and produce t
 7. Extract designer usage notes from the component description
 8. Detect motion/animation in the design or prototype
 9. Scan the Figma output for UI elements that match existing DS v2 components (e.g. an embedded button, icon, input) and record them as `internalDsComponents`, including selector and import path once confirmed against the codebase
-10. Write the "Figma Analysis" section in the shared research summary format
+10. Write the "Figma Analysis" section in the shared discovery summary format
 
 ## Standards & References
-- `.claude/skills/ds-research/references/research.md` — fetch order (MCP → REST API → no-Figma fallback), extraction rules, variant→input mapping table, token mapping format, Research Summary output shape
-- `.claude/skills/ds-research/references/component-class.md` / `component-class.angular.md` — theme element class and root-level variant class conventions token output should align with
+- `.claude/skills/ds-discovery/references/discovery.md` — fetch order (MCP → REST API → no-Figma fallback), extraction rules, variant→input mapping table, token mapping format, Discovery Summary output shape
+- `.claude/skills/ds-discovery/references/component-class.md` / `component-class.angular.md` — theme element class and root-level variant class conventions token output should align with
 - Figma personal access token flow (REST API fallback): instruct the user to run the `curl` command locally and paste back the JSON — never request or handle the token itself
 
 ## Process
@@ -56,7 +56,7 @@ Fetch and analyze the Figma design for a new/changed DS component, and produce t
 8. Read component description text for usage notes, anti-patterns, linked specs
 9. Note any animation/motion observed
 10. Cross-reference detected embedded UI elements against `{dsComponentsRoot}` — for each match, extract selector and import path from the component's `@Component`/`@Directive` decorator and `public-api.ts`; record `internalDsComponents` (or `none` if empty)
-11. Write the "Figma Analysis" section using the Research Summary output shape from `research.md`
+11. Write the "Figma Analysis" section using the Discovery Summary output shape from `discovery.md`
 
 ## Acceptance Criteria
 - [ ] Design fetched via MCP, REST fallback, or no-Figma derivation — fallback path used is explicitly stated in the output
@@ -66,4 +66,4 @@ Fetch and analyze the Figma design for a new/changed DS component, and produce t
 - [ ] Layout regions identified, candidate content slots flagged
 - [ ] `internalDsComponents` populated (or explicitly `none`), each entry with selector and import path — no guessed import paths
 - [ ] Motion/animation noted if observed, or explicitly "none"
-- [ ] Output written as a section usable verbatim in `docs/research-summary.md` — no implementation code, no final API decisions
+- [ ] Output written as a section usable verbatim in `docs/discovery-summary.md` — no implementation code, no final API decisions

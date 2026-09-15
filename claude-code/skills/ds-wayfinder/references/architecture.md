@@ -113,5 +113,5 @@ List anything unresolved that needs a decision before implementation:
 - **Component pattern must be decided before any code** — changing from single to two-part mid-implementation is costly
 - **State machine must be complete** — every state and every transition, including error states
 - **Open questions must be resolved** by the developer before Phase 5 starts — the architecture doc is the place to surface them, not mid-implementation
-- Derive primitive wiring from Phase 1 (primitive selection) — do not re-research
+- Derive primitive wiring from Phase 1 (primitive selection) — do not redo discovery
 - See framework file for concrete primitive imports and component-class naming

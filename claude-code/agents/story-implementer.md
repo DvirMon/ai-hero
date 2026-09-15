@@ -28,7 +28,8 @@ planner — the step file is the contract.
 3. Read the component's `docs/spec.md` (Implementation Decisions + Out of Scope), its
    `.types.ts`, and its `.module.css`, then `stepFilePath`.
 4. Write `<Component>.stories.tsx` per the skill's conventions.
-5. Typecheck (`nx run <project>:typecheck`). Fix errors before returning.
+5. Typecheck via the project config (`nx run <project>:typecheck`, else `npx tsc -p
+   <project>/tsconfig.json --noEmit`) — never `tsc <file.ts>`. Fix errors before returning.
 6. Do **not** start Storybook or any dev server — the user has asked not to serve unprompted.
 7. Do **not** commit. `/implement` commits.
 

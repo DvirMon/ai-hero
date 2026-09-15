@@ -24,7 +24,7 @@ Verify the implemented component stylesheet matches DS styling conventions and t
 2. **`:host` as sole styling root** — flag any wrapper element styled purely for layout/positioning purposes that duplicates what `:host` should own
 3. **No `::ng-deep`** — flag any use, even `:host`-scoped; the fix is always exposing a CSS custom property instead
 3a. **`ViewEncapsulation.None` requires justification** — flag any use unless the component's projected content is genuinely arbitrary (no fixed part-set, e.g. free-form rich text). If the projected shape is fixed/structured, the fix is directive-per-part (an attribute-hosted component per part, styling only its own `:host`), not `None`. When `None` is justified, every selector in that stylesheet must be scoped under a host class, not `:host` (`css-styling` skill, `styles.angular.md`)
-4. **Figma → token mapping fidelity** — spot-check that tokens used match the Figma token paths recorded in `docs/research-summary.md` (converted `/` → `-` correctly)
+4. **Figma → token mapping fidelity** — spot-check that tokens used match the Figma token paths recorded in `docs/discovery-summary.md` (converted `/` → `-` correctly)
 5. **Override API bounded and documented** — cross-check the actual custom-property override API against the styles step's token table: flag if more than 5–7 tokens are exposed, if locked tokens got exposed anyway, or if a documented token is missing from the CSS
 6. **Parent-ownership violations** — flag any styling concern duplicated here that the styles step noted a parent component already owns (e.g. redundant sizing rules that belong to a form-field wrapper)
 7. **Variant/state coverage** — every variant and state listed in the PRD's Variants & States table has a corresponding style block; flag missing coverage
@@ -36,7 +36,7 @@ Verify the implemented component stylesheet matches DS styling conventions and t
 - `.claude/skills/ds-scaffold/references/motion.md` — duration/easing standards, reduced-motion requirement, token usage
 - `{planDir}/step-*-styles.plan.md` — this component's specific design token table, override API list, locked tokens, parent-ownership check
 - `docs/prd.md` — Variants & States table for coverage checking
-- `docs/research-summary.md` — Figma token source for mapping-fidelity spot checks
+- `docs/discovery-summary.md` — Figma token source for mapping-fidelity spot checks
 - `docs/decisions.md`, `docs/narrative.md` (if present) — local decisions and design intent for this component; a documented decision overrides a convention/PRD-derived finding it explicitly addresses — cite the decision instead of flagging
 - Role token source: `{dsStyleTokensPath}/{prefix}-roles.scss`
 - `mdn` MCP tool — query to confirm CSS feature syntax/browser support when flagging a questionable property/value
@@ -50,7 +50,7 @@ Verify the implemented component stylesheet matches DS styling conventions and t
 5. Check `:host` is the styling root; flag any styling-only wrapper element
 6. Grep for `::ng-deep` — flag every instance regardless of scoping
 6a. Grep for `ViewEncapsulation.None` — for each hit, confirm the projected content has no fixed part-set; flag if it does (directive-per-part was skippable) or if `None` is used without host-class-scoped selectors
-7. Spot-check a sample of token usages against `docs/research-summary.md`'s Figma token list for correct `/`→`-` conversion
+7. Spot-check a sample of token usages against `docs/discovery-summary.md`'s Figma token list for correct `/`→`-` conversion
 8. Diff the actual override API (custom properties declared on `:host`) against the plan's token table — flag excess exposure, missing documented tokens, or locked tokens leaking through
 9. Check for concerns the plan flagged as parent-owned — flag duplication
 10. Diff style blocks against the PRD's Variants & States table — flag any missing variant/state
@@ -64,7 +64,7 @@ Verify the implemented component stylesheet matches DS styling conventions and t
 - [ ] `:host` confirmed as the sole styling root
 - [ ] Zero `::ng-deep` usage
 - [ ] Every `ViewEncapsulation.None` usage justified (arbitrary content, no fixed part-set) and host-class-scoped
-- [ ] Sampled token usages verified against `docs/research-summary.md`'s Figma token mapping
+- [ ] Sampled token usages verified against `docs/discovery-summary.md`'s Figma token mapping
 - [ ] Override API diffed against the plan's token table: bounded to 5–7, no locked-token leakage, no documented token missing
 - [ ] No parent-owned concern duplicated
 - [ ] Every PRD variant/state has a corresponding style block

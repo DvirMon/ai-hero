@@ -25,7 +25,7 @@ Verify the implemented component class/template matches its PRD and DS Angular c
 3. **Host binding conventions** — theme element class present in `host`; variant/state classes bound in `host`, never in the template; ARIA attributes bound in `host`, not hardcoded in markup
 4. **Type colocation** — all public types defined in the `.component.ts` file, re-exported (not redefined) from `public-api.ts`; `index.ts` is a pure barrel with no logic
 5. **Internal DS component usage** — every component listed in the PRD's Internal DS Components table is imported and used via its exact documented import path; none reimplemented from scratch
-6. **Primitive wiring correctness** — the primitive decided in research/architecture is the one actually wired; no substitution, no hand-rolled reimplementation of primitive behavior without documented justification
+6. **Primitive wiring correctness** — the primitive decided in discovery/architecture is the one actually wired; no substitution, no hand-rolled reimplementation of primitive behavior without documented justification
 7. **SRP / file organization** — component logic matches its `srpClassification`; if the file has grown to mix concerns (state, utils, mock data) it should be split per `.claude/rules/file-organization.md`, not left as one bloated file
 8. **Template hygiene** — correct `@if`/`@for` control flow, correct `ng-content` slot selectors (attribute selectors preferred for named slots), no stray class bindings that belong in `host`; no `protected` method called from a binding/interpolation purely to compute a render value (e.g. `isSelected(item)`) — should be `computed()` (no per-item param) or `@let` (per-item/reused); event-binding calls (`(click)="activate(item)"`) are exempt
 9. **Registration** — component exported from `{dsPublicApiBarrel}`
@@ -33,7 +33,7 @@ Verify the implemented component class/template matches its PRD and DS Angular c
 ## Standards & References
 - `docs/prd.md` — authoritative API surface and Internal DS Components table
 - `docs/decisions.md`, `docs/narrative.md` (if present) — local decisions and design intent for this component; a documented decision overrides a convention/PRD-derived finding it explicitly addresses — cite the decision instead of flagging
-- `.claude/skills/ds-research/references/component-class.md` + `component-class.angular.md` — required decorator/host-binding structure
+- `.claude/skills/ds-discovery/references/component-class.md` + `component-class.angular.md` — required decorator/host-binding structure
 - `.claude/skills/ds-interview/references/component-api.angular.md` + `component-api.md` — API pattern conventions (directive-as-feature, portal, trigger+panel, composable families), public API export shapes
 - `.claude/skills/ds-scaffold/references/file-structure.md` + `file-structure.angular.md` — file naming and `public-api.ts`/`index.ts` shape
 - `.claude/rules/file-organization.md` (repo CLAUDE.md) — one-concern-per-file rule for generated code
@@ -47,7 +47,7 @@ Verify the implemented component class/template matches its PRD and DS Angular c
 5. Check `host` for theme class, variant/state class bindings, ARIA attribute bindings — flag anything found in the template instead
 6. Check type definitions are colocated in `.component.ts` and correctly re-exported (not redefined) in `public-api.ts`; check `index.ts` has no logic
 7. Cross-check every Internal DS Component import against the PRD table's exact import paths — flag any reimplementation or path mismatch
-8. Verify the wired primitive matches research/architecture's decision — flag substitutions or unexplained hand-rolled behavior
+8. Verify the wired primitive matches discovery/architecture's decision — flag substitutions or unexplained hand-rolled behavior
 9. Assess file organization against `srpClassification` and the repo's file-organization rule — flag files mixing concerns that should be split
 10. Review template control flow and slot selectors for correctness and convention adherence; flag any `protected` method invoked from a non-event binding for render derivation
 11. Confirm registration in `{dsPublicApiBarrel}`
@@ -61,7 +61,7 @@ Verify the implemented component class/template matches its PRD and DS Angular c
 - [ ] Theme class and variant/state/ARIA host bindings verified as `host`-bound, not template-bound
 - [ ] Type colocation and barrel-purity of `index.ts` verified
 - [ ] Every Internal DS Component cross-checked against its documented import path — reimplementations flagged
-- [ ] Primitive wiring verified against the research/architecture decision
+- [ ] Primitive wiring verified against the discovery/architecture decision
 - [ ] File organization assessed against `srpClassification` and the repo's file-organization rule
 - [ ] Each finding tagged CRIT/HIGH/MED/LOW with `file.ts:line`, ≤12-word description, ≤8-word fix hint
 - [ ] No finding invents a rule not present in the PRD, DS conventions, or the repo's file-organization rule

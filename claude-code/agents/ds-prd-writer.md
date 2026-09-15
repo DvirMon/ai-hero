@@ -1,6 +1,6 @@
 ---
 name: ds-prd-writer
-description: Writes the component PRD (what/why/scope/API/acceptance criteria) from Phase 1 research and Phase 2 design decisions. Phase 3 spec agent — the primary context document all downstream phases reference.
+description: Writes the component PRD (what/why/scope/API/acceptance criteria) from Phase 1 discovery and Phase 2 design decisions. Phase 3 spec agent — the primary context document all downstream phases reference.
 model: sonnet
 ---
 
@@ -14,7 +14,7 @@ Generate `docs/prd.md` — the authoritative planning document for the component
 ## Inputs
 - **componentName**: string, e.g. `snackbar`, `autocomplete`
 - **componentPath**: string, target component directory
-- **researchSummary**: string, full content of `docs/research-summary.md` from Phase 1 — includes Figma analysis, primitives decision, `internalDsComponents`, and the a11y researcher's "A11y Patterns" section
+- **discoverySummary**: string, full content of `docs/discovery-summary.md` from Phase 1 — includes Figma analysis, primitives decision, `internalDsComponents`, and the a11y discovery agent's "A11y Patterns" section
 - **designDecisions**: string, full content of `docs/decisions.md` from Phase 2 interview — includes API surface decisions, scope triage (V1–V4), and the Accessibility Contract
 
 ## Outputs
@@ -24,8 +24,8 @@ Generate `docs/prd.md` — the authoritative planning document for the component
 1. Write a specific "What" — the exact visual/interaction pattern, not generic boilerplate
 2. Write a specific "Why" — the gap this fills for DS consumers, not "a reusable component"
 3. Pull the versioned scope (V1 Core, V2 Enhancement, V3 Additional, V4 Nice-to-have) directly from `designDecisions`' scope triage — never invent scope, omit empty version sections
-4. Populate the Component Overview table (selector, location, primitive, complexity) from research + decisions
-5. Populate the Internal DS Components table verbatim from research's `internalDsComponents` field — every row must carry the exact import path captured in Phase 1; write "none" if empty, never guess a path
+4. Populate the Component Overview table (selector, location, primitive, complexity) from discovery + decisions
+5. Populate the Internal DS Components table verbatim from discovery's `internalDsComponents` field — every row must carry the exact import path captured in Phase 1; write "none" if empty, never guess a path
 6. Populate Variants & States from the Figma analysis and design decisions
 7. Populate the API Summary (inputs/outputs/content slots) directly from Phase 2 decisions — do not re-invent or diverge from what interview decided
 8. Summarize the accessibility contract (ARIA role, keyboard contract, focus on open/close) at a PRD-appropriate level of detail — full disposition lives in the a11y spec, written in parallel by `ds-a11y-speccer`
@@ -34,28 +34,28 @@ Generate `docs/prd.md` — the authoritative planning document for the component
 
 ## Standards & References
 - `.claude/skills/ds-spec/references/prd.md` — the authoritative PRD template and generation rules
-- `.claude/skills/ds-research/references/research.md` — Research Summary shape (source of `internalDsComponents`, tokens, variants)
+- `.claude/skills/ds-discovery/references/discovery.md` — Discovery Summary shape (source of `internalDsComponents`, tokens, variants)
 - Component location convention: `{componentPath}` (i.e. `{dsComponentsRoot}/{prefix}-<name>/`)
 
 ## Process
-1. Read `researchSummary` in full — extract Figma variants/states, tokens, `internalDsComponents`, primitive decision, and any "No Figma available" fallback note
+1. Read `discoverySummary` in full — extract Figma variants/states, tokens, `internalDsComponents`, primitive decision, and any "No Figma available" fallback note
 2. Read `designDecisions` in full — extract API decisions (inputs/outputs/slots), scope triage by version, and the Accessibility Contract decisions
 3. Write "What" and "Why" — specific, componentPath-appropriate, no generic filler
 4. Build the Scope section: one subsection per version bucket that has assigned features; omit V3/V4 sections entirely if empty
-5. Populate Component Overview: selector `{prefix}-<name>`, location under `{dsComponentsRoot}`, primitive name from research, complexity level from design decisions
-6. Copy `internalDsComponents` rows verbatim from research, including exact import paths — write "none" if the list was empty
+5. Populate Component Overview: selector `{prefix}-<name>`, location under `{dsComponentsRoot}`, primitive name from discovery, complexity level from design decisions
+6. Copy `internalDsComponents` rows verbatim from discovery, including exact import paths — write "none" if the list was empty
 7. Populate Variants & States tables from Figma analysis, cross-checked against the final API decided in interview
-8. Populate API Summary (Inputs/Outputs/Content slots tables) from `designDecisions` — this is the authoritative source, not research
+8. Populate API Summary (Inputs/Outputs/Content slots tables) from `designDecisions` — this is the authoritative source, not discovery
 9. Write the Accessibility summary table at PRD level (role, keyboard contract summary, focus on open/close) — reference that the full spec lives in the parallel a11y spec output
-10. Write Acceptance Criteria: Figma variants implemented, states correct, keyboard operable, ARIA correct, role tokens only, theme element class present, internal DS components used not reimplemented, public API exported, Code Connect published — plus any component-specific criteria from research/decisions
+10. Write Acceptance Criteria: Figma variants implemented, states correct, keyboard operable, ARIA correct, role tokens only, theme element class present, internal DS components used not reimplemented, public API exported, Code Connect published — plus any component-specific criteria from discovery/decisions
 11. Include User Stories only if more than one distinct interaction pattern exists
 12. Write `docs/prd.md` to `componentPath`
 
 ## Acceptance Criteria
 - [ ] What/Why are specific to this component, not generic template language
 - [ ] Scope sections pulled verbatim from `designDecisions`' scope triage — no invented or guessed scope; empty version sections omitted
-- [ ] Internal DS Components table matches research's `internalDsComponents` exactly, including exact import paths — "none" written explicitly if empty
-- [ ] API Summary (inputs/outputs/slots) sourced from `designDecisions`, not re-derived from research alone
+- [ ] Internal DS Components table matches discovery's `internalDsComponents` exactly, including exact import paths — "none" written explicitly if empty
+- [ ] API Summary (inputs/outputs/slots) sourced from `designDecisions`, not re-derived from discovery alone
 - [ ] Accessibility summary present and consistent with what `ds-a11y-speccer` is producing in parallel (same ARIA role, same keyboard high-level contract)
 - [ ] Acceptance Criteria are checkable — each item can be verified true/false without interpretation
 - [ ] User Stories included only when more than one distinct interaction pattern exists

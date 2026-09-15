@@ -14,7 +14,7 @@ The directive reads from / writes to the host element via `inject(ElementRef)` o
 
 ## Pattern 2 — Portal-based content
 
-Check the codebase researcher output for internal overlay/portal wrappers first — use them before reaching for raw `@angular/cdk/portal` or `@angular/cdk/overlay`.
+Check the codebase discovery output for internal overlay/portal wrappers first — use them before reaching for raw `@angular/cdk/portal` or `@angular/cdk/overlay`.
 
 ---
 

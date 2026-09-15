@@ -1,6 +1,6 @@
 # Primitives — Angular (CDK + ng-primitives)
 
-> Research order and rationale live in `primitives.md` (agnostic). This file is the Angular-specific selection tables and libraries.
+> Discovery order and rationale live in `primitives.md` (agnostic). This file is the Angular-specific selection tables and libraries.
 
 Before writing any interaction logic from scratch, check if the Angular CDK already solves it. CDK handles keyboard management, focus trapping, and ARIA wiring correctly and accessibly.
 
