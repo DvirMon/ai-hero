@@ -106,6 +106,10 @@ If the ticket workspace's `state.json` exists, append the created issue numbers/
 - [ ] Acceptance criterion 1
 - [ ] Acceptance criterion 2
 
+## Pipeline
+
+<the sub form from "The Pipeline block" below — this issue came from a spec, so it has an epic>
+
 </local-issue-template>
 
 <issue-template>
@@ -126,6 +130,10 @@ The end-to-end behaviour this issue makes work, from the user's perspective — 
 ## Blocked by
 
 - A reference to each blocking issue, or "None — can start immediately".
+
+## Pipeline
+
+<the sub form from "The Pipeline block" below — this issue came from a spec, so it has an epic>
 
 </issue-template>
 
@@ -178,3 +186,152 @@ Work the frontier one issue at a time — `/to-tasks` first to plan it, then `/i
 ```
 Next: /to-tasks <first-frontier-issue-#-or-slug>
 ```
+
+---
+
+## The Pipeline block
+
+Every issue body ends with a `## Pipeline` section: which upstream stages actually ran, and
+whether the issue is ready to implement. `/implement` reads it and refuses to start work the
+pipeline has not prepared.
+
+It exists because `state.json`'s `checklist` only covers issues that came from a workspace. An
+issue opened mid-work — noticed while building something else, written down so a future session
+picks it up — has no workspace, so nothing records what was *not* done to it.
+
+### Two kinds
+
+**Epic** — owns its pipeline: grill, spec, slicing. Children are optional; an epic with no
+children is just one that never needed slicing. **An epic with children is never implemented
+directly** — you work the children. That is derived from the tracker's sub-issue relation, not
+declared, so it cannot go stale.
+
+**Sub** — a child of an epic. It inherits grill and spec from the parent and owns exactly one
+stage of its own: tasks.
+
+### Epic form
+
+````markdown
+## Pipeline
+
+```yaml
+workspace: <path to the folder holding state.json, or null>
+grill: none
+spec: none
+tasks: none
+readiness: needs:triage
+```
+````
+
+Stage values: `none`, `done: <path>`, or `skipped: <one-line reason>`. When `workspace` is set,
+`state.json`'s `checklist` owns `grill`/`spec` and those lines are dropped from the block — one
+copy only.
+
+### Sub form
+
+````markdown
+## Pipeline
+
+```yaml
+epic: "#82"
+workspace: <the epic's workspace path>
+tasks: none
+readiness: needs:tasks
+```
+````
+
+`grill` and `spec` are **absent by construction** — asking them here is a category error, and
+writing them would be a second copy of the epic's `state.json`. The `epic:` key is what makes
+this a sub; there is no `kind:` line, because presence already says it.
+
+`tasks` lives on the issue, not in `state.json`. `/to-tasks` plans **one issue**, while
+`checklist.tasks` is a single boolean for the whole workspace — on a multi-issue epic that
+boolean cannot answer "is *this* issue planned". Grain decides the home: epic-grain stages in
+`state.json`, the issue-grain stage on the issue.
+
+### `readiness` — the ladder
+
+A rung means "run this stage and every stage below it before implementing".
+
+| rung | meaning | epic | sub |
+|---|---|---|---|
+| `needs:triage` | nobody has judged this yet | ✓ | ✓ |
+| `needs:grill` | open questions in the body | ✓ | — |
+| `needs:spec` | exported surface changes, no contract written | ✓ | — |
+| `needs:issues` | grilled and specced, not yet sliced | ✓ | — |
+| `needs:tasks` | design settled, execution order is not | ✓ | ✓ |
+| `ready-for-agent` | implementable now | ✓ (childless only) | ✓ |
+
+A sub is never `needs:grill`, `needs:spec`, or `needs:issues` — those belong to its parent. A sub
+that genuinely needs grilling means the **epic regressed**: say so and point at the epic rather
+than grilling the child.
+
+### Assessing readiness
+
+**The assessment is a proposal, never a self-granted permission.** An agent that may promote
+itself to `ready-for-agent` will, every time — it is the cheap path and it carries none of the
+rework. Whoever assesses writes the verdict and its reason into the block and **stops**. Only the
+user grants `ready-for-agent`.
+
+Judge on triggers, not on feel. Any hit sets the rung; **ambiguity resolves upward, never down**:
+
+- Unresolved questions in the body — `## Questions to settle`, `Decide Q1-Q3`, an unchecked
+  `- [ ] Decide …`, an "open" or "worth checking" paragraph → **`needs:grill`**.
+- Adds, renames, or retypes an **exported** symbol — a public type, a new factory, a changed call
+  signature → **`needs:spec`**.
+- Names 3+ modules, or carries more than ~6 acceptance criteria → **`needs:issues`** on an epic,
+  **`needs:tasks`** on a sub.
+- None of the above, and the acceptance criteria are already concrete and testable →
+  **`ready-for-agent` is proposable**, not grantable.
+
+Record it dated, with the trigger that fired — a later reader should be able to check the call
+rather than take it on trust:
+
+```yaml
+readiness: needs:grill
+assessed: 2026-09-15 — body's Scope opens with "Decide Q1-Q3"; the column
+  fold's read of grouping() has undecided ordering semantics.
+```
+
+### Labels
+
+Three orthogonal axes. An issue carries one label from each of the last two, and optionally a
+type:
+
+| Axis | Values | Count |
+|---|---|---|
+| type | `bug` `enhancement` `documentation` | 0-1 |
+| kind | `kind:epic` `kind:sub` | exactly 1 |
+| rung | `needs:triage` `needs:grill` `needs:spec` `needs:issues` `needs:tasks` `ready-for-agent` | exactly 1 |
+| area | `area:<feature>` — the project's own feature vocabulary | 1+ |
+
+Create any that are missing (`gh label create`) before publishing.
+
+**`area:` is what an issue touches, never what state it is in.** It is the one axis that outlives
+the epic it came from: a bug filed against a feature two years after that feature's spec closed
+still carries the area, which is why the area is a label and not a parent issue. Apply the areas
+an issue actually changes or verifies — several is fine and often correct, but an issue carrying
+every area is really an `area:engine` change.
+
+Do not reach for a milestone or a sub-issue relation to express this. A milestone is single-valued
+and will end up competing with releases; a sub-issue relation asserts that the parent's grill and
+spec cover the child, which for a late-filed enhancement is false. Rationale and the survey behind
+it: `docs/agents/discovery/issue-feature-taxonomy.md`.
+
+**The body block is authoritative; the labels are a projection.** `/implement` reads the block,
+never a label — a label is one edit away from being stale and carries no reason. Every skill that
+writes the block re-syncs both labels in the same turn. On conflict the body wins and the label
+gets corrected.
+
+The kind label exists despite duplicating the native sub-issue relation because GitHub's
+`parent-issue:` / `no:parent-issue` search qualifiers do not reconcile reliably (measured
+2026-09-15: 27 open, 26 `no:parent-issue`, 0 `-no:parent-issue`). Set the native relation anyway —
+it is the truth for parentage — but filter on the label.
+
+### Opening an ad-hoc issue
+
+When the user asks to open a single issue with no spec behind it — mid-work, to park something
+for later — publish it with the epic form, `readiness: needs:triage`, labels `kind:epic` +
+`needs:triage`. Do not assess it in the same breath as creating it; assessment happens when
+someone actually wants to build it. Skip the issue graph and the frontier machinery — neither
+applies to one parked issue.

@@ -19,13 +19,54 @@ makes each step arrive with the right conventions loaded.
    `/to-tasks`. Each step file is self-contained: `Task type`, files to create/edit, what to
    do, acceptance checks.
 3. Read `<workspaceRoot>/docs/tasks/progress.md`. Skip steps already `✅ done`.
-4. If no `docs/tasks/` folder exists, fall back to the spec or tickets the user points to,
-   and treat each ticket as one step — classify it by the same table below.
+4. If no `docs/tasks/` folder exists, **do not fall through to implementing anyway.** Read the
+   issue's `## Pipeline` block and obey the readiness ladder — see step 1b.
 5. Only read `specPath`/`architecturePath` if a step is ambiguous — step files are the
    pre-digested version, not the spec itself.
 
 If the user pointed at several tickets, do this per ticket and keep each ticket's steps as
 its own ordered run.
+
+## 1b. The readiness gate
+
+An issue with no task plan is not automatically an issue you may implement. It is either an issue
+the pipeline decided needs no plan, or an issue nobody has looked at yet — opposite situations.
+The `## Pipeline` block on the issue body separates them (format, rungs and triggers:
+`to-issues`, "The Pipeline block"). Read the block, never the labels — labels are a projection.
+
+**An epic with children is never implemented directly.** Check the tracker's sub-issue relation
+first; if it has children, refuse and point at the frontier child.
+
+Then act on `readiness`:
+
+| `readiness` | Do |
+|---|---|
+| `ready-for-agent` | Implement. The issue body is the step; its acceptance criteria are the checks. |
+| `needs:tasks` | **Refuse.** `Next: /to-tasks <#>` |
+| `needs:issues` | **Refuse.** `Next: /to-issues <#>` |
+| `needs:spec` | **Refuse.** `Next: /to-spec <#>` |
+| `needs:grill` | **Refuse.** `Next: /grill-with-docs <#>` |
+| `needs:triage` | Assess, write the verdict back, **ask**. Never proceed on your own verdict. |
+
+**Refuse means refuse.** Say which rung fired and what tripped it, hand over the pointer line, and
+stop — no partial implementation, no "I'll make a start on the easy part", no offer to run the
+missing stage inline. The stages exist to arrive in a fresh context; running one here and
+implementing off it in the same window is the thing being prevented.
+
+On a **sub** (the block has an `epic:` key), only `needs:tasks` and `ready-for-agent` are
+reachable. A sub reading `needs:grill` means the epic regressed — refuse and point at the epic,
+not at the child.
+
+On `needs:triage`: apply `to-issues`' triggers, write the rung and its dated reason into the
+block via `gh issue edit`, re-sync the rung label, then stop and ask. **You may not promote an
+issue to `ready-for-agent` yourself** — you are the party that benefits from the answer, so it is
+not yours to give. Ambiguity resolves upward.
+
+**No `## Pipeline` block at all** (an issue predating the convention): treat it as `needs:triage`
+and stamp a block while you assess.
+
+If the user explicitly says to implement a refused issue anyway, that is their call — proceed, and
+note in your final report which stage was bypassed.
 
 ## 2. Route each step
 

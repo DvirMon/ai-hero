@@ -32,6 +32,16 @@ If no `state.json` exists yet, don't just fall back silently — create the work
 5. Before finishing, decide complexity: does implementing this safely need more than a PRD — new types/interfaces, a non-obvious file layout, a design that needs grounding against existing source before anyone builds it? If yes, set `isComplex: true`; otherwise `false`. This is about implementation risk, not ticket size — a small-sounding change to a shared abstraction can still need an architecture doc.
 6. If the ticket workspace's `state.json` exists, update it: set `isComplex`, set `checklist.grill = true`.
 
+**Update the source issue's `## Pipeline` block** (format: `to-issues`, "The Pipeline block"):
+set `workspace` to the workspace root, and move `readiness` down one rung — to `needs:spec`,
+or straight to `needs:issues` if the grilling settled the contract as well. Record the new
+rung's dated reason.
+
+`state.json` owns `grill`/`spec` once a workspace exists, so drop those lines from the block
+rather than keeping a second copy. Edit the issue body in place (`gh issue edit <n> --body-file -`)
+and re-sync the rung label in the same turn.
+
+
 Since the workspace is now created (either by `/to-ticket` or by step 0 above), steps 3 and 5 always apply — write `decisions.md` and update `state.json` as you go.
 
 6. `/to-spec` has `disable-model-invocation: true` — it cannot be launched programmatically from here, only typed by the user. Reference whatever grounds the synthesis: name the workspace's `decisionsPath` (and `ticketRef`, if set). Then end your final message with a one-line pointer, as the very last line — nothing after it:

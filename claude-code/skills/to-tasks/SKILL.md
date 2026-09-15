@@ -95,6 +95,15 @@ Status values: `⬚ pending`, `▶ in progress`, `✅ done`, `⏭ skipped`.
 
 If `state.json` exists (or was just created), set `checklist.tasks = true`.
 
+**Update the source issue's `## Pipeline` block** (format: `to-issues`, "The Pipeline block"):
+set `tasks: done: <workspaceRoot>/docs/tasks/` and `readiness: ready-for-agent`, and swap the
+`needs:tasks` label for `ready-for-agent`.
+
+This is the one promotion to `ready-for-agent` an agent may make unasked — a step plan either
+exists on disk or it does not, so it is an observation, not the judgement call `to-issues`
+reserves for the user.
+
+
 End your final message with a one-line pointer, as the very last line — nothing after it:
 
 ```
