@@ -1,6 +1,7 @@
 ---
 name: atomic-commit
 description: Split all current changes (staged and/or unstaged) into multiple atomic commits, each scoped to a single responsibility/concern, instead of one big commit. Use when the user asks to commit current changes "in an SRP way", "atomically", "split into logical commits", or when `git diff HEAD` clearly mixes unrelated concerns (e.g. a feature change bundled with an unrelated fix, a refactor, or a formatting pass).
+portedFrom: 3d7b3ab5911a
 ---
 
 # Commit current changes (SRP)

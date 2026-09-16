@@ -2,7 +2,7 @@
 
 > `{componentPath}` = this component's own working directory, resolved from the project's `ds-wayfinder.config.json` (`designSystem.path` + `componentPathPattern` + `{prefix}-{name}/`).
 >
-> **How to use this template:** When a DS component session is interrupted before completion, fill this file and save it to `{componentPath}docs/session-handoff.md` (e.g. `libs/shared/ui-core/src/lib/components/2.0/{prefix}-{name}/docs/session-handoff.md` for this repo's config). The next session reads this file to resume without re-running research.
+> **How to use this template:** When a DS component session is interrupted before completion, fill this file and save it to `{componentPath}docs/session-handoff.md` (e.g. `libs/shared/ui-core/src/lib/components/2.0/{prefix}-{name}/docs/session-handoff.md` for this repo's config). The next session reads this file to resume without re-running discovery.
 >
 > Phase data (isComplex, a11ySpecText, planDir, componentFilePath, etc.) is stored in `docs/phase-state.json` — not here.
 
@@ -13,7 +13,7 @@
 > Delete the inapplicable path below after filling in User type.
 
 ### Dev path (7 phases)
-- [ ] Phase 1 — Research
+- [ ] Phase 1 — Discovery
 - [ ] Phase 2 — Design Interview
 - [ ] Phase 3 — Spec (PRD + A11y + Architecture)
 - [ ] Phase 4 — Task Plan

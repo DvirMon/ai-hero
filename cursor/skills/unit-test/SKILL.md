@@ -1,6 +1,7 @@
 ---
 name: unit-test
 description: "Decide what deserves a unit test and write it — the SSOT for unit/component test selection policy across React and Angular. Use when writing or reviewing `*.spec.ts(x)` files, when a task plan has a `Task type: test` step, or when deciding whether a given behavior is worth testing at all."
+portedFrom: ce2efa5d5cf6
 ---
 
 # Unit Test
@@ -43,6 +44,15 @@ This skill answers *which tests are worth writing*. It deliberately does not dup
 
 If you need both — deciding *what* to cover and *how* to express it — load this skill for the
 policy and the framework developer skill for the mechanics.
+
+## Verifying a spec you just wrote
+
+Typecheck through the **spec** tsconfig (`tsc -p <project>/tsconfig.spec.json --noEmit`, or the
+project's `typecheck` target) — never `tsc <file.ts>`, which ignores tsconfig and checks a
+different program, and never `tsconfig.lib.json`, which does not include spec files. Full
+reasoning, plus the `--incremental` repeat-cost fix: `typecheck-with-project-config.mdc`.
+
+Then run only the spec files you wrote, not the suite.
 
 ## Other layers
 

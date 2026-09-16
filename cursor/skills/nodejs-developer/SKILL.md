@@ -7,6 +7,7 @@ metadata:
   version: '1.0'
   target: Node.js v22 LTS (primary); v18/v20 deltas noted separately
   scope: Greenfield HTTP API backend services. Out of scope — microservices/distributed-systems architecture (service decomposition, inter-service comms, gateways); CLI tools; libraries/packages; frontend-adjacent concerns.
+portedFrom: 4986df278081
 ---
 
 # Node.js Developer Guidelines

@@ -2,6 +2,7 @@
 name: to-ticket
 description: Turn a freeform product ask into a rough, product-level ticket — the intake stage before grilling and spec work begin. Initializes the ticket workspace the rest of the pipeline reads from.
 disable-model-invocation: true
+portedFrom: 277e7677c0ad
 ---
 
 # To Ticket

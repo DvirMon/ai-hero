@@ -5,6 +5,7 @@ license: MIT
 metadata:
   author: Copyright 2026 Google LLC
   version: '1.0'
+portedFrom: 5a5749b63b70
 ---
 
 # Angular Developer Guidelines
@@ -53,6 +54,27 @@ When **editing a file that uses legacy syntax**:
 2. Consult [refactoring.md](references/refactoring.md) to select the correct schematic.
 3. Run the schematic (scoped with `--path` when appropriate).
 4. Run `ng build` to verify no errors were introduced.
+
+---
+
+## Template Binding Policy (STRICT — applies to all template generation)
+
+**Never add a class method purely to compute a render value** (e.g. `isSelected(item)`,
+`getLabel(item)`). A method call in an interpolation or property/attribute binding re-runs on
+every change-detection check and hides render logic behind an opaque call site. Only methods
+triggered by an **event** binding (`(click)="activate(item)"`) belong in a template as calls.
+
+| Binding shape | Use |
+|---|---|
+| No per-item param; reused across bindings | `computed()` |
+| Per-item param inside `@for`, or reused across bindings on one row | `@let` over a signal read |
+| Trivial one-off, no reuse | inline expression — no method, no `@let` |
+
+If the helper does a per-row **lookup** (`rows().find(…)`, a filter, an index scan), calling it
+from the template is O(n²) per change detection. Derive a `Set`/`Map` once in a `computed()` and
+read `.has(id)` in the template.
+
+Full examples: [templates.md](references/templates.md).
 
 ---
 
@@ -172,6 +194,7 @@ When implementing navigation in Angular, consult the following references:
 - **Control Route Access with Guards**: Implementing `CanActivate`, `CanMatch`, and other guards for security. Read [route-guards.md](references/route-guards.md)
 - **Data Resolvers**: Pre-fetching data before route activation with `ResolveFn`. Read [data-resolvers.md](references/data-resolvers.md)
 - **Router Lifecycle and Events**: Chronological order of navigation events and debugging. Read [router-lifecycle.md](references/router-lifecycle.md)
+- **Route Resources**: Signals-based route data fetching with `resources` + `withRouterResources()` (v21+) — parallel loads, non-blocking routes, reload without navigation. Read [route-resources.md](references/route-resources.md)
 - **Rendering Strategies**: CSR, SSG (Prerendering), and SSR with hydration. Read [rendering-strategies.md](references/rendering-strategies.md)
 - **Route Transition Animations**: Enabling and customizing the View Transitions API. Read [route-animations.md](references/route-animations.md)
 

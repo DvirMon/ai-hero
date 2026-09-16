@@ -2,6 +2,7 @@
 name: grill-with-docs
 description: A relentless interview to sharpen a ticket, plan, or design — one question at a time — logging decisions as they crystallize and building the domain model (ADRs, glossary) alongside. Decides whether the resulting spec will need an architecture doc.
 disable-model-invocation: true
+portedFrom: 44459b5da31a
 ---
 
 # Grill (with docs)
@@ -31,6 +32,15 @@ If no `state.json` exists yet, don't just fall back silently — create the work
 
 5. Before finishing, decide complexity: does implementing this safely need more than a PRD — new types/interfaces, a non-obvious file layout, a design that needs grounding against existing source before anyone builds it? If yes, set `isComplex: true`; otherwise `false`. This is about implementation risk, not ticket size — a small-sounding change to a shared abstraction can still need an architecture doc.
 6. If the ticket workspace's `state.json` exists, update it: set `isComplex`, set `checklist.grill = true`.
+
+**Update the source issue's `## Pipeline` block** (format: `to-issues`, "The Pipeline block"):
+set `workspace` to the workspace root, and move `readiness` down one rung — to `needs:spec`,
+or straight to `needs:issues` if the grilling settled the contract as well. Record the new
+rung's dated reason.
+
+`state.json` owns `grill`/`spec` once a workspace exists, so drop those lines from the block
+rather than keeping a second copy. Edit the issue body in place using the tracker's own CLI and
+re-sync the rung label in the same turn.
 
 Since the workspace is now created (either by `/to-ticket` or by step 0 above), steps 3 and 5 always apply — write `decisions.md` and update `state.json` as you go.
 

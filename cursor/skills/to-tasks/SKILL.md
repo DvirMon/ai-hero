@@ -1,6 +1,7 @@
 ---
 name: to-tasks
 description: Generate a step-by-step implementation task plan for a single issue, from its spec and architecture doc — the last stop before /implement.
+portedFrom: 54895f51908a
 ---
 
 # To Tasks
@@ -48,7 +49,7 @@ execute the step. Exactly one of:
 | `Task type` | Step produces | How to execute it |
 |---|---|---|
 | `code` | components, hooks, services, stores, utils | follow the `react-developer` or `angular-developer` skill, by the ticket's `stack` |
-| `story` | `<Component>.stories.tsx` | follow the `storybook` skill |
+| `story` | `<Component>.stories.tsx` | follow the `story-create` skill |
 | `test` | `*.spec.ts(x)` | follow the `unit-test` skill |
 | `docs` | markdown, ADRs, README | write directly, no extra skill needed |
 | `chore` | config, deps, tooling | write directly, no extra skill needed |
@@ -90,6 +91,14 @@ Write `<workspaceRoot>/docs/tasks/progress.md` to track execution of the plan:
 
 Status values: `⬚ pending`, `▶ in progress`, `✅ done`, `⏭ skipped`.
 Update this file yourself as you work through steps.
+
+**Update the source issue's `## Pipeline` block** (format: `to-issues`, "The Pipeline block"):
+set `tasks: done: <workspaceRoot>/docs/tasks/` and `readiness: ready-for-agent`, and swap the
+`needs:tasks` label for `ready-for-agent`.
+
+This is the one promotion to `ready-for-agent` that may be made unasked — a step plan either
+exists on disk or it does not, so it is an observation, not the judgement call `to-issues`
+reserves for the user.
 
 #### State update
 

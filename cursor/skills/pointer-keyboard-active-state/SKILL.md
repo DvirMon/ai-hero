@@ -1,6 +1,7 @@
 ---
 name: pointer-keyboard-active-state
 description: TRIGGER when building/fixing any listbox, combobox, menu, or "roving active item" list where BOTH mouse hover and keyboard arrow-nav set an active/highlighted item (search overlays, autocomplete dropdowns, command palettes, select menus, dropdown menus). Fixes the classic bug — "highlight stuck on stale hover after keyboard nav moves active elsewhere" — without a global mousemove/keydown modality hack. Framework-agnostic (Angular, React, Vue, vanilla).
+portedFrom: 55c696faac16
 ---
 
 # Pointer + keyboard active-item conflict

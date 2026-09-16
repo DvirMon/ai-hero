@@ -1,6 +1,7 @@
 ---
 name: ds-review
 description: Phase 6 of DS component creation — runs a11y, code, and styles review in sequence and fixes issues. Run after ds-scaffold, after the phase-end context trim.
+portedFrom: 53c93a803d33
 ---
 
 # DS Component Builder — Phase 6: Review
@@ -84,12 +85,12 @@ Review targets rendered markup and runtime behavior, not framework source patter
 **Process:**
 1. Read `docs/prd.md` — extract API Summary and Internal DS Components table; read `docs/decisions.md` and `docs/narrative.md` (if present) — note any decision that pre-empts a convention check below (a documented decision overrides a convention/PRD-derived finding it explicitly addresses — cite the decision instead of flagging).
 2. Read `componentFilePath` and its template in full.
-3. Diff the decorator against `~/.cursor/skills/ds-research/references/component-class.angular.md` conventions — flag any deviation (explicit `standalone: true`, missing `OnPush`, `NgModule` wrapping).
+3. Diff the decorator against `~/.cursor/skills/ds-discovery/references/component-class.angular.md` conventions — flag any deviation (explicit `standalone: true`, missing `OnPush`, `NgModule` wrapping).
 4. Diff every input/output/content-slot in code against the PRD API Summary — flag mismatches, omissions, undocumented extras.
 5. Check `host` for theme class, variant/state class bindings, ARIA attribute bindings — flag anything found in the template instead.
 6. Check type definitions are colocated in `.component.ts` and correctly re-exported (not redefined) in `public-api.ts`; check `index.ts` has no logic.
 7. Cross-check every Internal DS Component import against the PRD table's exact import paths — flag any reimplementation or path mismatch.
-8. Verify the wired primitive matches research/architecture's decision — flag substitutions or unexplained hand-rolled behavior.
+8. Verify the wired primitive matches discovery/architecture's decision — flag substitutions or unexplained hand-rolled behavior.
 9. Assess file organization against `srpClassification` and the repo's file-organization rule — flag files mixing concerns that should be split.
 10. Review template control flow (`@if`/`@for` correctness) and content-slot selectors (attribute selectors preferred for named slots); flag any stray class binding that belongs in `host`, and any `protected` method invoked from a non-event binding purely to compute a render value (should be `computed()` or `@let` instead — event-binding calls like `(click)="activate(item)"` are exempt).
 11. Confirm registration in the design system's root barrel.
@@ -113,7 +114,7 @@ Review targets rendered markup and runtime behavior, not framework source patter
 6. Check `:host` is the styling root; flag any styling-only wrapper element.
 7. Search for `::ng-deep` — flag every instance regardless of scoping.
 8. Search for `ViewEncapsulation.None` — for each hit, confirm the projected content has no fixed part-set; flag if it does (a directive-per-part approach was skippable) or if `None` is used without host-class-scoped selectors.
-9. Spot-check a sample of token usages against `docs/research-summary.md`'s Figma token list for correct `/`→`-` conversion.
+9. Spot-check a sample of token usages against `docs/discovery-summary.md`'s Figma token list for correct `/`→`-` conversion.
 10. Diff the actual override API (custom properties declared on `:host`) against the plan's token table — flag excess exposure (beyond 5–7), missing documented tokens, or locked tokens leaking through.
 11. Check for concerns the plan flagged as parent-owned — flag duplication.
 12. Diff style blocks against the PRD's Variants & States table — flag any missing variant/state.

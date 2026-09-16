@@ -2,6 +2,7 @@
 name: to-spec
 description: Turn the current conversation (and, when one exists, a ticket workspace's decisions) into a spec — plus an architecture doc when the work is complex — and publish it to the project issue tracker. No interview, just synthesis of what's already been decided.
 disable-model-invocation: true
+portedFrom: f855039ba82b
 ---
 
 This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`) and the ticket it was grilled from — and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
@@ -22,7 +23,13 @@ Check with the user that these seams match their expectations.
 
 4. If the ticket workspace's `state.json` exists and `isComplex` is `true`, also write `<workspaceRoot>/architecture.md`: the decisions that are settled and not open for relitigation, grounded against the actual current source (cite real file paths, not assumptions), the types/interfaces/contracts involved, a file-layout table for the implementation session, and open questions still unresolved. Unlike the spec template below — which bans file paths and code snippets because a spec can sit unimplemented for a while — the architecture doc **may** include exact paths, types, and snippets: it's consumed immediately by `/to-tasks`, not left to go stale. Update `state.json`'s `architecturePath`.
 
-5. Publish the spec to the project issue tracker, and apply the `ready-for-agent` triage label - no need for additional triage. If `architecture.md` was written, link it from the issue body rather than inlining it.
+5. Publish the spec to the project issue tracker, and apply the `ready-for-agent` triage label - no need for additional triage.
+
+   Update the source issue's `## Pipeline` block (format: `to-issues`, "The Pipeline block"): set
+   `workspace` to the workspace root, drop the `grill`/`spec` lines now that `state.json`'s
+   `checklist` owns them, and move `readiness` to `needs:issues` — or `needs:tasks` if the spec
+   describes work small enough to need no slicing. Re-sync the rung label in the same turn.
+ If `architecture.md` was written, link it from the issue body rather than inlining it.
 
 <spec-template>
 

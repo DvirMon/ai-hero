@@ -1,6 +1,7 @@
 ---
 name: ds-scaffold
 description: Phase 5 of DS component creation — scaffolds Angular component, styles, Storybook, and tests in sequence. Run after ds-plan, after the phase-end context trim.
+portedFrom: 8d7b2d34b6f4
 ---
 
 # DS Component Builder — Phase 5: Scaffold
@@ -32,7 +33,7 @@ If the "Task Plan" checklist item is not marked complete → tell the user to fi
 From `{componentPath}docs/phase-state.json`, load:
 - `planDir` — path to the version subfolder (e.g. `.claude/plans/NNN-atera-{name}/v1-core/`)
 - `includeStorybook`, `includeTests` — from Task Plan decisions (user may override now)
-- `researchSummaryPath` — relative path to the research summary used to source `figmaTokens` (e.g. `"docs/research-summary.md"`)
+- `discoverySummaryPath` — relative path to the discovery summary used to source `figmaTokens` (e.g. `"docs/discovery-summary.md"`)
 
 Ask if they want to confirm or change the storybook/tests choices before starting.
 
@@ -41,7 +42,7 @@ Ask if they want to confirm or change the storybook/tests choices before startin
 Before starting, classify the component responsibilities from the PRD (`prdPath`) as directive / service / utils / component. This `srpClassification` drives the file-organization decisions in Phase A step 1 below.
 
 Resolve shared inputs once, before either phase:
-- `figmaTokens` = design tokens from `{componentPath}{researchSummaryPath}` — resolve `researchSummaryPath` from `phase-state.json` and join it to `componentPath`.
+- `figmaTokens` = design tokens from `{componentPath}{discoverySummaryPath}` — resolve `discoverySummaryPath` from `phase-state.json` and join it to `componentPath`.
 - `a11ySpec` = inline accessibility text, sourced from `{componentPath}docs/phase-state.json`: if `a11ySpecText` is set (non-complex), use its value; if `a11ySpecPath` is set (complex), read `{componentPath}{a11ySpecPath}` and use its full content. Always treat this as inline text downstream, never a file path.
 - `prdPath` = `{componentPath}docs/prd.md`.
 - `apiSpec` = inline API text — read the public API section of `prd.md` (inputs, outputs, content slots) and extract it as inline text.
@@ -58,12 +59,12 @@ Resolve shared inputs once, before either phase:
 3. Read `apiSpec` (inline) — extract every input/output/content-slot with types and defaults.
 4. Read `a11ySpec` (inline) — extract semantic element, ARIA role/attributes, keyboard map, focus contract.
 5. Confirm `srpClassification` and select the matching API pattern from `~/.cursor/skills/ds-interview/references/component-api.angular.md` (simple component, directive-as-feature, portal, trigger+panel, composable family).
-6. Scaffold the `@Component` decorator per `~/.cursor/skills/ds-research/references/component-class.angular.md` — selector `{prefix}-<name>`, `imports: []`, `templateUrl`/`styleUrl`, `changeDetection: ChangeDetectionStrategy.OnPush` (non-negotiable), no explicit `standalone: true`, no `NgModule`.
+6. Scaffold the `@Component` decorator per `~/.cursor/skills/ds-discovery/references/component-class.angular.md` — selector `{prefix}-<name>`, `imports: []`, `templateUrl`/`styleUrl`, `changeDetection: ChangeDetectionStrategy.OnPush` (non-negotiable), no explicit `standalone: true`, no `NgModule`.
 7. Apply the theme element class and selector class to `host`: `'class': '{prefix}-<name> {prefix}-theme-element'`.
 8. Declare typed inputs/outputs exactly matching `apiSpec`, using signal APIs (`input()`/`output()`) — no invented inputs, no dropped inputs.
 9. Wire variant/state classes as `host` bindings only — never inside the template.
 10. Wire ARIA attributes as `host` bindings, sourced from `a11ySpec` — role, aria-* attributes, `aria-disabled` reflecting the disabled state.
-11. If a primitive (CDK or ng-primitives) is required, inject and wire it per the import path decided in research/architecture — never substitute a different primitive.
+11. If a primitive (CDK or ng-primitives) is required, inject and wire it per the import path decided in discovery/architecture — never substitute a different primitive.
 12. Define all public types (`<Name>Variant`, `<Name>Size`, `<Name>Color`, etc.) in the `.component.ts` file, then re-export from `public-api.ts` — never define a type only at the re-export layer.
 13. Import and use every component listed in the PRD's Internal DS Components table via its exact import path — never reimplement their markup/behavior.
 14. Build the template: default content-projection slot, named slots per PRD content slots (prefer attribute selectors), internal structural elements from Figma anatomy, `@if`/`@for` control flow for conditional regions.
@@ -89,7 +90,7 @@ Resolve shared inputs once, before either phase:
 7. Never use `::ng-deep`, even `:host`-scoped — expose CSS custom properties instead when a child needs styling influence.
 8. Declare the CSS custom property override API on `:host` (5–7 tokens max per the plan's token table) — defaults pointing to role tokens, documented as overridable; leave locked tokens unexposed.
 9. Check whether a parent component already owns a styling concern (e.g. a form-field already owning input sizing) noted in the plan's parent-ownership check — skip duplicating it if so.
-10. If research/PRD notes motion, add transitions using DS `--motion-*` tokens (if present) or the fallback duration/easing table from `~/.cursor/skills/ds-scaffold/references/motion.md`, always paired with a `prefers-reduced-motion` override.
+10. If discovery/PRD notes motion, add transitions using DS `--motion-*` tokens (if present) or the fallback duration/easing table from `~/.cursor/skills/ds-scaffold/references/motion.md`, always paired with a `prefers-reduced-motion` override.
 11. Follow logical CSS property conventions per the project's `css-styling` skill (or general logical-property hygiene if that skill isn't installed) — this reference covers DS-specific rules only.
 12. Verify no `::ng-deep` usage anywhere in the file.
 13. Write `{componentPath}{prefix}-<name>.component.scss`.

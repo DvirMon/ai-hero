@@ -63,6 +63,13 @@ for f in "$CURSOR_RULES"/*.mdc; do ported_rules[$(claude_name_of "$f")]="$f"; do
 
 for src in "$CLAUDE_SKILLS"/*/; do
   name=$(basename "$src"); dst="$CURSOR_SKILLS/$name"
+  # A directory with no SKILL.md is a shared reference pool, not a skill. Cursor cannot
+  # symlink one, so its port is a hand-written wrapper; compare the pooled files only.
+  if [ ! -f "$src/SKILL.md" ]; then
+    [ -d "$dst" ] || missing+=("pool  $name (hand-port: reference pool)")
+    [ -d "$dst" ] && ! diff -qr "$src/references" "$dst/references" >/dev/null 2>&1       && stale+=("pool  $name references")
+    continue
+  fi
   if [ -d "$dst" ]; then
     stamp=$(stamp_of "$dst/SKILL.md")
     if [ -n "$stamp" ]; then

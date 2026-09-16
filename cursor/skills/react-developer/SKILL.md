@@ -6,6 +6,7 @@ metadata:
   author: Dvir Monajem
   version: '4.0'
   target: React 19 (greenfield, client-side SPA, Vite)
+portedFrom: 4491d1826382
 ---
 
 # React Developer — v19 (Greenfield)

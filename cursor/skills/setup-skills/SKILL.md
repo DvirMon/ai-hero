@@ -2,6 +2,7 @@
 name: setup-skills
 description: Configure this repo for the engineering skills — set up its issue tracker, ticket tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills.
 disable-model-invocation: true
+portedFrom: 02a338843e10
 ---
 
 # Setup Skills

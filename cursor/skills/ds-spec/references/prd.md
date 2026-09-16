@@ -65,13 +65,13 @@ Why does this component need to exist in the DS? What gap does it fill? What pro
 
 ## Internal DS Components
 
-> Sourced from the `internalDsComponents` field in the Phase 1 Research Summary. **Mandatory** — write "none" if the component contains no existing DS components. Each row MUST include the exact import path captured during Phase 1 research.
+> Sourced from the `internalDsComponents` field in the Phase 1 Discovery Summary. **Mandatory** — write "none" if the component contains no existing DS components. Each row MUST include the exact import path captured during Phase 1 discovery.
 
 | DS Component | Selector | Import path | Used for |
 |---|---|---|---|
 | {prefix}-button | `button[{prefix}-button]` | `@{NAMESPACE}/ui-core/2.0/{prefix}-button` | Trigger / action buttons |
 | {prefix}-icon-2 | `{prefix}-icon-2` | `@{NAMESPACE}/ui-core/2.0/{prefix}-icon-2` | Icons |
-| [add rows from Research Summary] | | | |
+| [add rows from Discovery Summary] | | | |
 
 **Scaffolding rule:** The angular scaffolder MUST import and use every component listed here using the exact `Import path` value in this table. Do NOT reimplement their markup or behaviour from scratch, and do not guess import paths from component names.
 

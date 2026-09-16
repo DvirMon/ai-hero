@@ -2,6 +2,7 @@
 name: handoff
 description: Write a short handoff document for a future agent session to pick up where this one left off. Triggers on "hand off", "handoff", "pass this to another session/agent", "pick this up later", ending a session with unfinished work.
 argument-hint: "What will the next session be used for?"
+portedFrom: bdf8b658af69
 ---
 
 Write a handoff document that **routes** a fresh agent session to the work. It is dispatch,

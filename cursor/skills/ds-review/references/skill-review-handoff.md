@@ -2,7 +2,7 @@
 
 ## PR Scope
 
-This PR splits the original monolithic `ds-wayfinder` orchestrator into 7 specialized micro-skills (`ds-research`, `ds-interview`, `ds-spec`, `ds-plan`, `ds-scaffold`, `ds-review`, `ds-ship`). The hub skill (`ds-wayfinder/SKILL.md`) is refactored into a routing table. This is a full architectural decomposition — not a minor addition of prerequisites, artifacts, or handoff clarification. Reviewers should evaluate the new skill boundaries, session-break protocol removal, and per-phase entry/exit contracts.
+This PR splits the original monolithic `ds-wayfinder` orchestrator into 7 specialized micro-skills (`ds-discovery`, `ds-interview`, `ds-spec`, `ds-plan`, `ds-scaffold`, `ds-review`, `ds-ship`). The hub skill (`ds-wayfinder/SKILL.md`) is refactored into a routing table. This is a full architectural decomposition — not a minor addition of prerequisites, artifacts, or handoff clarification. Reviewers should evaluate the new skill boundaries, session-break protocol removal, and per-phase entry/exit contracts.
 
 ## Architecture change (2026-05-09)
 
@@ -12,7 +12,7 @@ The monolithic orchestrator was split into 7 per-phase sibling skills. Each phas
 - [x] `ds-wayfinder/SKILL.md` — refactored to routing table (30 lines); lists all 7 phase skills and shared references
 
 **Phase skills (new):**
-- [x] `ds-research/SKILL.md` — Phase 1: setup, ng-primitives check, 3 parallel agents, dedup gate, handoff
+- [x] `ds-discovery/SKILL.md` — Phase 1: setup, ng-primitives check, 3 parallel agents, dedup gate, handoff
 - [x] `ds-interview/SKILL.md` — Phase 2: grill-me core (relentless, one-at-a-time, walk decision tree); designer vocabulary as translation layer only
 - [x] `ds-spec/SKILL.md` — Phase 3: PRD + a11y + architect agents, developer checkpoint
 - [x] `ds-plan/SKILL.md` — Phase 4: task planner agent, versioned plan folders, developer checkpoint

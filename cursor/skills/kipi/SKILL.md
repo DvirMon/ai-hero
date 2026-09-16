@@ -2,6 +2,7 @@
 name: kipi
 description: Generate or refresh colocated docs/ folders by reading actual source code. File set and templates are entirely config-driven (docs/agents/domain-docs.md) — this skill has no opinion on doc names. Runs single-domain or whole-repo (discovers every domain, documents them one at a time).
 disable-model-invocation: true
+portedFrom: 863d1585389f
 ---
 
 # Kipi
@@ -39,8 +40,10 @@ Each `##` heading is a filename generated in the domain's `docs/` folder; the `S
 
 Before anything else, establish which project this run is about — don't assume repo-root scope silently.
 
-1. Check root `CONTEXT-MAP.md`. If it exists, this is a **multi-context repo**: it lists the contexts (apps/libs), each with its own `CONTEXT.md` + `docs/adr/` (per `docs/agents/domain.md`). Ask the user which project/context this run targets, unless they already named one in their argument (a path under `apps/<x>/` or `libs/<x>/` implies that context — confirm, don't just assume).
-2. If no `CONTEXT-MAP.md`, this is a **single-context repo** — one root `CONTEXT.md` + `docs/adr/` (if present) covers everything; no project question needed.
+1. Check the repo's context map — root `llms.txt` (its `## Contexts` section), falling back to `CONTEXT-MAP.md` in repos that still use one. If either exists, this is a **multi-context repo**: it lists the contexts (apps/libs), each with its own `CONTEXT.md` + `docs/adr/` (per `docs/agents/domain.md`). Ask the user which project/context this run targets, unless they already named one in their argument (a path under `apps/<x>/` or `libs/<x>/` implies that context — confirm, don't just assume).
+2. If neither exists, this is a **single-context repo** — one root `CONTEXT.md` + `docs/adr/` (if present) covers everything; no project question needed.
+
+Where `llms.txt` is generated, never edit it to add or correct a context — edit that context's `CONTEXT.md` frontmatter and regenerate.
 3. Once scope is set, read that project's `CONTEXT.md` in full — glossary and any recorded architectural decisions — before doing anything else. This vocabulary is mandatory for every doc this run generates: don't let a generated spec invent a term the project's glossary already defines differently.
 
 This scope also bounds discovery (repo mode only enumerates domains inside the chosen project, never across unrelated contexts) and is the `projectContext` you carry into every domain you document below.
