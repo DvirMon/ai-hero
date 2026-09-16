@@ -1,4 +1,4 @@
-# Research Phase — Reading the Figma Design
+# Discovery Phase — Reading the Figma Design
 
 This is always Phase 1. Fetch the Figma design once. All subsequent planning steps consume this output.
 
@@ -32,7 +32,7 @@ If no Figma URL exists and the designer has not yet created a component frame, d
 1. Search the existing codebase for the **most similar DS component** already built (e.g. if building a "stat card", look for `{prefix}-card`, `{prefix}-content-block`, or any existing card-like component).
 2. Read its SCSS, template, and public API to understand the established pattern.
 3. Use that component as the structural and token reference instead of a Figma frame.
-4. Clearly note in the research summary: "No Figma available — pattern derived from `<existing-component>`."
+4. Clearly note in the discovery summary: "No Figma available — pattern derived from `<existing-component>`."
 
 This ensures the new component is consistent with existing DS patterns even without a design spec.
 
@@ -71,9 +71,9 @@ Designers often leave usage notes in the Figma component description. Extract:
 - What NOT to use it for
 - Links to documentation or specs
 
-## Angular Material Research (optional but recommended)
+## Angular Material Discovery (optional but recommended)
 
-For any component with **interactive behaviour** (dropdowns, dialogs, overlays, keyboard navigation, focus management), research the equivalent Angular Material component **before** Phase 2 planning.
+For any component with **interactive behaviour** (dropdowns, dialogs, overlays, keyboard navigation, focus management), discovery the equivalent Angular Material component **before** Phase 2 planning.
 
 Angular Material is **inspiration only** — never copy its code directly. It uses outdated Angular patterns (`@Input`, `NgModule`, `ngOnInit`). Use it to understand:
 - Which CDK primitives it uses
@@ -84,7 +84,7 @@ Angular Material is **inspiration only** — never copy its code directly. It us
 
 **Skip this step** for purely presentational components (cards, badges, banners, dividers) with no interactive behaviour.
 
-## Output: Research Summary
+## Output: Discovery Summary
 
 Before moving to Phase 2, produce this structured summary. It feeds all three parallel planning steps.
 

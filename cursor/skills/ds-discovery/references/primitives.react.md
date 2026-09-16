@@ -1,6 +1,6 @@
 # Primitives — React (React Aria + Radix Primitives)
 
-> Research order and rationale live in `primitives.md` (agnostic). This file is the React-specific selection tables and libraries.
+> Discovery order and rationale live in `primitives.md` (agnostic). This file is the React-specific selection tables and libraries.
 
 Before writing any interaction logic from scratch, check if React Aria or Radix Primitives already solves it. They handle keyboard management, focus trapping, and ARIA wiring correctly and accessibly.
 
@@ -8,7 +8,7 @@ Before writing any interaction logic from scratch, check if React Aria or Radix 
 
 1. **React Aria (`react-aria` / `react-aria-components`)** — hook-based, headless, most granular control. Prefer for anything with complex keyboard/focus contracts.
 2. **Radix Primitives (`@radix-ui/react-*`)** — component-based, headless, one package per primitive. Prefer when a compound-component shape fits better than hooks.
-3. **Ark UI** — alternative headless set (Zag.js-based) if the codebase already standardizes on it — check codebase researcher output before introducing a third option.
+3. **Ark UI** — alternative headless set (Zag.js-based) if the codebase already standardizes on it — check codebase discovery output before introducing a third option.
 
 Don't mix multiple primitive libraries for the same interaction pattern within one component — pick one per component and stay consistent with codebase precedent.
 

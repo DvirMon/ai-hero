@@ -1,7 +1,8 @@
 ---
-name: storybook
-description: "Generate Storybook stories for a design-system component. SSOT for story-creation conventions — sibling to /implement (component generation), invoked after a component's implementation is done."
+name: story-create
+description: "Write a Storybook story for a component that already exists. SSOT for story-creation conventions — sibling to /implement (component generation), invoked after a component's implementation is done."
 disable-model-invocation: true
+portedFrom: c6e2b8a641ae
 ---
 
 Generate `<Component>.stories.tsx` for a component that already exists (implemented via

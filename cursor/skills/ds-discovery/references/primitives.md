@@ -1,10 +1,10 @@
 # Primitives (Framework-Agnostic)
 
-> Framework-specific selection tables and library names live in the sibling file for your target framework (e.g. `primitives.angular.md`). This file covers the research order — read it first, then the framework file for concrete libraries/imports.
+> Framework-specific selection tables and library names live in the sibling file for your target framework (e.g. `primitives.angular.md`). This file covers the discovery order — read it first, then the framework file for concrete libraries/imports.
 
 Before writing any interaction logic from scratch, check whether the platform's primitive/behavior library already solves it. These libraries handle keyboard management, focus trapping, and ARIA wiring correctly and accessibly — reinventing them risks silent a11y regressions.
 
-## Research Order
+## Discovery Order
 
 1. **Framework-native behavior library** (e.g. Angular CDK, React Aria, Radix, Headless UI, Vue's `@vueuse/core`) — check its selection table (framework file) first.
 2. **Unstyled accessible primitive collection** for the framework (e.g. `ng-primitives` for Angular, Radix Primitives / Ark UI for React) if the native library doesn't cover the pattern.
