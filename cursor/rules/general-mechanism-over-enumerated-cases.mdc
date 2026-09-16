@@ -1,6 +1,7 @@
 ---
 description: Design one general composable mechanism plus optional defaults for a cluster of edge cases, not an API enumerating every case.
 alwaysApply: true
+portedFrom: 5927d4ebeef4
 ---
 
 # Design one general mechanism, not an enumerated case per API surface

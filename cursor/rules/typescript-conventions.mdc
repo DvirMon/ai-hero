@@ -2,6 +2,7 @@
 description: Framework-agnostic TypeScript conventions — explicit return types, naming, import order, avoid any/as.
 globs: "**/*.{ts,tsx}"
 alwaysApply: false
+portedFrom: 5c5e70e2e87e
 ---
 
 # TypeScript conventions

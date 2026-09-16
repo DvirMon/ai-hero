@@ -1,6 +1,7 @@
 ---
 description: Sequence a task/step graph for execution (not discussion) when a workflow emits steps an agent will execute directly.
 alwaysApply: true
+portedFrom: 75acbe00a2f5
 ---
 
 # Sequence a task/step graph for execution, not discussion

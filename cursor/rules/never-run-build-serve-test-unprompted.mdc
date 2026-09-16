@@ -1,6 +1,7 @@
 ---
 description: Never run builds, dev servers, installs/scaffolds, or tests without explicit user confirmation first — don't even offer to, just report what's worth verifying.
 alwaysApply: true
+portedFrom: 171ab33218fe
 ---
 
 # Never build, serve, install, or test unprompted

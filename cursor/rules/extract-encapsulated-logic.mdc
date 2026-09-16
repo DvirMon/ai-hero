@@ -2,6 +2,7 @@
 description: Extract inline logic that owns its own scope (lifecycle, state, or reasoning) into a named function/file, regardless of reuse — with guardrails against over-extraction.
 globs: "**/*.{ts,tsx,js,jsx}"
 alwaysApply: false
+portedFrom: 3ccab6e63c4b
 ---
 
 # Extract encapsulated logic, reuse not required

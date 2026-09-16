@@ -29,6 +29,18 @@ every Cursor install, not authored by you.
 
 ## Steps
 
+0. Check Cursor drift — the mirror is one-way, so `~/.cursor` does not follow `~/.claude`
+   on its own:
+   ```bash
+   bash ~/.claude/skills/sync-guidelines/port-to-cursor.sh
+   ```
+   Report the four buckets and stop there. **Porting is editorial, not a copy** — a Cursor
+   file differs from its Claude original on purpose: sub-agent dispatch becomes sequential
+   passes (Cursor has no Agent tool), cross-links go `.md` -> `.mdc`, toolchain names are
+   generalised. The script never overwrites; `--apply` only copies files absent from Cursor
+   that contain no Claude-specific text. Everything else is a hand-port the user decides to
+   spend time on, one file at a time.
+
 1. Run the sync script:
    ```bash
    bash ~/.claude/skills/sync-guidelines/sync.sh
@@ -43,7 +55,8 @@ every Cursor install, not authored by you.
 ## Notes
 
 - The script is idempotent — safe to re-run any time.
-- If `~/.cursor` has no custom rules yet (only built-in `skills-cursor/`), the `cursor/` folder
-  will be sparse. That's expected until custom Cursor rules exist.
+- `sync.sh` mirrors both harnesses into the repo but never between them. Cursor drift is
+  reported by `port-to-cursor.sh` (step 0) and closed by hand — see that script's header for why
+  a verbatim copy is wrong.
 - Do not add new source paths to `sync.sh` without checking they don't contain secrets or
   project-specific content first.

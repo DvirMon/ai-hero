@@ -2,6 +2,7 @@
 description: Declarative naming for event handlers, booleans, and function extraction — name for workflow intent, not implementation.
 globs: "**/*.{ts,tsx,js,jsx}"
 alwaysApply: false
+portedFrom: d629597feac7
 ---
 
 # Declarative naming and decomposition

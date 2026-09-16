@@ -1,0 +1,45 @@
+---
+description: Survey/compare/prior-art work is discovery — run it as its own pass and write findings to a Markdown file, with chat getting only the pointer.
+portedFromFile: route-discovery-to-agent
+portedFrom: 3c9b91db8ad7
+alwaysApply: true
+---
+
+# Discovery is its own pass, and its findings go to a file
+
+When the ask is **discovery** — survey what exists, compare candidates, find how others solved
+this, investigate an idea/architecture/design question — treat it as a distinct pass with its own
+output file, not as narration mixed into the work it informs.
+
+## What counts as discovery
+
+- "research X", "investigate X", "compare A vs B", "what are the options for X"
+- "how do enterprise codebases / other libraries handle X"
+- Evaluating a dependency against requirements before adopting it
+- Surveying prior art before an architecture or API decision
+
+## What does not
+
+- A concrete fact cheap to verify in one lookup — a search, a file read, a package-info command.
+  Just do it. (Same line as `ask-dont-search-on-ambiguity.mdc` draws.)
+- A judgment call about direction or preference — ask the user rather than investigating to guess.
+- **Product/UX questions** — what people struggle with, what a person can click and press in a
+  competing product, whether this repo already covers a use case. The split is the question, not
+  the topic: design discovery asks *how should this be built*, product discovery asks *what does a
+  person need and what hurts today*. Keep them as separate passes with separate outputs.
+
+## How to run it
+
+State the `question` and any stated `constraints` up front, then write to an output path chosen by
+the domain that owns the question — a domain's docs live with the domain, per
+`file-organization.mdc`. Default to `docs/discovery/<slug>.md` only when no domain owns it. The
+path ends in `.md`: output is always Markdown, one file unless it has outgrown one.
+
+Multiple independent discovery questions are separate passes with separate files — map the edges
+first per `decompose-by-dependency-graph.mdc`, and only sequence the ones that genuinely depend on
+an earlier answer.
+
+**Findings go to the file, chat gets the pointer.** Relay a summary, not the findings. Every claim
+in that file carries a source tag; anything uncited is listed as unverified instead.
+
+**Terminology: discovery, not research.** Name the files and the commands accordingly.

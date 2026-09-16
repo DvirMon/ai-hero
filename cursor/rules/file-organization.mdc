@@ -2,6 +2,7 @@
 description: File organization — one concern per file, three-level promotion ladder, folder-axis priority, domain-scoped docs.
 globs: "**/*.{ts,tsx,js,jsx}"
 alwaysApply: false
+portedFrom: 8c50f84aff0a
 ---
 
 # File organization: one concern per file
