@@ -2,6 +2,7 @@
 name: ai-docs
 description: Generate/refine JSDoc + Markdown documentation for AI agent consumption following token-efficient best practices
 portedFrom: 9300332729ba
+portedSelf: c919e0334d64
 ---
 
 # AI-Friendly Documentation Skill

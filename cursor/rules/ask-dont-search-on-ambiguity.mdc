@@ -2,6 +2,7 @@
 description: When ambiguity is about direction/preference (not a discoverable fact), ask the user directly instead of burning tool calls on exploratory search.
 alwaysApply: true
 portedFrom: 26254db4683f
+portedSelf: ed88540010d5
 ---
 
 # Ask, don't search, when the ambiguity is about direction/preference

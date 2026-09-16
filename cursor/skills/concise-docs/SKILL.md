@@ -2,6 +2,7 @@
 name: concise-docs
 description: Compress documentation files and code comments for concision — cut filler, hedging, and redundant restatement — without losing information (steps, acceptance criteria, edge cases, exact identifiers, flow sequences stay intact). Default scope is the file(s) the user names; compress every doc/comment in the project only when the user explicitly asks for "all docs"/"all comments". Edits directly, then reports a per-file line-delta and a preserved-content check (step/criteria count before vs. after). Different concern from `audit-docs`: this skill never checks truth against code, only verbosity. Use when the user wants a doc or comment block made "more concise", "less verbose", "tightened up", or asks to trim/shrink documentation without losing meaning.
 portedFrom: f3daa07d225a
+portedSelf: 66968febce1b
 ---
 
 Cut words, not facts. Every edit must pass one test: does this sentence add a fact, or restate one

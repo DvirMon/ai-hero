@@ -10,6 +10,7 @@ description: >
   pass" on something already designed or specced. Pairs with story-plan, which consumes the doc
   this skill produces and re-derives its coverage marks against real story code.
 portedFrom: ddd051684c1d
+portedSelf: 35204fbfca9b
 ---
 
 # Product user-stories discovery

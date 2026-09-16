@@ -2,6 +2,7 @@
 name: ds-scaffold
 description: Phase 5 of DS component creation — scaffolds Angular component, styles, Storybook, and tests in sequence. Run after ds-plan, after the phase-end context trim.
 portedFrom: 8d7b2d34b6f4
+portedSelf: ffe311f70c34
 ---
 
 # DS Component Builder — Phase 5: Scaffold

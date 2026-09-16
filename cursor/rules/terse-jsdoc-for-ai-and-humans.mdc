@@ -2,6 +2,7 @@
 description: JSDoc/docstrings must be terse and IDE-readable, not narrative — they serve both developers and LLMs reading the code.
 alwaysApply: true
 portedFrom: 149109625c26
+portedSelf: 7593ab1c6f0f
 ---
 
 # JSDoc: terse, not narrative — serves developers and LLMs alike

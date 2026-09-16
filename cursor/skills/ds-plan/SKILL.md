@@ -2,6 +2,7 @@
 name: ds-plan
 description: Phase 4 of DS component creation — generates the versioned implementation task plan. Run after ds-spec, after the phase-end context trim.
 portedFrom: f1bf097e92c1
+portedSelf: 6503a9410950
 ---
 
 # DS Component Builder — Phase 4: Task Plan

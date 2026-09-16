@@ -12,6 +12,7 @@ description: >
   doc that has coverage marks (✅/🟡/❌) — that doc's coverage marks are exactly what this
   skill re-derives.
 portedFrom: 7ad6839b7ecd
+portedSelf: 7ad6839b7ecd
 ---
 
 # Storybook story planning

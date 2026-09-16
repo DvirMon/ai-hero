@@ -2,6 +2,7 @@
 name: ds-discovery
 description: Phase 1 of DS component creation — runs Figma, primitive, codebase, and a11y discovery in sequence. Use when starting a new DS component. Run before ds-interview.
 portedFrom: 20b1844f1540
+portedSelf: db681b2ca770
 ---
 
 # DS Component Builder — Phase 1: Discovery

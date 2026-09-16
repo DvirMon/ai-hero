@@ -29,17 +29,26 @@ every Cursor install, not authored by you.
 
 ## Steps
 
-0. Check Cursor drift — the mirror is one-way, so `~/.cursor` does not follow `~/.claude`
-   on its own:
+0. Check drift both ways — the mirror copies each harness into the repo but never between
+   them:
    ```bash
-   bash ~/.claude/skills/sync-guidelines/port-to-cursor.sh
+   bash ~/.claude/skills/sync-guidelines/port-drift.sh
    ```
-   Report the four buckets and stop there. **Porting is editorial, not a copy** — a Cursor
-   file differs from its Claude original on purpose: sub-agent dispatch becomes sequential
-   passes (Cursor has no Agent tool), cross-links go `.md` -> `.mdc`, toolchain names are
-   generalised. The script never overwrites; `--apply` only copies files absent from Cursor
-   that contain no Claude-specific text. Everything else is a hand-port the user decides to
-   spend time on, one file at a time.
+   Report the buckets and stop there. **Porting is editorial, not a copy** — a Cursor file
+   differs from its Claude original on purpose: sub-agent dispatch becomes sequential passes
+   (Cursor has no Agent tool), cross-links go `.md` -> `.mdc`, toolchain names are generalised.
+   The script never overwrites; `--apply` only copies files that are new on one side and carry
+   no harness-specific text.
+
+   Each ported file records two hashes in its frontmatter — `portedFrom` (the Claude source at
+   last port) and `portedSelf` (its own body at last port) — so drift is reported per direction:
+   **forward-port** (Claude moved on), **back-port** (Cursor was edited), or **both sides**
+   (merge by hand). A sibling written independently for each harness declares
+   `portedFrom: independent` and is not tracked as a pair. After any hand-port:
+   `port-drift.sh --stamp <name>`.
+
+   Cursor has its own copy of this skill (`~/.cursor/skills/sync-guidelines/`) — an independent
+   sibling, not a port. Either side can run either job.
 
 1. Run the sync script:
    ```bash
@@ -55,8 +64,10 @@ every Cursor install, not authored by you.
 ## Notes
 
 - The script is idempotent — safe to re-run any time.
-- `sync.sh` mirrors both harnesses into the repo but never between them. Cursor drift is
-  reported by `port-to-cursor.sh` (step 0) and closed by hand — see that script's header for why
-  a verbatim copy is wrong.
+- `sync.sh` mirrors both harnesses into the repo but never between them. Drift in either
+  direction is reported by `port-drift.sh` (step 0) and closed by hand — see that script's
+  header for why a verbatim copy is wrong.
+- Two Claude skills are deliberately not ported: `permission-update` (targets Claude Code's
+  `settings.json` allow-rules) and this skill (Cursor has its own sibling version).
 - Do not add new source paths to `sync.sh` without checking they don't contain secrets or
   project-specific content first.

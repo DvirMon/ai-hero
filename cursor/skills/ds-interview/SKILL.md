@@ -2,6 +2,7 @@
 name: ds-interview
 description: Interview phase — grills the component's design/API/accessibility/edge-case surface until nothing is ambiguous, one question at a time, logging decisions as they crystallize. Phase 2 of DS component creation.
 portedFrom: 85a657f6d76a
+portedSelf: a722201404a0
 ---
 
 # DS Component Builder — Phase 2: Design Interview

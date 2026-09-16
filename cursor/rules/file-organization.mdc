@@ -3,6 +3,7 @@ description: File organization — one concern per file, three-level promotion l
 globs: "**/*.{ts,tsx,js,jsx}"
 alwaysApply: false
 portedFrom: 8c50f84aff0a
+portedSelf: a6dbe7769435
 ---
 
 # File organization: one concern per file

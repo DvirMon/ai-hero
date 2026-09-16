@@ -3,6 +3,7 @@ description: Framework-agnostic TypeScript conventions — explicit return types
 globs: "**/*.{ts,tsx}"
 alwaysApply: false
 portedFrom: 5c5e70e2e87e
+portedSelf: 69c17cadf67f
 ---
 
 # TypeScript conventions

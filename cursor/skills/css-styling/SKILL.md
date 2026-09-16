@@ -2,6 +2,7 @@
 name: css-styling
 description: TRIGGER before any write/edit touching styling — .css/.scss files, inline JSX style props, Angular [style.*]/[class.*] host/template bindings, or @Component styles/styleUrls. Apply CSS and styling using design tokens instead of hardcoded values. Covers Tailwind usage, flex/grid/subgrid layouts, container queries, fluid responsive units, native nesting, :has()/:is()/:where(), cascade layers, modern color (oklch/color-mix/light-dark), transitions/view-transitions, design-token override APIs, RTL/logical properties, and DS-component styling rules. Token names resolve per-project; falls back to Angular Material semantic naming when a project has no established token vocabulary.
 portedFrom: 9c37e46ea46b
+portedSelf: 9c37e46ea46b
 ---
 
 # CSS & Styling Standards

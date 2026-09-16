@@ -2,6 +2,7 @@
 description: When replicating a reference site's UI into a codebase, do a full feature inventory (nav, TOC, tabs, controls) before touching CSS — not just top-level color/radius tokens.
 alwaysApply: true
 portedFrom: 9059fa2c12c1
+portedSelf: beb1829fc435
 ---
 
 # Deep visual replication before applying UI changes

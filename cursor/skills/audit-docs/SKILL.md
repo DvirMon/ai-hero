@@ -2,6 +2,7 @@
 name: audit-docs
 description: Audit documentation file(s) against the current code and any cross-referenced docs to find stale content — broken links, claims a fix "still needs doing" that already shipped, code behavior the doc no longer describes correctly, status/date markers that don't match reality. Default scope is the file(s) the user names; audit every doc in the project only when the user explicitly asks for "all docs"/"all documentation". Reports findings per file and does not edit unless the user asks to apply/fix. Use when the user wants to "audit docs", check if documentation is stale or up to date, or verify docs against code state.
 portedFrom: ab01c5b6d66f
+portedSelf: 22d34e7baf7a
 ---
 
 Verify a doc's claims against ground truth — the current code, and any other doc it references —

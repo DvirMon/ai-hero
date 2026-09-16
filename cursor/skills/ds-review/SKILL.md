@@ -2,6 +2,7 @@
 name: ds-review
 description: Phase 6 of DS component creation — runs a11y, code, and styles review in sequence and fixes issues. Run after ds-scaffold, after the phase-end context trim.
 portedFrom: 53c93a803d33
+portedSelf: 15f46cbde51d
 ---
 
 # DS Component Builder — Phase 6: Review

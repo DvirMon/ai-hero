@@ -3,6 +3,7 @@ name: to-spec
 description: Turn the current conversation (and, when one exists, a ticket workspace's decisions) into a spec — plus an architecture doc when the work is complex — and publish it to the project issue tracker. No interview, just synthesis of what's already been decided.
 disable-model-invocation: true
 portedFrom: f855039ba82b
+portedSelf: 1d247e75d94b
 ---
 
 This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`) and the ticket it was grilled from — and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.

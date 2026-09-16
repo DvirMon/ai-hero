@@ -3,6 +3,7 @@ name: grill-with-docs
 description: A relentless interview to sharpen a ticket, plan, or design — one question at a time — logging decisions as they crystallize and building the domain model (ADRs, glossary) alongside. Decides whether the resulting spec will need an architecture doc.
 disable-model-invocation: true
 portedFrom: 44459b5da31a
+portedSelf: d64aee8c06d9
 ---
 
 # Grill (with docs)

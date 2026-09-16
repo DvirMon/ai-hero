@@ -3,6 +3,7 @@ name: story-create
 description: "Write a Storybook story for a component that already exists — SSOT for story-creation conventions, framework-agnostic core plus a per-framework reference (React, Angular). Invoked after a component's implementation is done, or ad hoc when asked to add/write a story."
 disable-model-invocation: true
 portedFrom: c6e2b8a641ae
+portedSelf: 14a2bf05cbed
 ---
 
 Write a Storybook story for a component/library that already exists. This skill owns the

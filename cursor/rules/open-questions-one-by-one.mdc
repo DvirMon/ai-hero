@@ -2,6 +2,7 @@
 description: When surfacing multiple open questions or gaps, present them one at a time instead of dumping them all at once.
 alwaysApply: true
 portedFrom: d027c56db790
+portedSelf: 8e9874b43d0f
 ---
 
 # Open questions / gaps: one at a time

@@ -3,6 +3,7 @@ name: implement
 description: "Execute a ticket's task plan step by step, loading the right conventions for each step and writing the code yourself."
 disable-model-invocation: true
 portedFrom: 1de3b96b77aa
+portedSelf: 6cae33127e79
 ---
 
 # Implement

@@ -3,6 +3,7 @@ description: Declarative naming for event handlers, booleans, and function extra
 globs: "**/*.{ts,tsx,js,jsx}"
 alwaysApply: false
 portedFrom: d629597feac7
+portedSelf: f763dc506291
 ---
 
 # Declarative naming and decomposition

@@ -2,6 +2,7 @@
 name: to-tasks
 description: Generate a step-by-step implementation task plan for a single issue, from its spec and architecture doc — the last stop before /implement.
 portedFrom: 54895f51908a
+portedSelf: a9cf54c8d215
 ---
 
 # To Tasks

@@ -2,6 +2,7 @@
 name: ds-spec
 description: Phase 3 of DS component creation — generates PRD, a11y spec, and architecture doc from interview decisions. Run after ds-interview, after the phase-end context trim.
 portedFrom: 4e6a784e311c
+portedSelf: bf92ac82419c
 ---
 
 # DS Component Builder — Phase 3: Spec

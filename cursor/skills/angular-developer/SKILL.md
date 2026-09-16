@@ -6,6 +6,7 @@ metadata:
   author: Copyright 2026 Google LLC
   version: '1.0'
 portedFrom: 5a5749b63b70
+portedSelf: 0194ed9912d0
 ---
 
 # Angular Developer Guidelines

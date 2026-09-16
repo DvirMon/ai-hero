@@ -2,6 +2,7 @@
 name: generate-claude-md
 description: Generate a lean, token-efficient CLAUDE.md file for any project type (single repo, monorepo, microservices, API project). Use when the user wants to create, bootstrap, or rewrite a CLAUDE.md from scratch.
 portedFrom: 921432cef0d8
+portedSelf: fd623460a9df
 ---
 
 # CLAUDE.md Generator

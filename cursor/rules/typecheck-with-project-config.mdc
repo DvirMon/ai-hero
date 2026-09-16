@@ -1,8 +1,9 @@
 ---
 description: Typecheck through the project's tsconfig, never a bare file path — a bare-file run compiles a different program and proves nothing.
-portedFrom: 96d1c8820aae
 globs: "**/*.{ts,tsx}"
 alwaysApply: false
+portedFrom: 96d1c8820aae
+portedSelf: 5e3ebb799b25
 ---
 
 # Typecheck through the project config, never a bare file

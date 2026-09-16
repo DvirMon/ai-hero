@@ -2,6 +2,7 @@
 name: unit-test
 description: "Decide what deserves a unit test and write it — the SSOT for unit/component test selection policy across React and Angular. Use when writing or reviewing `*.spec.ts(x)` files, when a task plan has a `Task type: test` step, or when deciding whether a given behavior is worth testing at all."
 portedFrom: ce2efa5d5cf6
+portedSelf: b1a0760a610b
 ---
 
 # Unit Test

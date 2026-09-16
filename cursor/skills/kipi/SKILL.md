@@ -3,6 +3,7 @@ name: kipi
 description: Generate or refresh colocated docs/ folders by reading actual source code. File set and templates are entirely config-driven (docs/agents/domain-docs.md) — this skill has no opinion on doc names. Runs single-domain or whole-repo (discovers every domain, documents them one at a time).
 disable-model-invocation: true
 portedFrom: 863d1585389f
+portedSelf: ae8b9ed31e16
 ---
 
 # Kipi

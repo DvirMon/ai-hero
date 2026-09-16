@@ -2,6 +2,8 @@
 name: handoff-inline
 description: Print a 1-3 line handoff for the next step, directly in chat — no file. Triggers on "handoff inline", "quick handoff", "what's next in 3 lines", ending a turn/session with a short pointer to the next action instead of a full handoff doc.
 argument-hint: "What will the next step focus on?"
+portedFrom: 519d7798a711
+portedSelf: 519d7798a711
 ---
 
 Print the handoff as chat text. Never write a file — that's [[handoff]]'s job, use it instead if

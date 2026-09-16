@@ -3,6 +3,7 @@ description: Extract inline logic that owns its own scope (lifecycle, state, or 
 globs: "**/*.{ts,tsx,js,jsx}"
 alwaysApply: false
 portedFrom: 3ccab6e63c4b
+portedSelf: 32177a807d17
 ---
 
 # Extract encapsulated logic, reuse not required

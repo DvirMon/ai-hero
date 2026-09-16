@@ -1,8 +1,9 @@
 ---
 description: Survey/compare/prior-art work is discovery — run it as its own pass and write findings to a Markdown file, with chat getting only the pointer.
 portedFromFile: route-discovery-to-agent
-portedFrom: 3c9b91db8ad7
 alwaysApply: true
+portedFrom: 3c9b91db8ad7
+portedSelf: 9ef2dc7d0fdb
 ---
 
 # Discovery is its own pass, and its findings go to a file

@@ -1,7 +1,8 @@
 ---
 description: Split every failure into construction/wiring errors (throw) and runtime data-dependent errors (never throw — degrade visibly and report) before picking an error strategy.
-portedFrom: e725904417c8
 alwaysApply: true
+portedFrom: e725904417c8
+portedSelf: 7626a053448d
 ---
 
 # Classify every error before deciding how to handle it

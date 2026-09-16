@@ -3,6 +3,7 @@ name: to-issues
 description: Break a spec, plan, or the current conversation into a set of tracer-bullet issues, each declaring its blocking edges, published to the configured tracker — edges as text in one file per issue locally, or native blocking links on a real tracker. (Renamed from to-tickets — "ticket" is reserved for the product-level intake stage; these are engineering-level issues sliced from a spec.)
 disable-model-invocation: true
 portedFrom: f9f416efcd48
+portedSelf: f9f416efcd48
 ---
 
 # To Issues

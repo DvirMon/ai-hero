@@ -2,6 +2,7 @@
 name: ds-ship
 description: Phase 7 of DS component creation — exports the component, issues Code Connect reminder, and runs final checklist. Runs after ds-review.
 portedFrom: 207f61672a7f
+portedSelf: 111995263f52
 ---
 
 # DS Component Builder — Phase 7: Ship

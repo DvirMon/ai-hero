@@ -2,6 +2,7 @@
 description: When comparing libraries/deps, score against the user's stated requirements first — don't let first-party/stability heuristics silently override them.
 alwaysApply: true
 portedFrom: df3520bce876
+portedSelf: 89b4a48adf6b
 ---
 
 # Weight stated requirements over stability bias when comparing libraries

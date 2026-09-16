@@ -2,6 +2,7 @@
 description: Decompose multi-step work by mapping the dependency graph before acting, instead of processing steps in listed order.
 alwaysApply: true
 portedFrom: 68b805438556
+portedSelf: 86ac0b5b8b1c
 ---
 
 # Decompose before acting: map the dependency graph first

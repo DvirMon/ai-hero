@@ -2,6 +2,7 @@
 name: ds-wayfinder
 description: Entry point for building a new DS component from a Figma design. Routes to the correct phase skill based on user intent. On first use, collects project config (frameworks, component paths, reference docs).
 portedFrom: 422cc7274053
+portedSelf: 2bc758d35b56
 ---
 
 # DS Component Builder — Hub

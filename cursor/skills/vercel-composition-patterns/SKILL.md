@@ -11,6 +11,7 @@ metadata:
   author: vercel
   version: '1.0.0'
 portedFrom: df45da2ef6eb
+portedSelf: df45da2ef6eb
 ---
 
 # React Composition Patterns
