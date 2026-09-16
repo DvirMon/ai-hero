@@ -53,9 +53,11 @@ stop — no partial implementation, no "I'll make a start on the easy part", no 
 missing stage inline. The stages exist to arrive in a fresh context; running one here and
 implementing off it in the same window is the thing being prevented.
 
-On a **sub** (the block has an `epic:` key), only `needs:tasks` and `ready-for-agent` are
-reachable. A sub reading `needs:grill` means the epic regressed — refuse and point at the epic,
-not at the child.
+On a **sub** (the block has an `epic:` key), `needs:spec` and `needs:issues` are unreachable —
+a sub's contract is the epic's. `needs:grill` **is** reachable and normal: an epic's grill often
+leaves one question scoped to one slice. Refuse and point at the child, not the epic. If several
+siblings read `needs:grill` at once, say so — that is the epic's grill having failed, and the
+regrill belongs there.
 
 On `needs:triage`: apply `to-issues`' triggers, write the rung and its dated reason into the
 block via `gh issue edit`, re-sync the rung label, then stop and ask. **You may not promote an

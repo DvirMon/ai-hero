@@ -256,15 +256,28 @@ A rung means "run this stage and every stage below it before implementing".
 | rung | meaning | epic | sub |
 |---|---|---|---|
 | `needs:triage` | nobody has judged this yet | ✓ | ✓ |
-| `needs:grill` | open questions in the body | ✓ | — |
+| `needs:grill` | open questions gate this issue | ✓ | ✓ (scoped) |
 | `needs:spec` | exported surface changes, no contract written | ✓ | — |
 | `needs:issues` | grilled and specced, not yet sliced | ✓ | — |
 | `needs:tasks` | design settled, execution order is not | ✓ | ✓ |
 | `ready-for-agent` | implementable now | ✓ (childless only) | ✓ |
 
-A sub is never `needs:grill`, `needs:spec`, or `needs:issues` — those belong to its parent. A sub
-that genuinely needs grilling means the **epic regressed**: say so and point at the epic rather
-than grilling the child.
+A sub is never `needs:spec` or `needs:issues` — a sub *is* the slice, and its contract is the
+epic's.
+
+**A sub may be `needs:grill`, and usually that is where an open question belongs.** An epic's
+grill settles the shape; it routinely leaves a residual question scoped to one slice. Put the rung
+on the slice the question actually gates, not on the epic — a question parked on the parent blocks
+every sibling, when only one of them is waiting on it.
+
+The diagnostic is the count, not the rung: **one** sub at `needs:grill` is a scoped leftover and
+normal; **several** at once means the epic's grill did not settle the shape, so regrill the epic
+rather than each child.
+
+**An epic's rung describes the epic's own pipeline — grill, spec, slicing — never its children's
+readiness.** Once those three are done and children exist, the epic is `ready-for-agent`
+regardless of what the children still need. Anything else double-counts a child's blocker as the
+parent's.
 
 ### Assessing readiness
 
@@ -276,7 +289,12 @@ user grants `ready-for-agent`.
 Judge on triggers, not on feel. Any hit sets the rung; **ambiguity resolves upward, never down**:
 
 - Unresolved questions in the body — `## Questions to settle`, `Decide Q1-Q3`, an unchecked
-  `- [ ] Decide …`, an "open" or "worth checking" paragraph → **`needs:grill`**.
+  `- [ ] Decide …`, an "open" or "worth checking" paragraph → **`needs:grill`**, on whichever
+  issue the question actually gates. A question the body itself scopes to one slice ("gates slice
+  2", "slice 1 is unaffected") belongs on that slice, not on the epic.
+- **The rung must agree with its own `assessed:` line.** A reason reading "X must be answered
+  first" under `readiness: needs:tasks` is a contradiction — the reason is usually the accurate
+  half, so fix the rung to match it.
 - Adds, renames, or retypes an **exported** symbol — a public type, a new factory, a changed call
   signature → **`needs:spec`**.
 - Names 3+ modules, or carries more than ~6 acceptance criteria → **`needs:issues`** on an epic,
