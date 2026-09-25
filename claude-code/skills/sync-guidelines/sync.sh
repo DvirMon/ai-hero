@@ -39,6 +39,32 @@ sync_dir "$CLAUDE_DIR/skills" "$REPO_DIR/claude-code/skills"
 # --- Claude Code: agents ---
 sync_dir "$CLAUDE_DIR/agents" "$REPO_DIR/claude-code/agents"
 
+# --- Claude Code: repo-level .claude/{skills,agents}, merged into the ---
+# --- same global folders above (no --delete: these add to, never wipe, ---
+# --- what ~/.claude already provided). Covers project-scoped skills/agents ---
+# --- (e.g. org's ds-*) that are intentionally kept out of ~/.claude so ---
+# --- they don't leak into unrelated projects' context, but should still ---
+# --- be preserved in this mirror. ---
+GIT_ROOT="$HOME/git"
+if [ -d "$GIT_ROOT" ]; then
+  for repo_claude in "$GIT_ROOT"/*/.claude; do
+    [ -d "$repo_claude" ] || continue
+    for sub in skills agents; do
+      [ -d "$repo_claude/$sub" ] || continue
+      for item in "$repo_claude/$sub"/*; do
+        [ -e "$item" ] || continue
+        name="$(basename "$item")"
+        if command -v rsync >/dev/null 2>&1; then
+          rsync -aL "$item" "$REPO_DIR/claude-code/$sub/"
+        else
+          rm -rf "$REPO_DIR/claude-code/$sub/$name"
+          cp -rL "$item" "$REPO_DIR/claude-code/$sub/$name"
+        fi
+      done
+    done
+  done
+fi
+
 # --- Claude Code: opt-in / project-dependent conventions (NOT auto-loaded, unlike rules/) ---
 [ -d "$CLAUDE_DIR/conventions" ] && sync_dir "$CLAUDE_DIR/conventions" "$REPO_DIR/claude-code/conventions"
 

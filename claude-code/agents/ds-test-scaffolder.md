@@ -28,9 +28,9 @@ Generate `{prefix}-<name>.component.spec.ts` covering only the component's actua
 6. Keep each test isolated and deterministic — no reliance on timing/animation completing unless explicitly awaited
 
 ## Standards & References
-- `.claude/skills/testing/references/testing-principles.md` — shared cross-cutting rules (taxonomy, coverage philosophy, mocking boundaries)
-- `.claude/skills/testing/references/unit-testing.md` — the framework-agnostic rule ("would this catch a logic bug?"), what to test, what not to test
-- `.claude/skills/testing/references/unit-testing.angular.md` — concrete Jasmine/Angular test patterns for each category, plus explicit BAD examples to avoid
+- `~/.claude/conventions/testing/testing-principles.md` — shared cross-cutting rules (taxonomy, coverage philosophy, mocking boundaries)
+- `~/.claude/skills/unit-test/references/unit-testing.md` — the framework-agnostic rule ("would this catch a logic bug?"), what to test, what not to test
+- `~/.claude/skills/unit-test/references/unit-testing.angular.md` — concrete Jasmine/Angular test patterns for each category, plus explicit BAD examples to avoid
 - `{planDir}/step-*-tests.plan.md` — this component's specific logical units requiring coverage
 
 ## Process

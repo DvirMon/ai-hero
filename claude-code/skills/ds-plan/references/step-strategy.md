@@ -9,7 +9,7 @@ Extracted from the user-level workflow skill for repo-level portability.
 
 ## Dependency Graph Reasoning (before ordering)
 
-Before assigning step numbers, apply `dependency-task-graph` (the execution specialization of
+Before assigning step numbers, apply `decompose-by-dependency-graph` § Execution grain (the execution specialization of
 `decompose-by-dependency-graph`): list the candidate steps, map the edges between them (does
 step B need a file/type/decision step A produces?), then rank each as core (others depend on
 it), independent/leaf (nothing depends on it, depends on nothing), or dependent (needs another

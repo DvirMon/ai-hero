@@ -16,6 +16,12 @@ session history, or credentials (mcp.json, settings.json with tokens). Only:
 - `~/.claude/rules/` → `claude-code/rules/`
 - `~/.claude/skills/` (symlinks dereferenced) → `claude-code/skills/`
 - `~/.claude/agents/` → `claude-code/agents/`
+- `~/git/*/.claude/{skills,agents}/` (repo-level) → merged into `claude-code/skills/` and
+  `claude-code/agents/`, no delete. Covers skills/agents kept at project level on purpose (e.g.
+  org's `ds-*` — scoped there so they don't leak into unrelated projects' context) but still
+  meant to be preserved in this mirror. Repo-level `rules/`, `hooks/`, `settings*.json` are not
+  synced — rules there are usually project-scoped dupes of global rules, and settings/hooks can
+  carry project-specific or credential content.
 - `~/.claude/conventions/` (opt-in / project-dependent — NOT auto-loaded like `rules/` is) → `claude-code/conventions/`
 - `~/.claude/plugins/marketplaces/*/{skills,agents,commands,docs}` → `claude-code/plugins/<marketplace>/`
   (excludes `.git`, `dist`, `node_modules`, `bin`, `tests`, `benchmarks`, `evals`, `src`,
