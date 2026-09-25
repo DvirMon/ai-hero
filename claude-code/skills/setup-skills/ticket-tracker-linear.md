@@ -1,6 +1,6 @@
 # Ticket tracker: Linear
 
-Intake tickets for this repo live in Linear. `to-ticket` is the only skill that writes here; every later stage reads the ticket once, then works from `docs/tickets/<slug>/`.
+Intake tickets for this repo live in Linear. `to-ticket` is the only skill that writes here; every later stage reads the ticket once, then works from the domain-colocated workspace `<domain-path>/docs/work/<slug>/`.
 
 ## Configuration
 

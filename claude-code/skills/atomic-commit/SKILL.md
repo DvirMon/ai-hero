@@ -61,14 +61,14 @@ Show the user the bucket breakdown (files/hunks + draft message per commit) befo
      ```
      If a single hunk itself mixes two concerns, answer `s` (split) at that prompt and continue with `y`/`n` for the resulting pieces; fall back to `e` (manual hunk edit) only if `s` can't separate them cleanly.
    - Verify the staged result matches the bucket's intent: `git diff --staged`.
-   - Commit with a heredoc, following conventional commit format with emoji (message via heredoc, `Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>` trailer, no `--no-verify`, no `--amend`):
+   - Commit with a heredoc, following conventional commit format with emoji (message via heredoc, plus the `Co-Authored-By:` trailer exactly as this session's system reminder specifies it — the model varies per session, so never hardcode one):
      ```bash
      git commit -m "$(cat <<'EOF'
      <emoji> <type>(scope): <description>
 
      <body if needed>
 
-     Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
+     Co-Authored-By: <the exact line from this session's attribution reminder>
      EOF
      )"
      ```

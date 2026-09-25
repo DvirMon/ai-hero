@@ -93,32 +93,68 @@ Follow `docs/agents/ticket-tracker.md`'s "When a skill says 'create an intake ti
 
 ### 4. Initialize the ticket workspace
 
-Every effort in this pipeline has a workspace directory, where `<slug>` is a short kebab-case name derived from the ticket title. Decide the workspace **root**:
+Every effort in this pipeline has a workspace directory, where `<slug>` is a short kebab-case name derived from the ticket title. The workspace root is always `<domain-path>/docs/work/<slug>/` — domain-colocated, per `docs/agents/ticket-tracker.md`. There is no repo-root default; `<domain-path>` must be resolved first.
 
-- **Default**: `docs/tickets/<slug>/` at the repo root.
-- **Monorepo override**: if `ticketRef` resolves to a path under `apps/<name>/` or `packages/<name>/` (e.g. a backlog row like `apps/<name>/BACKLOG.md#T-03`, or the ticket is otherwise unambiguously scoped to that project), use `apps/<name>/specs/<slug>/` (or `packages/<name>/specs/<slug>/`) instead — this colocates per-project ticket work with its project instead of pooling everything at the repo root. Apply this whenever the owning project is unambiguous; fall back to the repo-root default otherwise.
+**Resolving `<domain-path>`** — never guess silently:
 
-This skill creates the workspace; every later stage (`/grill-with-docs`, `/to-spec`, `/to-issues`, `/to-tasks`) reads and extends it purely via the paths recorded in `state.json` below — they read `workspaceRoot`/`decisionsPath`/`specPath`/`architecturePath` rather than reconstructing or assuming a root themselves. This is documented here, once.
+1. If the user already named the domain path (in this conversation, or as an argument), use it.
+2. Otherwise, try to derive it from the ticket's subject: does the ask map cleanly to one workspace project (`apps/<name>/`, `packages/<name>/`, `libs/<name>/`)? If `ticketRef` itself resolves to a path under one of those (e.g. a backlog row like `apps/<name>/BACKLOG.md#T-03`), that's a strong signal.
+3. If a derivation was made in step 2, **confirm it with the user** before writing anything — state the derived path and ask them to confirm or correct it. Do not proceed on an unconfirmed guess.
+4. If neither 1 nor 2 resolves cleanly, ask the user directly for the domain path.
 
-Write `<workspace-root>/state.json` (substituting whichever root was decided above):
+This skill creates the workspace; every later stage (`/grill-with-docs`, `/to-spec`, `/to-issues`, `/to-tasks`) reads and extends it purely via the paths recorded in `state.json` below — they read `workspaceRoot`/`decisionsPath`/`capabilityLogPath`/`specPath`/`architecturePath` rather than reconstructing or assuming a root themselves. This is documented here, once.
+
+The full field-by-field schema (owner, consumer, and the validation routine every state-reading
+skill follows) lives in `references/state-schema.md` — this section only shows the shape being
+written.
+
+This skill records the ticket's reference and URL in `state.json` only — it does **not** write a local snapshot of the ticket body to any file in the workspace. The ticket itself lives in the external tracker `docs/agents/ticket-tracker.md` configured; `ticketRef`/`ticketUrl` are the pointer back to it.
+
+**Before writing anything**, check whether `<workspace-root>` already exists. If it does, stop —
+do not write the workspace or `state.json`. Tell the user the directory already exists and ask
+whether to resume the existing workspace (read its `state.json` and continue the pipeline from
+there) or pick a different slug for a new workspace. Never silently overwrite an existing
+`state.json` — a re-run of `/to-ticket` on the same slug must not clobber another session's
+`decisionsPath`/`specPath`/`architecturePath`/`githubIssues` progress.
+
+Once the check passes, dispatch the write to a `haiku` writer per `references/file-writes.md`
+— never inline; the brief carries the full JSON below, filled in. Join it before step 5's
+hand-off, which names the workspace as created.
+
+Write `<workspace-root>/state.json` (substituting whichever root was decided above), per
+`references/state-schema.md`:
 
 ```json
 {
+  "schemaVersion": 2,
+  "runId": "<slug>-<utc-timestamp>",
   "slug": "<slug>",
   "ticketRef": "<the id/key/path the tracker convention returned>",
   "ticketUrl": "<url, if the tracker has one>",
+  "domainPath": "<domain-path>",
+  "workspaceRoot": "<workspace-root>",
   "stack": "react | angular | node | none",
   "isComplex": null,
-  "workspaceRoot": "<workspace-root>",
-  "decisionsPath": "<workspace-root>/decisions.md",
+  "decisionsPath": "<workspace-root>/1-decisions.md",
+  "capabilityLogPath": "<the capability's decisions log, or null>",
   "specPath": null,
   "architecturePath": null,
   "githubIssues": [],
-  "checklist": { "intake": true, "grill": false, "spec": false, "issues": false, "tasks": false }
+  "createdAt": "<iso8601, now>",
+  "updatedAt": "<iso8601, now>"
 }
 ```
 
-`isComplex` and the doc paths start `null` — `/grill-with-docs` and `/to-spec` fill them in as the effort progresses. `githubIssues` fills in once `/to-issues` runs.
+`capabilityLogPath` points at the permanent decisions log for the capability this work belongs
+to, when the project keeps them (`doc-contracts/decisions-log.md`; look for `docs/decisions/` or
+a pointer from the domain's `CLAUDE.md`). Set it at creation — `/grill-with-docs` reads it
+before its first question. `null` is the right value for work spanning more than one capability,
+and is a decision, not a skipped field; record why in `1-decisions.md`.
+
+`isComplex` and the doc paths start `null` — `/grill-with-docs` and `/to-spec` fill them in as
+the effort progresses. `githubIssues` fills in once `/to-issues` runs. `runId` is
+`<slug>-<utc-timestamp>`; `createdAt`/`updatedAt` both start at creation time and `updatedAt`
+moves forward on every later write, per `references/state-schema.md`'s validation routine.
 
 `stack` is set here and read by `/implement`, which pairs it with each step file's `Task type`
 to pick the implementer agent. It is the only routing field that belongs to the whole ticket —

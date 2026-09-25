@@ -9,5 +9,7 @@ wait for the user's answer, record it, then move to the next.
 - If complex/open-ended (needs explanation, tradeoffs beyond simple options), ask in plain text,
   still one question per turn.
 - After each answer, record it (e.g. update the source doc's open-questions section, mark
-  resolved, note decision + date) before presenting the next question.
+  resolved, note decision + date) — via a fork, per
+  [[fork-doc-writes-during-discussion]], not inline. Don't wait on the fork before presenting
+  the next question.
 - Do not pre-draft recommendations for all remaining questions up front — only the current one.

@@ -7,10 +7,10 @@ reference files, plus a shared cross-cutting reference nothing layer-specific sh
 
 **Structure:**
 - `unit-test` — unit/component test *selection policy* (what to test / what to skip), React +
-  Angular. Executed by the `test-implementer` agent via `/implement`. Its `references/` is a
-  symlink to the shared pool at `~/.claude/skills/testing/references/`.
-- `ds-test-scaffolder` — DS component logic tests (ds-plan/ds-scaffold pipeline only; reads the
-  same reference pool by path).
+  Angular. Executed by the `test-implementer` agent via `/implement`. Owns its `references/`
+  outright (the three unit-testing files).
+- `ds-test-scaffolder` — DS component logic tests (ds-plan/ds-scaffold pipeline only; reads
+  `unit-test`'s references and the shared principles by path).
 - `e2e-test-scaffolder` — future, Playwright critical-path smoke tests.
 - `contract-test-scaffolder` — future, MSW/fake server contract tests.
 - `backend-test-scaffolder` — future, if a backend lands in the repo.

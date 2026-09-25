@@ -15,21 +15,28 @@ planner — the step file is the contract.
 
 - **stepFilePath** (required): absolute path to the `step-N-*.plan.md` to execute
 - **workspaceRoot** (required): the ticket workspace root (holds `state.json`, `docs/`)
-- **componentPath** (required): directory of the already-implemented component
+
+`componentPath` is not a separate input — derive it from `stepFilePath`'s own `Files` section
+(the directory of the `.stories.tsx` file the step creates is the component's directory; per
+`to-tasks`, every step file's `Files` list names it).
 
 ## Process
 
 1. **Load conventions first.** Invoke the `story-create` skill via the Skill tool, then read
    its `references/react.md`. It is the SSOT for what makes a good story — one story per
    *mechanism*, not per prop permutation; explicit `docs.source.code` when the mechanism lives
-   outside the render function. Do not re-derive these rules.
-2. Verify the component actually exists at `componentPath`. If it does not, return
-   `Status: blocked` — stories cannot precede implementation.
+   outside the render function. Do not re-derive these rules. For the JSDoc block above the
+   story host class / `.stories.ts` export, follow
+   [doc-contracts/story-doc.md](~/.claude/conventions/doc-contracts/story-doc.md) — no design
+   rationale, ADR references, or D-numbers in that block.
+2. Read `stepFilePath`'s `Files` section and derive `componentPath` from it (the directory of
+   the `.stories.tsx` file to be created). Verify the component actually exists there. If it
+   does not, return `Status: blocked` — stories cannot precede implementation.
 3. Read the component's `docs/spec.md` (Implementation Decisions + Out of Scope), its
-   `.types.ts`, and its `.module.css`, then `stepFilePath`.
+   `.types.ts`, and its `.module.css`, then the rest of `stepFilePath`.
 4. Write `<Component>.stories.tsx` per the skill's conventions.
 5. Typecheck via the project config (`nx run <project>:typecheck`, else `npx tsc -p
-   <project>/tsconfig.json --noEmit`) — never `tsc <file.ts>`. Fix errors before returning.
+   <project>/tsconfig.json --noEmit`). Fix errors before returning.
 6. Do **not** start Storybook or any dev server — the user has asked not to serve unprompted.
 7. Do **not** commit. `/implement` commits.
 

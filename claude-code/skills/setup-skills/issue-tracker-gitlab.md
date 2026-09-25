@@ -26,6 +26,19 @@ When set to `yes`, MRs run through the same labels and states as issues, using t
 
 Unlike GitHub, GitLab numbers issues and MRs separately, so `#42` is unambiguous once you know which surface the maintainer means.
 
+## Ship mode
+
+**Direct push to default branch: no.** _(Set to `yes` if this repo pushes straight to the
+default branch instead of going through a merge request; `/ship` reads this flag.)_
+
+When set to `no` (default), `/ship` branches, pushes, and opens a merge request — the MR carries
+CI, and `Closes #N` in its description is what the closing-on-merge automation acts on.
+
+When set to `yes`, `/ship` pushes the current commit(s) straight to the default branch — no
+branch, no MR. `Closes #N` must already be present in a pushed commit message (GitLab closes on
+a direct push to the default branch too, not only on a merged MR) — `/ship` checks for this and
+stops rather than rewriting commit history if it's missing.
+
 ## When a skill says "publish to the issue tracker"
 
 Create a GitLab issue.

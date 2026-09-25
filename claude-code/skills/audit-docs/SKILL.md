@@ -1,18 +1,26 @@
 ---
 name: audit-docs
-description: Audit documentation file(s) against the current code and any cross-referenced docs to find stale content — broken links, claims a fix "still needs doing" that already shipped, code behavior the doc no longer describes correctly, status/date markers that don't match reality. Default scope is the file(s) the user names; audit every doc in the project only when the user explicitly asks for "all docs"/"all documentation". Reports findings per file and does not edit unless the user asks to apply/fix. Use when the user wants to "audit docs", check if documentation is stale or up to date, or verify docs against code state.
+description: Check whether documentation is still TRUE against the code — broken links, claims a fix "still needs doing" that already shipped, behavior the doc no longer describes correctly, status/date markers that do not match reality. TRUTH is the job — never rewrites for brevity (that is `concise-docs`, dispatched as the `doc-compressor` agent once fixes are applied) and never reshapes source comments to the JSDoc contract (that is `source-docs`). Reports findings per file and edits nothing unless asked to apply/fix. Default scope is the file(s) named; all docs only when explicitly asked. When given a capability/feature instead of a path, defers to the project's own capability-docs procedure if it documents one. When the scope is an episodic work folder (an `active/<slug>/` directory with a sibling `archive/`), also checks whether its tracked work shipped and, on request, dispatches `doc-archiver`. Use to audit docs, check whether documentation is stale or up to date, verify docs against code state, or archive finished work folders.
 ---
 
 Verify a doc's claims against ground truth — the current code, and any other doc it references —
-rather than trusting the doc's own account of itself. Report-only by default; apply fixes only on
-explicit request (see step 6). Verification always runs as **parallel sub-agents** (step 4), never
-serially — that's what keeps this fast enough to run routinely instead of just once.
+rather than trusting the doc's own account of itself. Report-only by default; apply fixes or
+archive finished folders only on explicit request (steps 6 and 7). Verification always runs as
+**parallel sub-agents** (step 4), never serially — that's what keeps this fast enough to run
+routinely instead of just once.
 
 ## Process
 
 ### 1. Pin the scope
 
 - User named specific file(s) → that's the scope, exactly.
+- User named a **capability/feature** rather than a path ("audit the filtering docs", "audit
+  grouping") → check whether the project documents a capability-docs procedure (look for a
+  `docs/agents/capability-docs.md`, or a pointer to one from its `CLAUDE.md`). If it does,
+  **follow that procedure** — this skill's steps 2–5 are its verification phase, but a
+  capability audit also consolidates, tombstones and moves, which this skill does not do on its
+  own. If the project documents no such procedure, treat the capability as a file-scope ask and
+  confirm which files before proceeding.
 - User said "all docs" / "all documentation" / similar, explicitly → scope is every doc file in
   the project (or the directory they named). Find the project's own doc convention first — check
   its `CLAUDE.md`/`AGENT.md` for a documented docs-structure table (e.g. numbered doc streams,
@@ -39,6 +47,16 @@ otherwise skip). For each, pull out two kinds of claims:
 
 Skip claims that are pure opinion/rationale ("we chose X because Y") — nothing to verify against
 ground truth there.
+
+- **Folder-completion claims** — when a target is itself an episodic work folder (an
+  `active/<slug>/` directory sibling to an `archive/`), don't read the whole folder to form
+  this claim. Read only its checklist/task-list file (`state.json`'s `checklist`, or a
+  `- [ ]` list in a plan/step file) and turn **each item** into its own claim, naming the
+  exact symbol/file/export the item points at (e.g. "`withComputed` is exported from
+  `index.ts`", not "computed feature is done"). One claim per item, not one per folder — this
+  is what makes step 4's verification a grep instead of a read. This is the one claim type in
+  this skill you're hoping comes back false — a false verdict (item already done) is an
+  archive candidate, not a defect.
 
 ### 3. Track every claim as a todo
 
@@ -73,6 +91,20 @@ Each agent's brief:
 - Verdict per claim: **STALE** (doc says X, current state is Y — quote both), **CONFIRMED**
   (still matches), or **CANNOT VERIFY** (claim isn't checkable — e.g. references something
   external, or a symbol that no longer exists anywhere to compare against).
+- For a folder-completion claim, verify cheap-first — never open the folder's full source tree
+  or history to answer this:
+  1. **Hypothesis, not verdict:** the item's own recorded mark (checkbox, `state.json`
+     checklist flag) says which way to check, nothing more — a checked box is not evidence.
+  2. **One targeted grep per item:** search for the exact symbol/file the claim names (from
+     step 2 — this is why that claim had to name it). A single hit that matches the claimed
+     shape (exported, wired, called where the item says) is enough to verdict; stop there.
+  3. **Escalate only on ambiguity:** open the specific file grep pointed at (not the whole
+     folder, not the whole `src/`) only when the grep is empty, has multiple candidates, or
+     the match doesn't obviously satisfy the claim. This is the exception path, not the
+     default one.
+  Verdict per item: **SHIPPED** (grep or the one escalated file confirms it), **IN PROGRESS**
+  (confirmed absent/incomplete), or **CANNOT VERIFY** (grep inconclusive even after escalating).
+  A folder is a **SHIPPED** folder only once every one of its items verdicts SHIPPED.
 
 As each agent returns, update the corresponding todo items to completed with their verdicts.
 
@@ -83,7 +115,11 @@ confirmations) as: what the doc says → what's actually true now → the specif
 fix. End with a one-line tally per file: confirmed vs. stale vs. cannot-verify — read straight off
 the completed todo list, not re-counted by hand.
 
-Do not edit anything in this step. Report and stop.
+Any folder-completion claim verdicted **SHIPPED** gets its own line instead, flagged as an
+archive candidate: `<folderPath> → SHIPPED, candidate for archive/`. **IN PROGRESS** folders are
+not findings — say nothing about them beyond the tally.
+
+Do not edit or move anything in this step. Report and stop.
 
 ### 6. Apply, only if asked
 
@@ -92,6 +128,27 @@ seeing the report, edit each STALE finding directly — minimal, targeted edits 
 sentence/link/status marker, not a rewrite of surrounding prose. Downstream files a finding
 points at (e.g. a handoff doc the audited file links to) are **out of scope for editing** unless
 the user names them too — flag what's stale there in the report, don't silently fix it.
+
+Once the edits are in, dispatch the `doc-compressor` agent over the files you changed, passing
+the file list. Fixing a stale claim tends to add words; this pass takes them back out. It loads
+`concise-docs` for the policy and runs its preserved-content check, so a fix can't be silently
+truncated. Skip it if you edited nothing.
+
+### 7. Archive, only if asked — and only what verified SHIPPED
+
+Moving a folder is a bigger action than editing a line, so it carries its own opt-in on top of
+step 6's: only act on an archive candidate when the user's request said fix/update/apply/archive,
+or they say so after seeing the report, **and** the report actually flagged that folder as a
+candidate. Never move a folder as a side effect of an unrelated fix request, and never act on an
+**IN PROGRESS** or **CANNOT VERIFY** folder.
+
+For each candidate to act on, dispatch the `doc-archiver` agent (parallel, one per folder, in a
+single message, if there's more than one) with: the folder's path, the project root, and the
+completion evidence step 4 already established (the verified checklist, quoted — the agent does
+not re-derive completeness, so hand it the verdict, not just "it's done"). The agent gate-checks
+the move itself (e.g. a project may require every decision in the folder to be logged first
+before it can move) and reports back moved-or-blocked; relay that verdict per folder rather than
+assuming every dispatch succeeded.
 
 ## Recurrence
 

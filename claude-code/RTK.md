@@ -2,7 +2,7 @@
 
 **Usage**: Token-optimized CLI proxy (60-90% savings on dev operations)
 
-## Meta Commands (always use rtk directly)
+## Meta Commands
 
 ```bash
 rtk gain              # Show token savings analytics
@@ -21,9 +21,9 @@ which rtk             # Verify correct binary
 
 ⚠️ **Name collision**: If `rtk gain` fails, you may have reachingforthejack/rtk (Rust Type Kit) installed instead.
 
-## Hook-Based Usage
+## Usage
 
-All other commands are automatically rewritten by the Claude Code hook.
-Example: `git status` → `rtk git status` (transparent, 0 tokens overhead)
+Invoke `rtk` explicitly as a prefix on dev operations: `rtk git status`, `rtk nx build <project>`.
+There is no automatic rewriting — commands run unprefixed unless you write the prefix.
 
 Refer to CLAUDE.md for full command reference.

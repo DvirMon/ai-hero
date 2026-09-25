@@ -14,7 +14,7 @@ The issue tracker and triage label vocabulary should have been provided to you �
 
 ### 1. Gather context
 
-If a ticket workspace's `state.json` exists in context, default to its `specPath` (and `architecturePath`, if set) as the source — read both fully. Otherwise, work from whatever is already in the conversation context, or if the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+If a ticket workspace's `state.json` exists in context, validate it per `to-ticket/references/state-schema.md`, then default to its `specPath` (and `architecturePath`, if set) as the source — read both fully. Otherwise, work from whatever is already in the conversation context, or if the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
 
 If no `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket). Backfill `specPath`/`architecturePath` from whatever source you actually used.
 
@@ -26,9 +26,9 @@ Look for opportunities to prefactor the code to make the implementation easier. 
 
 ### 3. Draft vertical slices
 
-If `decisions.md` records a `decompose-by-dependency-graph` ranking from `grill-with-docs`, use
+If `1-decisions.md` records a `decompose-by-dependency-graph` ranking from `grill-with-docs`, use
 it as the starting point — don't re-derive the sub-feature structure from scratch. But re-check
-the edges at issue grain per `dependency-task-graph`: the grilling ranking ordered *discussion*
+the edges at issue grain per `decompose-by-dependency-graph` § Execution grain: the grilling ranking ordered *discussion*
 (which decisions had no shared unknowns), not *build* (which issues share a schema, a file, or a
 compile-time type) — a node independent for one is not automatically independent for the other.
 Core/independent nodes that hold up at issue grain become issues with "None — can start
@@ -67,35 +67,69 @@ Ask the user:
 
 Iterate until the user approves the breakdown.
 
-### 5. Publish the issues to the configured tracker
+### 5. Before creating anything on the tracker
 
-Publish the approved issues. **How** depends on the tracker `/setup-skills` configured — the issues are the same either way, only the shape of the blocking edges changes:
+Every create in this skill is guarded. Re-running `/to-issues` on a spec that was already sliced
+must converge on the existing issues, never produce a second set.
 
-- **Local files** → write one file per issue under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-issue file template below — one issue per file, never a single combined file.
-- **A real issue tracker (GitHub, Linear, …)** → publish one issue per slice in dependency order (blockers first) so each issue's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each issue's "Blocked by" to the blocking issues. Apply the `ready-for-agent` triage label unless instructed otherwise — the issues are agent-grabbable by construction.
+1. **Slice issues.** Before creating, search for an existing issue carrying this slice's marker:
+   `gh issue list --state all --search "<epic-ref> in:body" --json number,title,body`.
+   Each created issue body carries a machine-readable marker line —
+   `<!-- slice: <epic-ref>/<slice-slug> -->` — written at creation (see the templates below). A
+   match means the slice exists: reuse its number, update the body if the spec changed, and do
+   not create.
+2. **Labels.** `gh label list --json name` once, before the loop in step 6. Create only names
+   absent from that list.
+3. **Sub-issue attachment.** Query the parent's existing sub-issues before `addSubIssue`; skip
+   when the child is already attached.
+4. **Blocking edges.** Query existing `blocked_by` entries before the POST; skip duplicates.
+
+Report at the end how many issues were created versus reused. A run that reuses everything is a
+success, not a no-op to be worked around.
+
+### 6. Publish the issues to the configured tracker
+
+Publish the approved issues, applying the existence checks from step 5 above. **How** depends on the tracker `/setup-skills` configured — the issues are the same either way, only the shape of the blocking edges changes:
+
+- **Local files** → write one file per issue under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-issue file template below — one issue per file, never a single combined file. `.scratch/` is git-ignored: these are drafts consumed by this publishing step, and the published issues on the tracker are the durable artifact.
+- **A real issue tracker** (whichever this repo configured — see `docs/agents/issue-tracker.md`) → publish one issue per slice in dependency order (blockers first) so each issue's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each issue's "Blocked by" to the blocking issues. Apply the `ready-for-agent` triage label unless instructed otherwise — the issues are agent-grabbable by construction.
 
   **Set both native relations, not just one** — they are different axes, and the tracker doc has
-  the exact commands (for GitHub, `docs/agents/issue-tracker.md` § Epics and hierarchy):
+  the exact commands (for GitHub, `docs/agents/issue-tracker.md` § Epics and hierarchy). Both are
+  guarded by step 5 above: query before writing, skip what's already there.
 
   - **Hierarchy** — attach every slice to the epic as a sub-issue, so the epic shows a progress
     rollup and each slice shows a parent breadcrumb. When the tracker has this, it **replaces**
-    the `## Parent` prose section; keep that section only as a fallback where it doesn't.
+    the `## Parent` prose section; keep that section only as a fallback where it doesn't. Check
+    the parent's existing sub-issues first (step 5.3) — skip `addSubIssue` when already attached.
   - **Sequencing** — record each blocking edge natively, so "is this unblocked" is a query
     rather than prose someone has to read. Keep the `## Blocked by` body section too: it is what
-    survives a tracker migration and what a reader sees without an API call.
+    survives a tracker migration and what a reader sees without an API call. Check existing
+    `blocked_by` entries first (step 5.4) — skip the POST when the edge already exists.
 
   Setting these is not optional cleanup — an epic published without them has its structure in
   prose only, which is exactly the state `issue-graph.md` then has to be reconciled against by hand.
 
 Work the **frontier**: any issue whose blockers are all done. For a purely linear chain that means top to bottom.
 
-Do NOT close or modify any parent issue.
+Do NOT close the parent issue. Its only edit: once every slice is published, set its
+Pipeline block to `readiness: in-progress`, add `graph: <workspaceRoot>/issue-graph.md`, and
+swap its rung label to `in-progress` (per `references/pipeline-block.md` § Epic form). Nothing
+else in its body changes.
 
-If the ticket workspace's `state.json` exists, append the created issue numbers/references to its `githubIssues` array and set `checklist.issues = true`.
+If the ticket workspace's `state.json` exists, append the created issue numbers/references to its `githubIssues` array and refresh `updatedAt` — per `to-ticket/references/state-schema.md`'s validation routine.
+
+**File writes go to one `sonnet` writer**, per `to-ticket/references/file-writes.md`: the
+local-issue drafts, the `state.json` update above, and step 7's `issue-graph.md` — the graph
+is shaped from tracker data, not dictated, hence `sonnet`. The tracker calls stay in the main
+session — the writer needs their issue numbers and edges, so dispatch it once they return,
+with those in the brief. Join it before the final message.
 
 <local-issue-template>
 
 # <NN> — <Issue title>
+
+<!-- slice: <epic-ref>/<slice-slug> -->
 
 **What to build:** the end-to-end behaviour this issue makes work, from the user's perspective — not a layer-by-layer implementation list.
 
@@ -108,11 +142,13 @@ If the ticket workspace's `state.json` exists, append the created issue numbers/
 
 ## Pipeline
 
-<the sub form from "The Pipeline block" below — this issue came from a spec, so it has an epic>
+<the sub form from `references/pipeline-block.md` — this issue came from a spec, so it has an epic>
 
 </local-issue-template>
 
 <issue-template>
+
+<!-- slice: <epic-ref>/<slice-slug> -->
 
 ## Parent
 
@@ -133,13 +169,13 @@ The end-to-end behaviour this issue makes work, from the user's perspective — 
 
 ## Pipeline
 
-<the sub form from "The Pipeline block" below — this issue came from a spec, so it has an epic>
+<the sub form from `references/pipeline-block.md` — this issue came from a spec, so it has an epic>
 
 </issue-template>
 
 In either form, avoid specific file paths or code snippets — they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
 
-### 6. Write the epic's issue graph
+### 7. Write the epic's issue graph
 
 Always write `<workspaceRoot>/issue-graph.md` — one file per epic, regardless of tracker. It is
 the high-level view of the whole epic: every issue, its edges, and where the frontier is. It does
@@ -191,162 +227,26 @@ Next: /to-tasks <first-frontier-issue-#-or-slug>
 
 ## The Pipeline block
 
-Every issue body ends with a `## Pipeline` section: which upstream stages actually ran, and
-whether the issue is ready to implement. `/implement` reads it and refuses to start work the
-pipeline has not prepared.
+Every issue body ends with a `## Pipeline` section recording which upstream stages ran and
+whether the issue is ready to implement. `/implement` reads it and refuses work the pipeline
+has not prepared.
 
-It exists because `state.json`'s `checklist` only covers issues that came from a workspace. An
-issue opened mid-work — noticed while building something else, written down so a future session
-picks it up — has no workspace, so nothing records what was *not* done to it.
+**The full contract lives in [`references/pipeline-block.md`](references/pipeline-block.md)** —
+the epic and sub forms, the `readiness` ladder, the assessment triggers, and the label
+taxonomy. It is the SSOT for every skill that writes the block, not just this one. Read it
+before stamping a block; don't work from memory of this summary.
 
-### Two kinds
+Two rules that govern this skill's own steps, repeated here because steps 5-7 depend on them:
 
-**Epic** — owns its pipeline: grill, spec, slicing. Children are optional; an epic with no
-children is just one that never needed slicing. **An epic with children is never implemented
-directly** — you work the children. That is derived from the tracker's sub-issue relation, not
-declared, so it cannot go stale.
+- **You set the rung from your own difficulty reasoning — `ready-for-agent` included.** Write
+  the rung and its evidence into `assessed:`; never cite the user's approval of the breakdown
+  as the reason. The closing `Next:` line follows the frontier issue's rung — `/implement` for
+  `ready-for-agent`, `/to-tasks` for `needs:tasks`.
+- **The body block is authoritative; labels are a projection.** Re-sync both labels in the same
+  turn you write the block. On conflict the body wins.
 
-**Sub** — a child of an epic. It inherits grill and spec from the parent and owns exactly one
-stage of its own: tasks.
 
-### Epic form
-
-````markdown
-## Pipeline
-
-```yaml
-workspace: <path to the folder holding state.json, or null>
-grill: none
-spec: none
-tasks: none
-readiness: needs:triage
-```
-````
-
-Stage values: `none`, `done: <path>`, or `skipped: <one-line reason>`. When `workspace` is set,
-`state.json`'s `checklist` owns `grill`/`spec` and those lines are dropped from the block — one
-copy only.
-
-### Sub form
-
-````markdown
-## Pipeline
-
-```yaml
-epic: "#82"
-workspace: <the epic's workspace path>
-tasks: none
-readiness: needs:tasks
-```
-````
-
-`grill` and `spec` are **absent by construction** — asking them here is a category error, and
-writing them would be a second copy of the epic's `state.json`. The `epic:` key is what makes
-this a sub; there is no `kind:` line, because presence already says it.
-
-`tasks` lives on the issue, not in `state.json`. `/to-tasks` plans **one issue**, while
-`checklist.tasks` is a single boolean for the whole workspace — on a multi-issue epic that
-boolean cannot answer "is *this* issue planned". Grain decides the home: epic-grain stages in
-`state.json`, the issue-grain stage on the issue.
-
-### `readiness` — the ladder
-
-A rung means "run this stage and every stage below it before implementing".
-
-| rung | meaning | epic | sub |
-|---|---|---|---|
-| `needs:triage` | nobody has judged this yet | ✓ | ✓ |
-| `needs:grill` | open questions gate this issue | ✓ | ✓ (scoped) |
-| `needs:spec` | exported surface changes, no contract written | ✓ | — |
-| `needs:issues` | grilled and specced, not yet sliced | ✓ | — |
-| `needs:tasks` | design settled, execution order is not | ✓ | ✓ |
-| `ready-for-agent` | implementable now | ✓ (childless only) | ✓ |
-
-A sub is never `needs:spec` or `needs:issues` — a sub *is* the slice, and its contract is the
-epic's.
-
-**A sub may be `needs:grill`, and usually that is where an open question belongs.** An epic's
-grill settles the shape; it routinely leaves a residual question scoped to one slice. Put the rung
-on the slice the question actually gates, not on the epic — a question parked on the parent blocks
-every sibling, when only one of them is waiting on it.
-
-The diagnostic is the count, not the rung: **one** sub at `needs:grill` is a scoped leftover and
-normal; **several** at once means the epic's grill did not settle the shape, so regrill the epic
-rather than each child.
-
-**An epic's rung describes the epic's own pipeline — grill, spec, slicing — never its children's
-readiness.** Once those three are done and children exist, the epic is `ready-for-agent`
-regardless of what the children still need. Anything else double-counts a child's blocker as the
-parent's.
-
-### Assessing readiness
-
-**The assessment is a proposal, never a self-granted permission.** An agent that may promote
-itself to `ready-for-agent` will, every time — it is the cheap path and it carries none of the
-rework. Whoever assesses writes the verdict and its reason into the block and **stops**. Only the
-user grants `ready-for-agent`.
-
-Judge on triggers, not on feel. Any hit sets the rung; **ambiguity resolves upward, never down**:
-
-- Unresolved questions in the body — `## Questions to settle`, `Decide Q1-Q3`, an unchecked
-  `- [ ] Decide …`, an "open" or "worth checking" paragraph → **`needs:grill`**, on whichever
-  issue the question actually gates. A question the body itself scopes to one slice ("gates slice
-  2", "slice 1 is unaffected") belongs on that slice, not on the epic.
-- **The rung must agree with its own `assessed:` line.** A reason reading "X must be answered
-  first" under `readiness: needs:tasks` is a contradiction — the reason is usually the accurate
-  half, so fix the rung to match it.
-- Adds, renames, or retypes an **exported** symbol — a public type, a new factory, a changed call
-  signature → **`needs:spec`**.
-- Names 3+ modules, or carries more than ~6 acceptance criteria → **`needs:issues`** on an epic,
-  **`needs:tasks`** on a sub.
-- None of the above, and the acceptance criteria are already concrete and testable →
-  **`ready-for-agent` is proposable**, not grantable.
-
-Record it dated, with the trigger that fired — a later reader should be able to check the call
-rather than take it on trust:
-
-```yaml
-readiness: needs:grill
-assessed: 2026-09-15 — body's Scope opens with "Decide Q1-Q3"; the column
-  fold's read of grouping() has undecided ordering semantics.
-```
-
-### Labels
-
-Three orthogonal axes. An issue carries one label from each of the last two, and optionally a
-type:
-
-| Axis | Values | Count |
-|---|---|---|
-| type | `bug` `enhancement` `documentation` | 0-1 |
-| kind | `kind:epic` `kind:sub` | exactly 1 |
-| rung | `needs:triage` `needs:grill` `needs:spec` `needs:issues` `needs:tasks` `ready-for-agent` | exactly 1 |
-| area | `area:<feature>` — the project's own feature vocabulary | 1+ |
-
-Create any that are missing (`gh label create`) before publishing.
-
-**`area:` is what an issue touches, never what state it is in.** It is the one axis that outlives
-the epic it came from: a bug filed against a feature two years after that feature's spec closed
-still carries the area, which is why the area is a label and not a parent issue. Apply the areas
-an issue actually changes or verifies — several is fine and often correct, but an issue carrying
-every area is really an `area:engine` change.
-
-Do not reach for a milestone or a sub-issue relation to express this. A milestone is single-valued
-and will end up competing with releases; a sub-issue relation asserts that the parent's grill and
-spec cover the child, which for a late-filed enhancement is false. Rationale and the survey behind
-it: `docs/agents/discovery/issue-feature-taxonomy.md`.
-
-**The body block is authoritative; the labels are a projection.** `/implement` reads the block,
-never a label — a label is one edit away from being stale and carries no reason. Every skill that
-writes the block re-syncs both labels in the same turn. On conflict the body wins and the label
-gets corrected.
-
-The kind label exists despite duplicating the native sub-issue relation because GitHub's
-`parent-issue:` / `no:parent-issue` search qualifiers do not reconcile reliably (measured
-2026-09-15: 27 open, 26 `no:parent-issue`, 0 `-no:parent-issue`). Set the native relation anyway —
-it is the truth for parentage — but filter on the label.
-
-### Opening an ad-hoc issue
+## Opening an ad-hoc issue
 
 When the user asks to open a single issue with no spec behind it — mid-work, to park something
 for later — publish it with the epic form, `readiness: needs:triage`, labels `kind:epic` +

@@ -1,5 +1,8 @@
 # Typecheck through the project config, never a bare file
 
+> **Enforced, not advisory.** `hooks/command-guard.js` (PreToolUse) denies a bare `tsc <file>`
+> at the tool-call layer. The reasoning below is why — the hook is the gate.
+
 `tsc <file.ts>` **ignores tsconfig entirely** — no `paths`, no `strict`, no `lib`, no `types`.
 It compiles a different program than the project does, so a pass proves nothing and a failure
 is often an artifact of the missing config. It is not a cheaper typecheck; it is not a

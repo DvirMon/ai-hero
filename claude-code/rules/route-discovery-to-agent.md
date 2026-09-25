@@ -18,8 +18,9 @@ of work; no per-request confirmation needed.
   (Same line as [[ask-dont-search-on-ambiguity]] draws.)
 - A judgment call about direction or preference — ask the user, don't dispatch an agent to
   guess.
-- Work a phase-specific agent already owns: `ds-discovery`, `ds-figma-discovery`,
-  `ds-codebase-discovery`, `ds-a11y-discovery`, `kipi-discovery`. Those win in their phase.
+- Work a phase-specific agent already owns: `kipi-discovery` globally; inside `org`, also
+  `ds-discovery`, `ds-figma-discovery`, `ds-codebase-discovery`, `ds-a11y-discovery`
+  (project-scoped agents there, not global). Those win in their phase.
 - **Product/UX questions** — what people struggle with, what a person can click and press in a
   competing product, whether this repo already covers a use case. Those belong to the
   `story-discovery` agent, dispatched by the `story-discovery` skill. The split is the question,
@@ -41,6 +42,13 @@ an earlier answer.
 
 **Findings go to the file, chat gets the pointer.** Relay the agent's summary, not its findings.
 Every claim in that file carries a source tag; anything uncited is listed as unverified instead.
+
+This holds for **any** audit, not only an agent's output — a competitive feature audit, a
+codebase audit, a doc audit. The user's words: dumping a large result into chat "pollutes" the
+session; "from now on, whenever I ask you to go and audit the research". So: write one
+consolidated Markdown doc to disk, publish it as an Artifact too when it benefits from a
+shareable page, and give chat only a short pointer plus the path — never the tables or the body.
+It does not block normal terse Q&A answers.
 
 **Terminology: discovery, not research.** Name the agent, the files, and the commands
 accordingly — the user's word for this is discovery.

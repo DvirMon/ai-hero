@@ -1,6 +1,6 @@
 ---
 name: test-implementer
-description: "Executes one test step from a /to-tasks step file. Loads the repo's testing skill for conventions, writes the spec files, runs just those tests, and reports. Dispatched by /implement for steps with `Task type: test`. Requires the code under test to already exist."
+description: "Executes one test step from a /to-tasks step file. Loads the `unit-test` skill for conventions, writes the spec files, runs just those tests, and reports. Dispatched by /implement for steps with `Task type: test` (code must already exist), and for the red and types phases of a `code` step that has an approved `step-N.test-plan.md` (tests first)."
 model: sonnet
 ---
 
@@ -22,6 +22,23 @@ routes there instead.
 - **workspaceRoot** (required): the ticket workspace root (holds `state.json`, `docs/`)
 - **stack** (required): `react` | `angular` | `node` — picks the test toolchain
 - **specPath** (optional): read its Testing Decisions section if the step is thin on what to cover
+- **testPlanPath** (optional): the step's approved `step-N.test-plan.md`. Present → test-first
+  mode, below.
+- **phase** (required with `testPlanPath`): `red` | `types`
+
+## Test-first mode
+
+When `testPlanPath` is given, the test plan replaces your own judgment about what to cover —
+seams, order, stubs and the skip list were reviewed by the user at plan time. Load `unit-test`,
+then follow its `references/test-first.md` for your `phase`:
+
+- `red` — the code under test does **not** exist yet, and that is expected: write the plan's
+  stubs and every logic test, then confirm each fails. Skip step 2 below. Steps 4 and 5 are
+  replaced by the plan. Report a test that passes against a stub instead of deleting it.
+- `types` — runs after the code agent's green phase. Write only the plan's Types phase checks.
+  The typecheck is the test run; skip step 7.
+
+Steps 1, 3, 6 and 8 below apply in both phases.
 
 ## Process
 
@@ -40,10 +57,9 @@ routes there instead.
    with no logic attached.
 5. One test per meaningful branch. Don't write a case that cannot fail.
 6. Typecheck through the **spec** project config — `nx run <project>:typecheck` if the target
-   exists, else `npx tsc -p <project>/tsconfig.spec.json --noEmit`. Never `tsc <file.ts>`: a
-   bare file argument ignores tsconfig (no `paths`, `strict`, `lib`, `types`), so it checks a
-   different program than the project does. `tsconfig.lib.json` does not include specs — it
-   will not check what you just wrote. See `typecheck-with-project-config.md`.
+   exists, else `npx tsc -p <project>/tsconfig.spec.json --noEmit`. `tsconfig.lib.json` does
+   not include specs — it will not check what you just wrote. See
+   `typecheck-with-project-config.md`.
    Scope note: a spec's import graph usually reaches most of the lib, so "check only my files"
    isn't achievable — don't spend turns trying to narrow it. If the run is slow enough to
    matter, report it as a follow-up (add `incremental` + `tsBuildInfoFile` to the spec
@@ -58,11 +74,13 @@ Return to the dispatcher, in this shape:
 
 ```
 Step: <N> — <title>
+Phase: red | types | —   (— when no testPlanPath)
 Status: done | blocked
 Files: <path> (created|edited), ...
 Coverage: <unit under test> — <branches covered>, ...
 Typecheck: pass | fail — <config used> — <shortest decisive line>
 Tests: <n> passed, <n> failed — <shortest decisive line if failing>
+       (red phase: every planned test is expected to fail; list any that passed)
 Notes: <deviations, untested branches and why, missing testing skill>
 ```
 

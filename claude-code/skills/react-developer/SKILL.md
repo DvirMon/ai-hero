@@ -106,3 +106,12 @@ for that policy and this skill does not duplicate it.
 * Forbidden Patterns: The generation-guardrail table. Read [forbidden-patterns.md](references/forbidden-patterns.md)
 
 If you require deeper documentation not found in the references above, read the documentation at `https://react.dev/reference/react`.
+
+## 13. Source Comments
+
+Do not improvise JSDoc/`//` comments. The contract is
+[doc-contracts/jsdoc.md](../../conventions/doc-contracts/jsdoc.md) — two channels
+(consumer-facing `/** */`, maintainer `//`), with word/line budgets and a "never in either
+channel" list (decision history, D-numbers, rejected alternatives, restating the signature).
+Read it before writing a comment block; when a file's comments need a full pass rather than a
+single block, run the `source-docs` skill over that path instead of hand-editing.

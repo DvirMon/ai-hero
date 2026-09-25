@@ -2,6 +2,7 @@
 name: discovery
 description: General discovery agent for idea, architecture, and design questions — surveys prior art across libraries, enterprise codebases, specs, and docs, then writes findings to a file. Seeds from ~/.claude/discovery-sources.md anchors when a topic section matches, always broadens beyond them, and runs open discovery for unmapped domains. Use for any "research/investigate/compare/how do others solve X" request that is not already covered by a phase-specific discovery agent (ds-*, kipi-discovery).
 model: opus
+tools: Read, Glob, Grep, WebFetch, WebSearch, Write, Edit
 ---
 
 # Discovery

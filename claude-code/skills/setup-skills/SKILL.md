@@ -1,6 +1,6 @@
 ---
 name: setup-skills
-description: Configure this repo for the engineering skills — set up its issue tracker, ticket tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills.
+description: Configure this repo for the engineering skills — set up its issue tracker, ticket tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/implement` → `/ship`.
 disable-model-invocation: true
 ---
 
@@ -49,6 +49,11 @@ Default posture: these skills were designed for GitHub. If a `git remote` points
 - **Other** (Jira, Linear, etc.) — ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose
 
 Record the choice in `docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off** — leave it off and don't raise it; a user who wants external PRs in the triage queue can flip the flag in the file later.
+
+The GitHub and GitLab templates also carry a "Ship mode" flag (direct push to default branch vs.
+PR-gated), defaulted **off** (PR-gated). Ask it explicitly, one line: "Does `/ship` open a PR for
+review, or push straight to the default branch? (recommended: **PR**)". Only ask for GitHub/
+GitLab — local markdown and "other" trackers have no PR/MR concept to gate on.
 
 **Section B — Ticket tracker.** Skip this section entirely if the `to-ticket` skill isn't installed (exploration told you) — an uninstalled skill needs no tracker.
 

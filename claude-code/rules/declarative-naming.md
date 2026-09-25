@@ -27,6 +27,23 @@ const canManageBilling = isAdmin && isActiveUser && isPaidOrg;
 if (canManageBilling) { ... }
 ```
 
+## Boolean-returning functions
+
+Any function whose return value is a boolean guard/predicate
+takes an `is*` / `has*` / `can*` prefix: `isEqual(a, b)`,
+`isInRange(v, r)`, `hasAnyOf(list, wanted)`. A bare verb
+(`equals`, `contains`) is reserved for functions that *do*
+something — e.g. a declaration rule that registers a filter.
+
+**Why:** raised as an already-established convention when a
+filter matcher and a filter rule were both named `equals`. The
+prefix is what makes the two forms distinguishable at a
+glance, and it resolves the name collision structurally
+instead of by namespacing.
+
+Same instinct as the boolean-`const` section above, applied to
+the function's name rather than the variable's.
+
 ## Function decomposition
 
 Reason about whether a step inside a larger function deserves its own named pure function — even if it's used exactly once and never reused elsewhere. The payoff is clarity and self-documenting structure, not reuse.

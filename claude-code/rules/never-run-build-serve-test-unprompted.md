@@ -1,5 +1,13 @@
 # Never build, serve, install, or test unprompted
 
+> **Enforced, not advisory.** `hooks/command-guard.js` (PreToolUse) turns builds, dev servers,
+> installs and suite/lint runs into a permission prompt, so you approve each one. Scoped
+> spec runs (one spec file, or a `-t`/`--testNamePattern` filter) are auto-allowed for
+> `test-implementer`, and for `angular-implementer`/`react-implementer` in the test-first
+> green phase.
+> Approving a command makes that **exact** command stop asking for the rest of the
+> session — a different target, an added flag, or a new session prompts again.
+
 Never run builds, dev servers, installs/scaffolds, or tests without explicit confirmation first
 — this covers `npm install`/`ng new`/scaffold commands, `nx build`/`ng build`, `nx serve`/`ng serve`/
 `storybook dev`/`build-storybook`, and `nx test`/`vitest`/Playwright runs. Running tests is

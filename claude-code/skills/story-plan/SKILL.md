@@ -108,7 +108,7 @@ near-duplicate files.
 
 ### 3. Decide the target story set
 
-Apply four constraints, in this order:
+Apply five constraints, in this order:
 
 **Minimize story count.** Default to folding a gap into an existing story as a new
 button/control/toggle/keybinding. Only give a mechanism its own standalone story when it is
@@ -121,6 +121,17 @@ update: capture → in-flight → success/rollback), or a conflict/edge-case flo
 a baseline story if bolted on. When in doubt, don't create a new file — extend an existing one
 and see if it becomes unreadable; that's the actual signal a split is warranted, not a guess in
 advance.
+
+**Or: would bundling risk teaching the wrong distinction?** A second, independent test — size
+is not the only reason to split. Two options can each be individually small and still each
+deserve their own story when they are conceptually adjacent enough that a consumer could
+confuse which one governs what (e.g. a level's *activation* predicate vs. its *admission*
+predicate — different questions with easily-confused names). Bundling them into one host risks
+teaching the wrong mental model of which knob does what, even though neither alone is "large or
+cross-cutting." The question is "would a person need to hold these two things apart," not "how
+many controls does this take" — two options that are genuinely one coherent lesson (e.g. what a
+derived value is, and what its display label says) belong in ONE story with multiple controls,
+same as any other single-lesson story.
 
 **Ground every affordance in the capability discovery.** Before writing that a story needs a
 given button, toggle or keybinding, check what shipped peer implementations actually render for
@@ -211,3 +222,6 @@ user wants it, or default to returning it as a chat artifact.
   story than the one its host's doc-comment claims — the comment cited the wrong acceptance
   criteria, or none at all. Verify the claim against the product doc's actual section, don't take
   the comment's word for it.
+- Two adjacent-but-distinct options (activation vs. admission, deriving a value vs. labeling it)
+  folded into one story because each alone seemed too small to stand on its own — teaching the
+  wrong boundary between them instead of saving a file.

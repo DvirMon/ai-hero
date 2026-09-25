@@ -13,13 +13,22 @@ makes each step arrive with the right conventions loaded.
 
 ## 1. Gather context
 
-1. Find `state.json` in the target domain's `docs/` folder (or the workspace root the user
-   points you at). Read `workspaceRoot` and `stack`.
-2. Read all `<workspaceRoot>/docs/tasks/step-*.plan.md` in order — these are the plan from
-   `/to-tasks`. Each step file is self-contained: `Task type`, files to create/edit, what to
-   do, acceptance checks.
-3. Read `<workspaceRoot>/docs/tasks/progress.md`. Skip steps already `✅ done`.
-4. If no `docs/tasks/` folder exists, **do not fall through to implementing anyway.** Read the
+1. Find `state.json` at the workspace root — `<domain-path>/docs/work/<slug>/` (or the
+   workspace root the user points you at directly). Validate it per
+   `to-ticket/references/state-schema.md`, then read `workspaceRoot` and `stack`.
+2. Read all `<workspaceRoot>/4-tasks/step-*.plan.md` in order — these are the plan from
+   `/to-tasks`. Each step file is self-contained. Routing fields live in YAML frontmatter:
+   `step`, `type`, `depends_on`, `files`. The body holds a summary, `## Do`,
+   `## Watch out`, `## Out of scope` and `## Done when` (the step's own checks).
+   **Legacy step files** (no frontmatter — plans written before the format change) carry
+   bold header lines instead: `**Task type:**`, `**Depends on:**`, a `## Files` list, and
+   `## Acceptance Checks` in place of `## Done when`. Read those when frontmatter is absent.
+   Note which `code` steps have a sibling `step-N-<slug>.test-plan.md` — those run
+   test-first (§2).
+3. Read `<workspaceRoot>/4-tasks/progress.md`. Skip steps already `✅ done`. Its top holds
+   the plan's dependency graph (ASCII + a one-line `Parallel-safe / Dependency` summary) —
+   the schedule you run, see §3 Parallelism. Legacy `progress.md` files have no graph.
+4. If no `4-tasks/` folder exists, **do not fall through to implementing anyway.** Read the
    issue's `## Pipeline` block and obey the readiness ladder — see step 1b.
 5. Only read `specPath`/`architecturePath` if a step is ambiguous — step files are the
    pre-digested version, not the spec itself.
@@ -31,8 +40,9 @@ its own ordered run.
 
 An issue with no task plan is not automatically an issue you may implement. It is either an issue
 the pipeline decided needs no plan, or an issue nobody has looked at yet — opposite situations.
-The `## Pipeline` block on the issue body separates them (format, rungs and triggers:
-`to-issues`, "The Pipeline block"). Read the block, never the labels — labels are a projection.
+The `## Pipeline` block on the issue body separates them. Its form, the rungs and the
+assessment triggers are defined in `to-issues/references/pipeline-block.md` — the SSOT.
+Read the block, never the labels; labels are a projection.
 
 **An epic with children is never implemented directly.** Check the tracker's sub-issue relation
 first; if it has children, refuse and point at the frontier child.
@@ -59,7 +69,7 @@ leaves one question scoped to one slice. Refuse and point at the child, not the 
 siblings read `needs:grill` at once, say so — that is the epic's grill having failed, and the
 regrill belongs there.
 
-On `needs:triage`: apply `to-issues`' triggers, write the rung and its dated reason into the
+On `needs:triage`: apply the triggers in `to-issues/references/pipeline-block.md`, write the rung and its dated reason into the
 block via `gh issue edit`, re-sync the rung label, then stop and ask. **You may not promote an
 issue to `ready-for-agent` yourself** — you are the party that benefits from the answer, so it is
 not yours to give. Ambiguity resolves upward.
@@ -72,8 +82,9 @@ note in your final report which stage was bypassed.
 
 ## 2. Route each step
 
-Every step file declares a `Task type`. Combine it with the ticket's `stack` from
-`state.json`:
+Every step file declares a type — frontmatter `type`, or `**Task type:**` on a legacy file.
+Combine it with the ticket's `stack` from `state.json`. Step files no longer name their skills
+or agent; this table derives both:
 
 | `Task type` | `stack` | Dispatch to |
 |---|---|---|
@@ -82,54 +93,175 @@ Every step file declares a `Task type`. Combine it with the ticket's `stack` fro
 | `code` | `node` | handle directly, loading the `nodejs-developer` skill first |
 | `story` | any | `story-implementer` agent |
 | `test` | any | `test-implementer` agent |
-| `docs`, `chore` | any | handle directly — no agent |
+| `docs`, `chore` | any | fork (see "Docs and chore steps dispatch too" below) |
 
 One exception on tests: if the step belongs to a DS component going through the `ds-plan` /
 `ds-scaffold` pipeline (there's a `docs/prd.md` and a versioned plan folder), dispatch
 `ds-test-scaffolder` instead — it takes `componentName`/`componentFilePath`/`prdPath`/`planDir`,
 not a step file. Everywhere else, `test-implementer`.
 
-If a step file has no `Task type`, infer it from the files it touches (`*.stories.tsx` →
+**`code` steps with a test plan run test-first.** When `step-N-<slug>.test-plan.md` sits beside
+the step file, the user approved it in `/to-tasks` §4b, and one step becomes three dispatches,
+in order. Phase rules: the `unit-test` skill's `references/test-first.md`.
+
+| Phase | Dispatch to | Extra inputs |
+|---|---|---|
+| 1. Red | `test-implementer` | `testPlanPath`, `phase: red`, `stack` |
+| 2. Green | the code row above for this `stack` | `testPlanPath` |
+| 3. Types | `test-implementer` | `testPlanPath`, `phase: types`, `stack` |
+
+- Skip phase 3 when the plan's Types phase says `None`.
+- Red must report every planned test failing. A test that passed against a stub stops the
+  step — surface it to the user as a plan defect before green runs.
+- Green `blocked` on a seam means a test looks wrong. Stop and surface it; never re-dispatch
+  red to rewrite the test.
+- A `code` step with no test plan keeps the single dispatch above, and any `test` step still
+  waits for it.
+
+**Docs and chore steps dispatch too, never handled inline.** A doc-heavy step — a capability's
+decisions log, its feature-contract doc, an ADR amendment, a story `.mdx`, workspace tracking
+files (`issue-graph.md`, `state.json`), an `llms.txt` regen — generates many reads and edits
+across several Markdown files. That tool-call noise belongs in a subagent's transcript, not the
+dispatcher's own context, which needs to stay free to track the rest of the plan. Default:
+spawn a fork (`Agent`, `subagent_type: "fork"`) — it inherits this session's full context (every
+prior step's diff, the decisions already made while planning), so unlike the other rows it needs
+no self-contained briefing, just the step file path and a pointer to what changed since the plan
+was written. Per `~/.claude/rules/fork-doc-writes-during-discussion.md`, dispatch it and continue
+(don't idle waiting on tool output you don't need); block only when a later step actually depends
+on this one's artifact.
+
+Prefer a narrower specialist over the generic fork when the step is *exactly* that specialist's
+job, not a mix: `adr-writer` when the step is "write one ADR" (it takes a decision/why/consequences
+summary, not a step file — extract those fields from the step's summary and the decision-log
+rows its `Decisions:` line links to, or from "Why This Step Exists" on a legacy file); `domain-docs-writer` (via `kipi`'s own config-resolution flow) when
+the step is regenerating a whole domain's `docs/` folder from source, not editing existing docs in
+place. A step mixing several artifact types (a decisions log entry plus a feature doc plus a
+tracking-file update, say) stays on the fork; don't force it through a specialist scoped to one
+artifact.
+
+Workspace JSON/MD writes this skill makes *outside* a step (`progress.md` status flips,
+`state.json`) are mechanical: they go to a `haiku` writer, not a fork, per
+`to-ticket/references/file-writes.md`. `docs`/`chore` steps themselves stay on the fork above.
+
+`code` + `node` remains the one row actually handled inline (see "Steps you handle directly"
+below) — everything else, including docs/chore, is dispatched.
+
+If a step file has no type (neither frontmatter `type` nor `**Task type:**`), infer it from the files it touches (`*.stories.tsx` →
 `story`, `*.spec.ts(x)` → `test`, else `code`) and **say so in your final report** — an
 inferred type means `/to-tasks` produced an incomplete step file.
 
 If `stack` is missing from `state.json`, infer it from the project's dependencies and write it
-back so later runs don't re-infer.
+back (refreshing `updatedAt`, per the validation routine) so later runs don't re-infer.
 
 ## 3. Execute
 
-Work through steps **in order**. For each step:
+Work through steps in the order the plan's graph allows (see Parallelism below). For each
+step:
 
 1. Mark it `▶ in progress` in `progress.md`.
-2. Dispatch per the table, passing `stepFilePath`, `workspaceRoot`, `stack`, and `specPath` /
-   `architecturePath` if set. One agent call per step — never batch several steps into one
-   agent, or the step boundary (and its acceptance checks) is lost.
+2. Dispatch per the table, passing `stepFilePath`, `workspaceRoot`, and `specPath` /
+   `architecturePath` if set. Also pass `stack` to `test-implementer` — it routes its toolchain
+   on it. `react-implementer` and `angular-implementer` don't take `stack`: the routing table
+   above already used it to pick the agent, and neither agent's body reads it again. One agent
+   call per step — never batch several steps into one agent, or the step boundary (and its
+   `Done when` checks) is lost. A test-first step is the one exception: its three phase calls
+   (§2) run in sequence, all inside the one step.
 3. On return, verify the agent's claims against the files it says it touched. An agent
    reporting `done` is a claim, not proof.
 4. Mark `✅ done` in `progress.md`, or stop and surface the blocker.
 
-**Parallelism:** dispatch steps concurrently only when they declare no `Depends on:` on each
-other *and* their `Files` lists do not overlap. Otherwise sequential — steps are ordered so
-each leaves the codebase working, and racing them breaks that.
+**Parallelism: the plan's graph is the schedule.** The user approved the dependency graph at
+the top of `progress.md`; run that graph, don't re-derive your own. Dispatch the unblocked
+frontier — every pending step whose `depends_on` steps are all `✅ done` — concurrently, and
+recompute the frontier as each one finishes.
 
-A `story` or `test` step always waits for the `code` step that produces its subject.
+**File overlap is a plan check, not a scheduler.** Before dispatching a frontier, compare the
+`files` of the steps in it. Two steps the graph runs in parallel that share a file are a bug in
+the plan, not a hint to serialise quietly. On overlap:
 
-**Steps you handle directly** (per the table): load the relevant skill first, then do the same
-work an agent would — read the step file, implement only its Files + What To Do, satisfy its
-acceptance checks. Use `/tdd` where the plan named a seam for it.
+1. Stop dispatching. Let steps already running finish.
+2. Fix the plan on disk: add the missing edge to the later step's `depends_on`, and update
+   the graph and its summary line in `progress.md`.
+3. If the new edge changes what a step must do (its `Do` or `Watch out` now assumes the
+   other step landed first), re-invoke `/to-tasks`' writer — or whichever skill owns the
+   file — to rewrite those step files. Re-invoking a skill here is expected, not a detour.
+4. Report the change: which steps, which file, what edge was added.
+5. Resume from the corrected graph.
+
+Never run an order that isn't written back to the plan — the plan on disk stays the source of
+truth for what ran.
+
+**Legacy plans** (no graph in `progress.md`): build the frontier from `depends_on` /
+`**Depends on:**` edges alone, apply the same overlap check, and write the graph you ran to
+the top of `progress.md` so the fix above has something to amend. Ignore any per-step
+`Parallel-safe with:` line — it is no longer read.
+
+A `story` or `test` step always waits for the `code` step that produces its subject. Inside a
+test-first step the order reverses: its tests come first (§2). That is a phase order within one
+step, not a `test` step — `/to-tasks` absorbs the `test` step into it.
+
+**The one step you handle directly** (per the table, `code` + `node`): load the `nodejs-developer`
+skill first, then do the same work an agent would — read the step file, implement only its
+`files` + `## Do`, satisfy its `## Done when` checks (legacy: Files + What To Do, Acceptance
+Checks). When the step has a test plan, you are the green phase: dispatch red first, then
+follow `unit-test`'s `references/test-first.md` § Green yourself, then dispatch types. Every
+other row, including `docs`/`chore`, dispatches — see the row-by-row table above.
 
 ## 4. Verify
 
-After all steps complete:
+After all steps complete, start the machine checks **in the background** and do the reading
+work while they run — they touch no shared files, so the review's wall-clock absorbs them:
 
-- Run typechecking across affected projects.
-- Run the full test suite once.
-- Use `/code-review` to review the work.
+1. **Dispatch in background, immediately:**
+   - Typecheck across affected projects — `nx run-many -t typecheck -p <affected>`, plus
+     `typecheck-spec` where a step wrote specs.
+
+   CI runs the full test suite and `nx run-many -t lint` on every pull request. Both are the
+   pipeline's gate, not this skill's — and the PR that carries that gate is opened by `/ship`.
+   Running either here duplicates CI and costs minutes per implementation rather than per PR.
+
+2. **In the foreground, while those run:**
+   - Run the `source-docs` skill over the non-spec `.ts` files the steps touched — implementers
+     write code, not comment prose, so this is the pass that brings JSDoc/`//` to
+     `doc-contracts/jsdoc.md`. Skip only if no non-spec `.ts` file changed (story hosts and
+     `.stories.ts` are out of its scope by design). It sets `context: fork`, so it already
+     runs isolated and its file-by-file transcript never lands here — call it plainly, and
+     do not "fix" this by wrapping it in an agent.
+   - Use `/code-review` to review the work.
+
+3. **Join before §5.** The typecheck must have reported before you show the user a summary. A
+   red typecheck is fixed first — never carried into the commit, and never reported as "done
+   pending checks."
+
+   Tests are the exception, and say so plainly in the summary: the suite has not run locally,
+   and the work is green-in-CI or not green at all. A step whose `Done when` check is a
+   behavioural claim the suite proves — "output byte-identical", "existing assertions
+   unchanged" — is implemented, not verified, until the PR's CI run passes. Do not mark such a
+   step `✅ done` in `progress.md` on the strength of a clean typecheck. That PR is opened by
+   `/ship`, not this skill — `/implement` stops at the approved commit.
+
+This backgrounding does **not** replace the per-step typecheck each implementer runs. That one
+stays: `ngc` aborts at the first `.ts` error and never reaches the template phase, so errors
+accumulated across N steps make the terminal run *more* likely to abort in source and tell you
+nothing about templates — exactly the blind spot the target exists to close. Per-step runs also
+keep the fix with the agent holding that step's `Watch out` notes. See
+`typecheck-angular-templates.md`.
 
 ## 5. Close out
 
 Before committing: show the user a summary of changed files and the `/code-review` outcome,
 then wait for explicit approval. Do not commit until the user confirms.
+
+**Check the repo's Ship mode before writing the commit message.** Read
+`docs/agents/issue-tracker.md`'s Ship mode flag (the same one `/ship` reads). If it says direct
+push, the commit message is the only place a closing keyword can ever live — there is no PR body
+for it to land in later, and `/ship` will refuse to push without one (it also refuses to amend a
+commit to add it). So write `Closes #<issue-number>` into the body of *this* commit, for every
+issue this run fully implemented — never for an issue this run only touched or partially
+satisfied; whether an issue's acceptance criteria are fully checked off (below) is exactly the
+signal for "fully implemented" here. If the flag is PR-gated, or the file/flag is missing, leave
+the commit message as-is — `/ship` writes `Closes #N` into the PR body instead, and a closing
+keyword in both places is redundant, not wrong, but the PR body is that mode's canonical spot.
 
 Commit to the current branch.
 
@@ -139,24 +271,22 @@ editing the issue body — for GitHub, `gh issue edit <n> --body-file -` with th
 (fetch current body first via `gh issue view <n> --json body --jq .body`). Leave unmet criteria
 unchecked and flag them instead of closing.
 
-Then close it once committed — follow the repo's issue tracker convention (see
-`docs/agents/issue-tracker.md` if `setup-skills` has been run) for the close command and
-comment format. Skip this if there's no source ticket.
+This skill does not close the issue. The issue closes when CI goes green on the PR that
+`/ship` opens — `/ship` writes `Closes #N` into the PR body, and
+`close-linked-issue-on-ci-green.yml` acts on it. Closing here, ahead of that, would assert a
+result this skill has no evidence for.
 
 If the project also maintains a backlog/status file (e.g. referenced from the project's own
 `CLAUDE.md`), update that ticket's status/link there too, in the same commit.
 
 ## 6. Hand off
 
-Report per step: which agent ran it, files touched, acceptance checks met, any inferred
-`Task type`.
+Report per step: which agent ran it, files touched, `Done when` checks met, any inferred
+type. Also report any edge the overlap check added to the graph.
 
-Check the tracker for the next frontier issue (`/to-issues`'s "Work the frontier" convention —
-any issue whose blockers are all done). End your final message with a one-line pointer, as the
-very last line — nothing after it:
+End your final message with a one-line pointer to `/ship`, as the very last line — nothing
+after it:
 
 ```
-Next: /to-tasks <next-frontier-issue-#-or-slug>
+Next: /ship <issue-#-or-slug>
 ```
-
-If no frontier issue remains, use `Next: none — all issues done` instead.

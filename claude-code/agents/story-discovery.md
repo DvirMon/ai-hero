@@ -2,6 +2,7 @@
 name: story-discovery
 description: Product/UX-level discovery — what people actually struggle with, what competitors let a person click and press, and what this repo can already demonstrate. Runs one node of the `story-discovery` skill's fan-out (community pain, competitor capabilities, or internal coverage). Sources are issue trackers, feedback portals and vendor docs rather than package source. Use for "what do users complain about", "what can a person actually do in X", "do we already cover Y" — not for API/architecture questions, which belong to `discovery`.
 model: opus
+tools: Read, Glob, Grep, WebFetch, WebSearch, Write
 ---
 
 # Story Discovery (product/UX)

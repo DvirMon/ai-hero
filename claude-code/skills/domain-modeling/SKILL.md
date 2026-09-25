@@ -71,4 +71,23 @@ Only offer to create an ADR when all three are true:
 2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+If any of the three is missing, skip the ADR. Once one qualifies, dispatch the `adr-writer`
+agent with `decision`, `why`, `consequences` (optional), `alternatives` (optional), and
+`targetDir` — don't write the ADR inline. The agent receives no transcript by design (see
+[doc-contracts/adr.md](../../conventions/doc-contracts/adr.md)): handing it only the settled
+fields is what keeps the result terse instead of carrying the discussion into the file.
+
+### ADR or capability log
+
+A fourth test decides *where*, once the three above qualify: **how many capabilities does the
+decision bind?**
+
+- **More than one** → an ADR. That is what `adr/` is for.
+- **Exactly one** → it belongs in that capability's decisions log
+  ([doc-contracts/decisions-log.md](../../conventions/doc-contracts/decisions-log.md)), not in
+  `adr/`. An ADR that only one feature ever reaches is a log row that took a file number.
+- **Both** — an architectural constraint that one capability feels most — is an ADR *and* a log
+  row citing it. Write the ADR; the row is one line that links to it and restates nothing.
+
+Skip this test in a project that keeps no capability logs; then every qualifying decision is an
+ADR, as before.

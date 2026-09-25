@@ -210,6 +210,15 @@ When implementing styling and animations in Angular, consult the following refer
 - **Angular Animations**: Using native CSS (recommended) or the legacy DSL for dynamic effects. Read [angular-animations.md](references/angular-animations.md)
 - **Styling components**: Best practices for component styles and encapsulation. Read [component-styling.md](references/component-styling.md)
 
+## Source Comments
+
+Do not improvise JSDoc/`//` comments. The contract is
+[doc-contracts/jsdoc.md](../../conventions/doc-contracts/jsdoc.md) — two channels
+(consumer-facing `/** */`, maintainer `//`), with word/line budgets and a "never in either
+channel" list (decision history, D-numbers, rejected alternatives, restating the signature).
+Read it before writing a comment block; when a file's comments need a full pass rather than a
+single block, run the `source-docs` skill over that path instead of hand-editing.
+
 ## Testing
 
 When writing or updating tests, consult the following references based on the task:

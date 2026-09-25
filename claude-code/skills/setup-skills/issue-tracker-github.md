@@ -25,6 +25,19 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either — resolve with `gh pr view 42` and fall back to `gh issue view 42`.
 
+## Ship mode
+
+**Direct push to default branch: no.** _(Set to `yes` if this repo pushes straight to the
+default branch instead of going through a PR; `/ship` reads this flag.)_
+
+When set to `no` (default), `/ship` branches, pushes, and opens a PR — the PR carries CI, and
+`Closes #N` in its body is what `close-linked-issue-on-ci-green.yml` acts on.
+
+When set to `yes`, `/ship` pushes the current commit(s) straight to the default branch — no
+branch, no PR. `Closes #N` must already be present in a pushed commit message (GitHub closes on
+a direct push to the default branch too, not only on a merged PR) — `/ship` checks for this and
+stops rather than rewriting commit history if it's missing.
+
 ## When a skill says "publish to the issue tracker"
 
 Create a GitHub issue.

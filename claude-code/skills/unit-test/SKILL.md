@@ -32,6 +32,15 @@ test: it costs maintenance and buys nothing.
    - React → [unit-testing.react.md](references/unit-testing.react.md) (Vitest + RTL)
    - Angular → [unit-testing.angular.md](references/unit-testing.angular.md)
 
+## Test-first mode
+
+When a step has an approved `step-N.test-plan.md`, tests are
+written before the code: red, then green, then types. The phase
+rules and who owns each are in
+[test-first.md](references/test-first.md). The seam choice in that
+plan was made with this skill's selection policy — this skill
+says *which* tests, `test-first.md` says *when*.
+
 ## Division of labour
 
 This skill answers *which tests are worth writing*. It deliberately does not duplicate:
@@ -48,20 +57,20 @@ policy and the framework developer skill for the mechanics.
 ## Verifying a spec you just wrote
 
 Typecheck through the **spec** tsconfig (`tsc -p <project>/tsconfig.spec.json --noEmit`, or the
-project's `typecheck` target) — never `tsc <file.ts>`, which ignores tsconfig and checks a
-different program, and never `tsconfig.lib.json`, which does not include spec files. Full
-reasoning, plus the `--incremental` repeat-cost fix: `typecheck-with-project-config.md`.
+project's `typecheck` target) — never `tsconfig.lib.json`, which does not include spec files.
+Full reasoning, plus the `--incremental` repeat-cost fix: `typecheck-with-project-config.md`.
 
 Then run only the spec files you wrote, not the suite.
 
 ## Other layers
 
-Sibling references exist for layers that don't have their own skill yet — create one when
-there's a real need, don't scaffold ahead of it:
+Cross-cutting rules that every test layer shares — taxonomy, coverage philosophy, mocking
+boundaries — live outside this skill, at
+`~/.claude/conventions/testing/testing-principles.md`. `ds-test-scaffolder` reads it by path
+too. Nothing layer-specific may contradict it.
 
-- [backend-testing.md](references/backend-testing.md)
-- [contract-testing.md](references/contract-testing.md)
-- [e2e-testing.md](references/e2e-testing.md)
+Layers without their own skill yet (backend, contract, e2e) are stubs in that same folder —
+create a skill when there's a real need, don't scaffold ahead of it. Tracked in
+`DvirMon/ai-coding-guidelines#1`.
 
-`references/` is a symlink to the shared pool at `.claude/skills/testing/references/`, which
-`ds-test-scaffolder` also reads by path. Edit the files in place — do not fork a second copy.
+`references/` here holds the unit-testing files only, and is this skill's own — edit in place.
