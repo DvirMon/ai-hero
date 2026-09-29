@@ -9,7 +9,7 @@ model: inherit
 
 Read the `contract` path in your prompt first. Severity, evidence,
 lanes and output format come only from there. Then read
-`${CLAUDE_PLUGIN_ROOT}/skills/code-review/references/security.md` —
+`${CLAUDE_PLUGIN_ROOT}/skills/review/references/security.md` —
 sources, sinks and the evidence bar.
 
 **Your axis:** `security`.

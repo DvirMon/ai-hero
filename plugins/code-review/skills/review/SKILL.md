@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: review
 description: Review a diff (since a commit, branch, tag or merge-base) or a named set of files, and report findings ranked by practical impact on consumers — blocking P0–P2 in full, P3 capped — with standards and spec conformance in a separate block. Fans out to subject reviewer agents routed by file type and per-repo config, then verifies and merges. Also generates the per-repo config (`init`). Use to review a branch, a PR, work-in-progress changes, "review since X", or a component's files.
 ---
 
@@ -10,11 +10,11 @@ dispatch agents.
 
 Three references define everything this file doesn't restate:
 
-- [review-contract.md](${CLAUDE_PLUGIN_ROOT}/skills/code-review/references/review-contract.md)
+- [review-contract.md](${CLAUDE_PLUGIN_ROOT}/skills/review/references/review-contract.md)
   — severity, evidence, finding format, verify, reporting, hand-off.
-- [routing.md](${CLAUDE_PLUGIN_ROOT}/skills/code-review/references/routing.md)
+- [routing.md](${CLAUDE_PLUGIN_ROOT}/skills/review/references/routing.md)
   — which reviewers run, lanes, references per reviewer.
-- [config-template.md](${CLAUDE_PLUGIN_ROOT}/skills/code-review/references/config-template.md)
+- [config-template.md](${CLAUDE_PLUGIN_ROOT}/skills/review/references/config-template.md)
   — config keys, defaults, validation, `init`.
 
 ## Arguments
@@ -44,7 +44,7 @@ Read `docs/agents/code-review.md` in the reviewed repo.
 - **Missing, CI** → run on defaults.
 
 Running on defaults: the report's first line is
-`config: defaults — run /code-review:code-review init`. Ask again on the
+`config: defaults — run /code-review:review init`. Ask again on the
 next local run; never remember a decline.
 
 ### 0.2 Generate (`init`, or a missing config locally)
@@ -128,7 +128,7 @@ Every dispatch prompt carries:
 ```
 scope: diff: <cmd> | files: [...]
 commits: <git log output>            # diff mode
-contract: ${CLAUDE_PLUGIN_ROOT}/skills/code-review/references/review-contract.md
+contract: ${CLAUDE_PLUGIN_ROOT}/skills/review/references/review-contract.md
 files: <path — type — context — a11y mode>, one per line
 standards: [...]                      # §3
 decisions: [...]                      # §3

@@ -41,5 +41,5 @@ or CI are out of scope.
 
 ## 3. Smells
 
-Apply `${CLAUDE_PLUGIN_ROOT}/skills/code-review/references/smells.md`.
+Apply `${CLAUDE_PLUGIN_ROOT}/skills/review/references/smells.md`.
 Impact findings, P3 by default; its rules decide the rare P2.
