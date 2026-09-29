@@ -22,6 +22,11 @@ cursor/
 │                          (opt-in, attach manually per project) rules — Cursor supports this
 │                          distinction natively in each .mdc file's frontmatter
 └── skills/             — own skills, ported from claude-code/skills
+
+plugins/                — plugins authored HERE (source of truth), not mirrored
+└── code-review/        — impact-ranked code review: orchestrator skill + reviewer agents
+.claude-plugin/
+└── marketplace.json    — makes this repo a plugin marketplace
 ```
 
 Not mirrored: `~/.cursor/skills-cursor/` — Cursor's own built-in skill bundle, ships with every
@@ -94,6 +99,17 @@ source machine.
 plugins. The installer asks per plugin before copying anything from it, and copying it in is a
 one-time snapshot, not a live-updating install — for that, use
 `claude plugin marketplace add <repo>` instead.
+
+## Own plugins (`plugins/`)
+
+Unlike everything above, `plugins/` is authored in this repo — it is the source, not a mirror,
+and `sync.sh` skips this repo's own marketplace so it is never copied back into
+`claude-code/plugins/`. Install:
+
+```bash
+claude plugin marketplace add DvirMon/ai-coding-guidelines   # or a local clone's path
+claude plugin install code-review@ai-coding-guidelines
+```
 
 Never touches `settings.json`, `mcp.json`, or credentials — not in this repo, not copied by the
 installer.

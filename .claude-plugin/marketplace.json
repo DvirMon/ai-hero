@@ -1,0 +1,14 @@
+{
+  "name": "ai-coding-guidelines",
+  "description": "DvirMon's personal Claude Code plugins.",
+  "owner": {
+    "name": "DvirMon"
+  },
+  "plugins": [
+    {
+      "name": "code-review",
+      "source": "./plugins/code-review",
+      "description": "Impact-ranked code review: one orchestrator, thin reviewer agents, per-repo config."
+    }
+  ]
+}
