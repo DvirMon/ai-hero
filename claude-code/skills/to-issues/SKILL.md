@@ -12,6 +12,13 @@ The issue tracker and triage label vocabulary should have been provided to you �
 
 ## Process
 
+### 0. Branch guard
+
+The issue graph and `state.json` update are committed on the epic's planning branch,
+`docs/<slug>`, in its worktree. On the default branch or an issue branch, stop and point the
+user to `/to-ticket`, which starts it via `to-tasks/references/start-branch.md`. (An ad-hoc
+issue — § Opening an ad-hoc issue — writes no repo files and needs no branch.)
+
 ### 1. Gather context
 
 If a ticket workspace's `state.json` exists in context, validate it per `to-ticket/references/state-schema.md`, then default to its `specPath` (and `architecturePath`, if set) as the source — read both fully. Otherwise, work from whatever is already in the conversation context, or if the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
@@ -49,7 +56,7 @@ Break the work into **tracer bullet** issues.
 
 Give each issue its **blocking edges** — the other issues that must complete before it can start. An issue with no blockers can start immediately.
 
-**Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change — rename a column, retype a shared symbol — whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own issue blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in an issue blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify issue — green is promised only there.
+**Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change — rename a column, retype a shared symbol — whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own issue blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in an issue blocked by every migrate batch. A wide refactor is still sequenced issues off `main` — never a shared integration branch: one issue = one branch = one PR, and every branch starts from `origin/main` after its blockers merged. When a batch can't stay green alone, the batch is too big — split it further, or widen the expand step until each batch can land on its own.
 
 ### 4. Quiz the user
 
@@ -110,7 +117,7 @@ Publish the approved issues, applying the existence checks from step 5 above. **
   Setting these is not optional cleanup — an epic published without them has its structure in
   prose only, which is exactly the state `issue-graph.md` then has to be reconciled against by hand.
 
-Work the **frontier**: any issue whose blockers are all done. For a purely linear chain that means top to bottom.
+Work the **frontier**: any issue whose blockers are all merged. For a purely linear chain that means top to bottom.
 
 Do NOT close the parent issue. Its only edit: once every slice is published, set its
 Pipeline block to `readiness: in-progress`, add `graph: <workspaceRoot>/issue-graph.md`, and
@@ -178,13 +185,16 @@ In either form, avoid specific file paths or code snippets — they go stale fas
 ### 7. Write the epic's issue graph
 
 Always write `<workspaceRoot>/issue-graph.md` — one file per epic, regardless of tracker. It is
-the high-level view of the whole epic: every issue, its edges, and where the frontier is. It does
-NOT restate acceptance criteria or per-issue task steps — those live on the tracker and in
+the structural view of the whole epic: every issue, its slice slug, and its edges. It does NOT
+restate acceptance criteria or per-issue task steps — those live on the tracker and in
 `/to-tasks` step files.
 
-Rewrite this file whenever the epic's shape or state changes — an issue closed, added, split, or
-an edge corrected. Pull live state with `gh issue list`/`gh issue view` (or the tracker's
-equivalent) rather than trusting the file's own rows; a stale graph is worse than none.
+**Edges only, never state.** The file carries no open/closed column and no current frontier:
+issue and PR state live on GitHub, which is canonical, and a committed copy would need a
+commit on `main` every time a child merges. Readers derive state live — `gh issue list`
+against the edges gives the frontier. Rewrite the file only when the epic's **shape** changes
+(an issue added or split, an edge corrected), and that rewrite goes through a branch + PR like
+any other change.
 
 <issue-graph-template>
 
@@ -194,9 +204,11 @@ Epic: [#<epic>](<url>) — <one-line epic summary>.
 
 ## Nodes
 
-| # | Title | State | Depends on | Blocks |
+| # | Title | Slice slug | Depends on | Blocks |
 |---|---|---|---|---|
-| [#NN](<url>) | <title> | ✅ CLOSED / 🟡 OPEN | <blockers, or —> | <dependents, or —> |
+| [#NN](<url>) | <title> | <slice-slug> | <blockers, or —> | <dependents, or —> |
+
+The slice slug is what `/to-tasks` uses in the issue's branch name, `<type>/<NN>-<slice-slug>`.
 
 ## Graph
 
@@ -208,19 +220,33 @@ Epic: [#<epic>](<url>) — <one-line epic summary>.
 
 - **Parallel-safe:** <issues with no edge between them, and what they share downstream>
 - **Sequenced:** <the chains, with the artifact each edge is gated on>
-- **Current frontier:** <every issue whose blockers are all closed>
+- **Starting frontier:** <issues with no blockers — structural, not live state>
 
 ## Source
 
-<how the edges were derived — user-confirmed, spec section, or grilling ranking> Titles/states
-pulled from `gh issue view` on <date>. Related docs: <spec/architecture/decisions paths>.
+<how the edges were derived — user-confirmed, spec section, or grilling ranking> Titles pulled
+from `gh issue view` on <date>. Related docs: <spec/architecture/decisions paths>.
 
 </issue-graph-template>
 
-Work the frontier one issue at a time — `/to-tasks` first to plan it, then `/implement` — clearing context between issues. Then end your final message with a one-line pointer to the first frontier issue, as the very last line — nothing after it:
+### 8. Commit and ship the planning PR
+
+Join the writer, then make one commit on `docs/<slug>`, staged by path: `issue-graph.md` and
+`state.json`. Never `-A`. Message per `atomic-commit` § Commit format:
+`📚 docs(<scope>): slice <slug> into issues`, trailer `Refs: #<epic>`.
+
+The planning branch now holds the epic's whole planning story — workspace, decisions, spec,
+graph — one commit per stage. `/ship` pushes it and opens the planning PR; GitHub auto-merges
+it on green. **No issue branch starts until that PR has merged** — `/to-tasks` checks.
+
+Then work the frontier: **one issue = one branch = one PR.** Each issue branch starts from
+fresh `origin/main`; a blocked issue starts only after every blocker's PR has merged — no
+stacked branches. Per issue, `/to-tasks` plans it (and starts its branch + worktree), then
+`/implement`, then `/ship` — clearing context between issues. End your final message with a
+one-line pointer, as the very last line — nothing after it:
 
 ```
-Next: /to-tasks <first-frontier-issue-#-or-slug>
+Next: /ship (planning PR) — once merged: /to-tasks <first-frontier-issue-#-or-slug>
 ```
 
 ---
@@ -241,7 +267,7 @@ Two rules that govern this skill's own steps, repeated here because steps 5-7 de
 - **You set the rung from your own difficulty reasoning — `ready-for-agent` included.** Write
   the rung and its evidence into `assessed:`; never cite the user's approval of the breakdown
   as the reason. The closing `Next:` line follows the frontier issue's rung — `/implement` for
-  `ready-for-agent`, `/to-tasks` for `needs:tasks`.
+  `ready-for-agent` (it starts the issue branch itself), `/to-tasks` for `needs:tasks`.
 - **The body block is authoritative; labels are a projection.** Re-sync both labels in the same
   turn you write the block. On conflict the body wins.
 

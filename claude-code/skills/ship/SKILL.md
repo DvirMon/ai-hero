@@ -1,232 +1,170 @@
 ---
 name: ship
-description: "Take an implemented, committed change to a reviewable state and get it onto the default branch — branch/push/PR for repos that gate on review, or a direct push for repos that don't (per this repo's Ship mode flag). Reads state.json for the issue reference; ensures Closes #N reaches the tracker so the issue closes when CI (or the push itself) resolves it, then refreshes the workspace's own copy of issue state — issue-graph.md's node states and edges, and state.json's updatedAt — from one live tracker read. Use after /implement reports done and the developer has approved the commit."
+description: "Take a finished feature branch to an open, auto-merging PR — show the commit story for approval, rebase onto origin/main, push (force-with-lease after a rebase), open or reuse the PR with an emoji-conventional title and a Closes #N body, then enable GitHub auto-merge (rebase). Handles issue branches (<type>/<N>-<slug>) and epic planning branches (docs/<epic-slug>). Never pushes to main, never merges manually. Use after /implement reports done, or after /to-issues on a planning branch."
 disable-model-invocation: true
 ---
 
 # Ship
 
-`/implement` stops at an approved commit on the current branch. This skill takes it from there.
-Which of two modes it runs depends on this repo's Ship mode flag (step 2):
+One issue = one branch = one PR. `/implement` leaves a feature branch with one commit per step.
+This skill turns that branch into a PR that GitHub merges on its own once required checks pass.
 
-- **PR-gated** (default): branch (if needed), push, open the PR that carries CI — the pipeline's
-  actual test gate.
-- **Direct push**: push straight to the default branch. No branch, no PR — CI (if this repo has
-  it) runs after the fact instead of gating the push.
+There is one mode. No push to the default branch, ever — the Claude hook, the repo's git hooks
+and the `main` ruleset all block it; this skill never tries.
 
-This skill never closes an issue itself. `Closes #N` reaching the tracker — via a merged PR body
-in PR-gated mode, or via the pushed commit message in direct-push mode — is the mechanism; CI (or
-the push itself) is the trigger. A skill that closes an issue before that has happened is
-asserting a result it has no evidence for.
+This skill never merges and never closes an issue. `Closes #N` in the PR body plus a rebase-merge
+is the mechanism; GitHub auto-merge on green CI is the trigger. A skill that merges or closes
+before that has happened is asserting a result it has no evidence for.
 
 ## 1. Preconditions
 
-Check these in order, before touching git. Any failure stops here — say which one failed and
-why. Do not push a partial run.
+Check in order, before touching git. Any failure stops here — say which one and why.
 
-1. **`state.json` resolves.** Find it in the target ticket workspace
-   (`<domain-path>/docs/work/<slug>/state.json`, per `/to-ticket`'s workspace-root rule). Read
-   `slug` and `githubIssues`. If it doesn't exist or won't parse, stop.
-2. **The working tree has at least one commit not on the remote.** `git status -sb` and
-   `git log @{u}..HEAD --oneline` (or, if there's no upstream yet, `git log origin/<default>..HEAD
-   --oneline`). Zero commits ahead means there's nothing to ship — stop.
-3. **No step is mid-run.** Read `<workspaceRoot>/4-tasks/progress.md`. If any row reads
-   `▶ in progress`, stop — `/implement` hasn't finished, or died mid-step. Do not ship a partial
-   implementation.
+1. **On a feature branch.** `git branch --show-current` is not the default branch
+   (`git symbolic-ref refs/remotes/origin/HEAD`). Classify it:
+   - **Issue branch** `<type>/<N>-<slug>` → issue `#N`.
+   - **Planning branch** `docs/<epic-slug>` → the epic's planning PR (step 5b).
+   - Anything else → stop; renaming a branch is the developer's call.
+2. **Clean tree.** `git status --porcelain` is empty. Leftover changes → stop and suggest
+   `atomic-commit` to turn them into commits first.
+3. **`state.json` resolves** in the workspace (`<domain-path>/docs/work/<slug>/state.json`, per
+   `/to-ticket`'s workspace-root rule). Read `specPath`, `githubIssues`, `workspaceRoot`.
+   **No workspace** — issue `#N`'s Pipeline block says `workspace: null`: skip this check; there
+   is no spec and no `githubIssues` list, only issue `#N`.
+4. **Issue branch only — work is finished.** Find `progress.md` in the tasks root
+   (`/to-tasks` §5: `<workspaceRoot>/4-tasks/issue-<N>/`, or
+   `$(git rev-parse --git-dir)/pipeline/issue-<N>/` with no workspace).
+   - **Found:** its `**Branch:**` header must equal the current branch. Every row is `✅ done`,
+     `🧪 awaiting CI` (CI on this PR proves it) or `⏭ skipped`; any `▶ in progress` or
+     `⬚ pending` → stop. Do not ship unfinished steps.
+   - **None** (the issue body was the step): the branch's `N` already matched in check 1. Read
+     the issue's "Acceptance criteria" boxes (`gh issue view <N> --json body`). All ticked →
+     ship with `Closes #N`. Some unticked → ship only if `/implement` reported the issue as
+     partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/implement` hasn't closed
+     out.
+5. **Something to ship.** `git log --oneline origin/main..HEAD` is non-empty.
 
-## 2. Ship mode
+## 2. Gate — the developer approves the story
 
-Read the repo's `docs/agents/issue-tracker.md` for its "Ship mode" flag (set by `setup-skills`).
-No file, or the flag missing/`no` → **PR-gated**, continue at step 3. Flag is `yes` → **direct
-push**, skip to step 3'.
+This is the pipeline's human gate (`/implement` commits per step without asking). Show:
 
-This is a repo-level setting, not a per-run choice — don't ask which mode to use each time
-`/ship` runs; that's what the flag is for. If the flag is ambiguous or the file describes
-something this skill doesn't recognize, stop and say so rather than guessing which mode applies.
+- `git log --reverse --format='%h %s' origin/main..HEAD` — the commit story, oldest first.
+- The latest `/code-review` outcome for this branch, if `/implement` reported one; otherwise say
+  none ran.
 
-## 3. Branch (PR-gated mode)
+Wait for explicit approval. The developer may ask for fixes first — those become new commits
+(never `--amend`, never interactive rebase); then re-run from step 1.
 
-- If the current branch **is** the repo's default branch (`git symbolic-ref
-  refs/remotes/origin/HEAD`, or ask if that fails), create one. Name it
-  `<type>/<slug>` using `state.json`'s `slug`, and a `<type>` inferred from the change (`feat` for
-  new capability, `fix` for a bug fix, etc.). If this repo has a branch-name validator (e.g. a
-  `pre-push` hook, or a `tools/validate-branch-name.*` script — check before assuming one
-  exists), match its pattern; otherwise use `<type>/<slug>` as-is.
-  `git checkout -b <type>/<slug>`.
-- If already on a **non-default branch that conforms to any validator this repo has**, stay on
-  it — don't rename or recreate.
-- If already on a non-default branch that does **not** conform, stop and say so; renaming a
-  branch with existing pushed history is a judgment call for the developer, not this skill.
-
-## 4. Push (PR-gated mode)
-
-```bash
-git push -u origin <branch>
-```
-
-If this repo has a `pre-push` hook validating the branch name, that's a control on the branch
-name matching what this skill just built, not an obstacle to route around. If the push is rejected, fix the underlying cause (branch name, diverged remote) and
-push again; don't force past the hook.
-
-## 5. Open the PR — deduplicated (PR-gated mode)
-
-Check for an existing PR on this branch **before** creating one:
+## 3. Rebase onto `origin/main`
 
 ```bash
-gh pr list --head <branch> --json number,url
+git fetch origin
+git rebase origin/main
 ```
 
-- **If one is open:** the push in step 4 already updated it. Report its URL and stop — do not
-  run `gh pr create`, which would open a second PR for the same branch.
-- **If none exists:** `gh pr create --title "..." --body "..."`.
+No merge commits, ever — never `git merge origin/main` into the branch. On conflict:
+`git rebase --abort`, stop, and name the conflicting files. Resolving them is the developer's
+call.
 
-## 6. PR body (PR-gated mode)
+Record whether the rebase rewrote anything (`HEAD` changed) — step 4 needs it.
 
-Must contain, for each issue this change completes:
+## 4. Push
 
+```bash
+git push -u origin <branch>                    # first push
+git push --force-with-lease origin <branch>    # branch already on remote and step 3 rewrote it
 ```
-Closes #<issue-number>
+
+Never plain `--force`, never `--no-verify`. A rejected push (hook, branch-name validator,
+lease failure) is a signal — fix the cause, don't route around it. A lease failure means someone
+(or `rebase-behind-prs.yml`) pushed to the branch; fetch, re-run from step 3.
+
+## 5. Open the PR — deduplicated
+
+```bash
+gh pr list --head <branch> --state open --json number,url
 ```
 
-per this repo's `docs/agents/issue-tracker.md` — "Only `Closes`/`Fixes` closes an issue; a bare
-`#101` links without closing." Pull the issue number(s) from `state.json`'s `githubIssues`.
+- **Open PR exists:** step 4 already updated it. Skip to step 6 with its number — do not run
+  `gh pr create`.
+- **None:** draft, review, create (5a / 5b).
 
-Also include, as the evidence chain a reviewer needs:
+**Title** — emoji-conventional, same format as a commit subject, ending in the issue ref:
+`<emoji> [#N stage] <type>(<project>[/<domain>]): <summary> (#N)` (story tag optional;
+usually omit on a PR title). Format SSOT: `skills/atomic-commit/SKILL.md`, rule at
+`docs/agents/issue-tracker.md#issue-references` — don't restate them here. The repo's `pr-conventions.yml` checks this.
 
-- The spec path (`state.json`'s `specPath`)
-- The step-file directory (`<workspaceRoot>/4-tasks/`)
+**Body drafting** goes to a writer: `Agent`, `subagent_type: "general-purpose"`,
+`model: "sonnet"`. It starts with no context, so hand it everything: the commit log
+(`git log --reverse --format='%h %s%n%b' origin/main..HEAD`), the spec path, the step titles
+from `progress.md` (issue branch), and the body template below. It returns text only; it does
+not run `gh`. Review its output against the template and the log before creating — the
+closing line in particular must be exactly as specified below.
 
-Example body shape:
+```bash
+gh pr create --base main --head <branch> --title "<title>" --body-file <tmpfile>
+```
+
+### 5a. Issue branch body
 
 ```markdown
 ## Summary
-<1-3 bullets on what changed and why>
+<1-3 bullets: what changed and why>
+
+## Commits
+<one line per commit, oldest first: `<sha>` <subject> — reads as the story of the change>
 
 ## Evidence
-- Spec: <specPath>
-- Steps: <workspaceRoot>/4-tasks/
+- Spec: <specPath>                               (no workspace: omit)
+- Steps: <workspaceRoot>/4-tasks/issue-<N>/      (no workspace: "issue body")
 
-Closes #<issue-number>
+Closes #<N>
 ```
 
-Go to step 7.
+Exactly one `Closes #<N>` — this issue only. Exception: if `/implement` reported acceptance
+criteria left unchecked on the issue (partially satisfied), write `Refs #<N>` instead and say so
+in the Summary — the issue stays open. `Closes` is what closes the issue on merge; a bare
+`#N` only links. Commits carry `Refs: #N`, never a closing keyword.
 
-## 3'. Verify the closing keyword (direct-push mode)
+### 5b. Planning branch body
 
-Direct push has no PR body to carry `Closes #N` — the commit message is the only place it can
-live, and GitHub/GitLab both honor a closing keyword on a direct push to the default branch, not
-only on a merged PR/MR.
+Same shape, but it closes nothing: the planning PR lands the decisions, spec and issue graph
+that the slice issues build on. Replace the closing line with
+`Refs: #<spec-or-epic-issue>` (from `state.json`'s `githubIssues` / the spec issue `/to-spec`
+created), and list the created slice issues under **Evidence**.
 
-Check the commit(s) about to be pushed (`git log @{u}..HEAD` or `git log origin/<default>..HEAD`)
-for `Closes #<issue-number>` (or `Fixes #<issue-number>`), for each issue in `state.json`'s
-`githubIssues`. Missing → **stop and say so**. Do not amend or rewrite the commit message
-yourself — that rewrites history the developer already made; ask them to add it and re-run.
-
-## 4'. Push directly (direct-push mode)
-
-Confirm the current branch **is** the repo's default branch (`git symbolic-ref
-refs/remotes/origin/HEAD`, or ask if that fails). If it isn't, stop — direct-push mode ships
-from the default branch, not a feature branch; if you're on a feature branch, this repo's flag
-may be misconfigured for what you're trying to do, or the PR-gated flow is what you actually want
-here.
+## 6. Enable auto-merge
 
 ```bash
-git push origin <default-branch>
+gh pr merge <number> --auto --rebase
 ```
 
-No branch is created, no PR is opened.
+Rebase is the only allowed method (repo settings disable merge commits and squash). GitHub merges
+when the required checks (`ci-gate`, `pr-conventions`) and any required review pass, deletes the
+branch, and `Closes #N` closes the issue.
 
-Go to step 7.
+If `gh` reports auto-merge isn't allowed on this repo, stop and say so — the repo hasn't had the
+`setup-skills` branch-workflow bootstrap (rulesets + `allow_auto_merge`). Do not merge by hand
+as a workaround.
 
-## 7. Refresh the local tracking files
+## 7. Report and stop
 
-The tracker is the source of truth for issue state; the workspace keeps a local copy of it
-(`issue-graph.md`'s **State** column). The push is what makes that copy stale, so refreshing it
-is part of shipping, not a follow-up someone remembers to do.
+- The PR URL, and "auto-merge on (rebase)".
+- Acceptance checks are **implemented, not verified** — CI on the PR decides. Do not poll CI,
+  do not merge, do not close anything.
+- **Next frontier.** From `<workspaceRoot>/issue-graph.md`'s edges and one read of open issues
+  (`gh issue list --state open --json number,title`), name the issues this PR will unblock once
+  it merges, and any already unblocked now. Blocked issues start only after GitHub merges — the
+  next `/to-tasks` prunes this branch's worktree and fast-forwards `main` at that point.
+- Local cleanup is not this skill's job (see `to-tasks/references/start-branch.md`).
 
-**Dispatch this step's writes to a writer agent — never edit the tracking files inline in the main
-session.** Same shape as `/implement`'s `docs`/`chore` step routing: a tracker read plus
-multi-file Markdown edits (`issue-graph.md`'s rows, edges, ASCII graph and Summary/Source
-prose, `state.json`'s bump) generates tool-call noise this session doesn't need to hold, and the
-dispatcher's own context should stay free for the report in step 8. Run the tracker read below
-yourself, then spawn a `sonnet` writer (`Agent`, `subagent_type: "general-purpose"`,
-`model: "sonnet"`) with the read's output, the workspace path, and step 7.1–7.3's rules below
-— it shapes the graph from that data, and starts with no context, so the brief is
-self-contained. Unlike `/implement`'s fire-and-continue default, **wait for its report before
-step 8** — step 8's own text ("name which local files step 7 rewrote") depends on what the
-writer actually wrote, so there is nothing left to do in this run until it returns. Shared
-contract for every pipeline skill's file writes: `to-ticket/references/file-writes.md`.
+## Re-running
 
-**Read the state, never assert it.** For every issue in `state.json`'s `githubIssues`:
+`/ship` is idempotent on a branch. Re-run it when:
 
-```bash
-gh issue list --repo <owner/repo> --state all \
-  --json number,title,state,closedAt \
-  --jq '.[] | select(.number | IN(<n1>,<n2>,...))'
-```
+- the developer added fix commits after review;
+- the PR fell behind `main` and `rebase-behind-prs.yml` couldn't rebase it (conflict comment on
+  the PR).
 
-One read, right after the push. That is not polling — do not loop, wait, or re-read until a
-number changes. Whatever the tracker reports at that moment is what gets written.
-
-### 7.1 `issue-graph.md`
-
-Path: `<workspaceRoot>/issue-graph.md`. **If it does not exist, skip 7.1** — `/to-issues` owns
-creating it, and a ticket with no epic legitimately has no graph. Do not scaffold one here.
-
-Update, in this order:
-
-1. **The `State` cell of every row**, from the read above — `✅ CLOSED <MM-DD>` for a closed
-   issue, `🟡 OPEN` for an open one. Every row, not only the shipped one: a closing keyword can
-   close a sibling, and a read you already paid for is the cheapest correction there is.
-2. **The shipped node's annotation.** Append the evidence this skill owns and the tracker does
-   not — the PR URL in PR-gated mode, the short commit sha in direct-push mode. Shape:
-   `✅ CLOSED 09-20 (94e8050)` or `🟣 IN REVIEW ([PR #42](<url>))`.
-3. **Edges the closure cleared.** For each row that listed the shipped issue under
-   `Depends on`, mark it cleared rather than deleting it — `#112 (cleared)` — and do the same
-   in the ASCII graph (`✅ closed` under the node). The edge is history; a reader who sees it
-   vanish cannot tell whether it was satisfied or was never real.
-4. **The `Summary` bullets that named it** — most often **Current frontier**, which gains every
-   issue whose last blocker just closed. Leave a bullet alone if the closure did not change it;
-   this is a state refresh, not a rewrite of the reasoning.
-5. **The `Source` line** — the provenance sentence records which date the states were pulled and
-   what moved. Extend it, don't replace it.
-
-An issue that is still `OPEN` after the push is written as `OPEN`. In PR-gated mode that is the
-expected result (the PR has to merge first). In direct-push mode it usually means the tracker
-has not processed the closing keyword yet — say so in the report and leave the row honest; the
-next `/ship` or `/to-issues` run corrects it from the same live read.
-
-### 7.2 `state.json`
-
-Bump `updatedAt` to the current ISO 8601 timestamp. Write nothing else — per
-`to-ticket/references/state-schema.md`'s validation routine, preserve every key this stage does
-not own, and do not add a field for what shipped: `issue-graph.md` and the tracker already carry
-that, and the schema's rule is that a field with no stated consumer does not go in.
-
-### 7.3 These writes are not a gate
-
-Step 7 runs **after** the push. A failure here — `gh` erroring, the graph file being in a shape
-these edits do not match — is reported as an unfinished doc update, not as a failed ship. Never
-revert, force-push, or re-push to "undo" a bookkeeping failure: the code is already on the
-remote, and the correct recovery is to fix the file.
-
-## 8. Report and stop
-
-**PR-gated mode:** print the PR URL. State plainly that acceptance checks are **implemented, not
-verified** — they stay that way until the PR's CI run passes. Do not poll CI status. Do not
-merge. Do not enable or suggest auto-merge. Do not close anything — the issue closes on its own
-once `close-linked-issue-on-ci-green.yml` (or this repo's equivalent) sees the merge with
-`Closes #N` resolved.
-
-Whether a failing CI run actually **blocks** merge is unverified in general — branch protection
-may or may not be configured. Don't assert that red CI blocks anything; say only that the PR
-carries the check, and CI's result is what determines whether the issue closes.
-
-**Direct-push mode:** state plainly that the commit is now on the default branch, and CI (if
-any) runs on it after the fact rather than gating it. For the issue, report what step 7's single
-read actually returned — closed, or still open because the tracker has not processed the closing
-keyword yet. Do not re-read to get a better answer, and do not assert a closure the read did not
-show.
-
-**Both modes:** name which local files step 7 rewrote (or which it skipped, and why), so the
-developer knows the workspace copy matches the tracker as of this run.
+Steps 3–4 rebase and `--force-with-lease`; step 5 finds the existing PR; step 6 is a no-op if
+auto-merge is already on. No second PR, no re-created branch.

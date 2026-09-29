@@ -38,7 +38,7 @@ reads it, not just who writes it.
 |---|---|---|
 | `schemaVersion` | `to-ticket`, at workspace creation. Never bumped in place — a schema change ships as a new version number and a migration note here. | All six pipeline skills, via the validation routine below (step 2). |
 | `runId` | `to-ticket`, at workspace creation. | No skill reads it back. Stated consumer: a human correlating a workspace with the session that created it — cheap correlation, not a telemetry system. Required by this schema's own design brief regardless of automated reads. |
-| `slug` | `to-ticket`. | All six pipeline skills (workspace identification); `org/.claude/hooks/pipeline-current-ticket.sh` (argument matching); `ship` (branch name `<type>/<slug>`). |
+| `slug` | `to-ticket`. | All six pipeline skills (workspace identification); `org/.claude/hooks/pipeline-current-ticket.sh` (argument matching); `to-ticket`, `grill-with-docs`, `to-spec`, `to-issues` (the epic's planning branch, `docs/<slug>`). It does **not** name issue branches — each issue's branch is `<type>/<N>-<slice-slug>`, recorded in that issue's `progress.md` header, not here. |
 | `ticketRef` | `to-ticket`. | `grill-with-docs` (fetches the ticket this points at); `pipeline-current-ticket.sh` (displays it in suggested context). |
 | `ticketUrl` | `to-ticket`. | `to-ticket` itself, in its own hand-off message to the user (step 5). |
 | `domainPath` | `to-ticket`, resolved during workspace creation (step 4's domain-path resolution). | No skill re-reads it today. Stated consumer: any future stage that needs the domain root without re-deriving it from `workspaceRoot` — e.g. locating the domain's own `CONTEXT.md` / `docs/adr/` for cross-referencing. Step 7 made the layout domain-colocated; this is the field that records the domain once instead of re-deriving it every stage. |
@@ -49,9 +49,9 @@ reads it, not just who writes it.
 | `capabilityLogPath` | `to-ticket`, at creation — the permanent decisions log for the capability this work belongs to (`doc-contracts/decisions-log.md`), if the project keeps them and this work belongs to exactly one capability. `null` otherwise, which is the correct value for cross-capability work, not a missing field. | `grill-with-docs` (reads it before the first question, so the interview does not re-decide something settled; appends a row per capability-scoped decision); `to-spec` (reads it as a second input alongside `decisionsPath` — the log carries what earlier efforts settled, which the workspace's own decisions file does not). |
 | `specPath` | `to-spec`. | `to-issues` (default source, read in full); `to-tasks` (read for consistency); `implement` (read only if a step is ambiguous); `ship` (linked as evidence in the PR body). |
 | `architecturePath` | `to-spec`, only when `isComplex` is `true`. | `to-issues`, `to-tasks`, `implement` — same read pattern as `specPath`. |
-| `githubIssues` | `to-issues` (appends created issue numbers/references). | `to-spec` (step 5 — checks for a prior spec issue before creating a duplicate); `ship` (step 1 and step 5 — pulls the issue number(s) for `Closes #N` in the PR body). |
+| `githubIssues` | `to-issues` (appends created issue numbers/references). | `to-spec` (step 5 — checks for a prior spec issue before creating a duplicate); `ship` (pulls the issue number(s) for the `Closes #N` reference in the PR body — commits carry only `Refs: #N`). |
 | `createdAt` | `to-ticket`, at workspace creation. Never updated after. | No skill reads it back today. Paired with `updatedAt`, it is what makes workspace age/staleness computable by a human or a future audit — same class of consumer as `runId`. |
-| `updatedAt` | Every skill that writes to `state.json`, on every write (validation routine step 4). | No skill reads it back today. It is what makes staleness detectable at all — a workspace whose `updatedAt` is old relative to its `readiness` rung is a candidate for review. |
+| `updatedAt` | Every skill that writes to `state.json`, on every write (validation routine step 4). `ship` no longer writes `state.json` at all — after the planning PR merges the file is static on `main`, and live status comes from GitHub. | No skill reads it back today. It is what makes staleness detectable at all — a workspace whose `updatedAt` is old relative to its `readiness` rung is a candidate for review. |
 
 ### Migration: version 1 → 2
 
@@ -73,9 +73,20 @@ file back at version 2. Do not rewrite version-1 workspaces in bulk.
 - **`githubIssues` was NOT removed**, despite being named for removal in the step-8 finding
   (A14: "written by four skills, read by none"). That claim does not hold: `to-spec` reads it
   at step 5 to avoid creating a duplicate spec issue, and `ship` reads it at steps 1 and 5 to
-  populate `Closes #N` in the PR body. Both are real, already-documented reads, not new
+  populate the closing reference in the PR body. Both are real, already-documented reads, not new
   consumers invented to save the field. The field stays in the schema; only `checklist` was
   removed.
+
+### Deliberately absent: branch, worktree, PR
+
+`state.json` is epic-grain and committed with the planning PR; issue work happens later on
+per-issue branches. A per-issue git fact written here would need a commit on every issue
+branch to the same shared file — a rebase conflict per sibling. So:
+
+- **Branch and worktree** → the issue's `progress.md` header (`**Branch:**`,
+  `**Worktree:**`), written by `/to-tasks`.
+- **PR number/state** → not stored anywhere; looked up with `gh pr list --head <branch>`.
+- **Issue open/closed** → GitHub; `issue-graph.md` carries edges only.
 
 ## Validation routine
 

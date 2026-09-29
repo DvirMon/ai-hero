@@ -55,7 +55,7 @@ or implement steps you were not given.
    and never run it again after that second pass unless you touch more files.
 8. The dispatcher owns final verification, not you. This overrides the angular-developer
    skill's "run `ng build` after generating" instruction.
-9. Do **not** commit. `/implement` commits.
+9. Do **not** commit. `/implement` commits after your step is verified.
 
 ## Output
 

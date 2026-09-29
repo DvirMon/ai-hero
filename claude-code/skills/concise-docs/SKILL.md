@@ -46,6 +46,14 @@ in a sequence (rare, but happens in setup/migration scripts) is procedural — t
   collapse to the list, drop the prose.
 - Adjective/adverb padding that adds no fact.
 
+**A cut only counts if it removes a whole clause, sentence, or repeated
+fact.** A single filler word or synonym swap, with nothing else cuttable in
+its sentence, is not a compression — it's noise. If a pass through a file
+turns up nothing but single-word deletions or word-for-word substitutions
+(no clause/sentence/repeated-fact removed anywhere), the file is already
+tight: change nothing and report "already tight, no change" per step 5. Do
+not apply the one-word edit just to have something to report.
+
 **Never cut:**
 - Any numbered/ordered step in a procedure — step count before and after must match.
 - Any distinct acceptance criterion or edge case — never merge two into one line to save a line.
@@ -75,6 +83,11 @@ Edit the file(s) directly. Report per file:
 <file>: <before-lines> → <after-lines> lines (-N%)
 Preserved: <X> steps, <Y> criteria, 0 dropped
 ```
+
+A "0%" or near-0% result must mean **no edit was applied** — never a
+single-word edit dressed up as a line-count delta. If the only thing you
+found was one word here or there, that's the "already tight" outcome from
+step 4/the materiality rule above, not a 0%-delta edit.
 
 Don't touch files the user didn't name, even if they're linked from a target file — cross-file
 scope only on explicit request, same as `audit-docs`.

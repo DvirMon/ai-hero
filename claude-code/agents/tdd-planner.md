@@ -1,6 +1,6 @@
 ---
 name: tdd-planner
-description: "Designs the tests for one /to-tasks `code` step before any code exists — which seams, one test per seam, what each asserts and why, the red-green order, and what is deliberately not tested. Returns the `step-N.test-plan.md` body as text; writes nothing. Dispatched by /to-tasks step 4b, once per code step with a test seam."
+description: "Designs the tests for one /to-tasks `code` step before any code exists — which seams, one test per seam, what each asserts and why, the red-green order, and what is deliberately not tested. Returns the `step-N-<slug>.test-plan.md` body as text; writes nothing. Dispatched by /to-tasks step 4b, once per code step with a test seam."
 model: opus
 tools: Read, Glob, Grep
 ---

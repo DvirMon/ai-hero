@@ -25,18 +25,19 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either — resolve with `gh pr view 42` and fall back to `gh issue view 42`.
 
-## Ship mode
+## Issue references
 
-**Direct push to default branch: no.** _(Set to `yes` if this repo pushes straight to the
-default branch instead of going through a PR; `/ship` reads this flag.)_
+Every change reaches the default branch through a PR, rebase-merged (see
+`CLAUDE.md` § Git workflow). Issues close when that PR merges.
 
-When set to `no` (default), `/ship` branches, pushes, and opens a PR — the PR carries CI, and
-`Closes #N` in its body is what `close-linked-issue-on-ci-green.yml` acts on.
+- **Commits** carry a `Refs: #N` trailer (`Refs: none` for the planning
+  workspace-open commit). Never a closing keyword (`close[sd]`,
+  `fix(e[sd])`, `resolve[sd]`, `Ships:`) — `pr-conventions.yml` rejects it.
+- **PR body** carries the closing reference: `Closes #N` for an issue the PR
+  completes, `Refs #N` for one it only partly delivers. Planning PRs
+  (`docs/<slug>`) use `Refs #<epic>` and close nothing.
 
-When set to `yes`, `/ship` pushes the current commit(s) straight to the default branch — no
-branch, no PR. `Closes #N` must already be present in a pushed commit message (GitHub closes on
-a direct push to the default branch too, not only on a merged PR) — `/ship` checks for this and
-stops rather than rewriting commit history if it's missing.
+`/implement`, `/ship` and `code-review` read these rules.
 
 ## When a skill says "publish to the issue tracker"
 

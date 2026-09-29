@@ -43,6 +43,11 @@ and say so in your report.
 - If a file is already tight, say so and change nothing. Reporting
   "no change needed" is a valid outcome — do not manufacture edits to
   look productive.
+- **A one- or two-word deletion or synonym swap, with no whole
+  clause/sentence/repeated-fact removed, is not a compression.** If
+  that's the only thing you can find in a file, that IS "already
+  tight" — leave it unedited and report zero change, don't apply the
+  word-level edit and call it a delta.
 
 ## Reporting back
 

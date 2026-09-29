@@ -102,6 +102,16 @@ Every effort in this pipeline has a workspace directory, where `<slug>` is a sho
 3. If a derivation was made in step 2, **confirm it with the user** before writing anything — state the derived path and ask them to confirm or correct it. Do not proceed on an unconfirmed guess.
 4. If neither 1 nor 2 resolves cleanly, ask the user directly for the domain path.
 
+**Start the planning branch before writing anything.** Planning never happens on the default
+branch: the whole epic's planning docs (`/to-ticket` → `/to-issues`) ship as one PR from
+`docs/<slug>`, and each issue later gets its own branch off `main`. Run
+`to-tasks/references/start-branch.md` with branch `docs/<slug>` once `<domain-path>` and
+`<slug>` are settled — it prunes merged work, refuses a dirty tree, creates the worktree off
+`origin/main` and enters it. Every path below then resolves inside that worktree. On resume
+(the existing-workspace case below), switch to the existing `docs/<slug>` worktree instead of
+creating a new one; if its planning PR already merged, the workspace is on `main` and resuming
+it means a new `docs/<slug>-<topic>` branch from the same procedure.
+
 This skill creates the workspace; every later stage (`/grill-with-docs`, `/to-spec`, `/to-issues`, `/to-tasks`) reads and extends it purely via the paths recorded in `state.json` below — they read `workspaceRoot`/`decisionsPath`/`capabilityLogPath`/`specPath`/`architecturePath` rather than reconstructing or assuming a root themselves. This is documented here, once.
 
 The full field-by-field schema (owner, consumer, and the validation routine every state-reading
@@ -119,7 +129,7 @@ there) or pick a different slug for a new workspace. Never silently overwrite an
 
 Once the check passes, dispatch the write to a `haiku` writer per `references/file-writes.md`
 — never inline; the brief carries the full JSON below, filled in. Join it before step 5's
-hand-off, which names the workspace as created.
+commit, which needs the file on disk.
 
 Write `<workspace-root>/state.json` (substituting whichever root was decided above), per
 `references/state-schema.md`:
@@ -160,9 +170,19 @@ moves forward on every later write, per `references/state-schema.md`'s validatio
 to pick the implementer agent. It is the only routing field that belongs to the whole ticket —
 per-step routing lives in the step files `/to-tasks` writes.
 
-### 5. Hand off
+### 5. Commit
 
-Tell the user the ticket reference/URL and the workspace path. Then end your final message with a one-line pointer, as the very last line — nothing after it:
+Once the writer has joined, commit `state.json` on `docs/<slug>` — one commit, staged by path
+(`git add <workspace-root>/state.json`, plus the ticket file if the tracker convention is
+local files; never `-A`). Message per `atomic-commit` § Commit
+format: `📚 docs(<scope>): open <slug> workspace`, trailer `Refs: none` (the epic issue does
+not exist until `/to-spec`). Do not push — `/ship` pushes the planning branch after
+`/to-issues`.
+
+### 6. Hand off
+
+Tell the user the ticket reference/URL, the workspace path, and the branch + worktree path
+(`docs/<slug>` at `<worktree>`). Then end your final message with a one-line pointer, as the very last line — nothing after it:
 
 ```
 Next: /grill-with-docs <ticket-id-or-slug>

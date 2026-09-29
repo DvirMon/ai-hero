@@ -48,7 +48,7 @@ or implement steps you were not given.
    reports errors, fix them and re-run **once more** to confirm — never re-run speculatively,
    and never run it again after that second pass unless you touch more files.
 7. The dispatcher owns final verification, not you.
-8. Do **not** commit. `/implement` commits.
+8. Do **not** commit. `/implement` commits after your step is verified.
 
 ## Output
 

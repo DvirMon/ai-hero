@@ -9,8 +9,46 @@ Turn all current uncommitted changes in the working tree — staged or not — i
 
 This only ever touches the **index** (staging area) and creates **new** commits. It never rewrites existing history, never discards or edits any file's contents, and never pushes.
 
+This skill is also the **commit-format SSOT** for the pipeline (§ Commit format). `/implement` writes its per-step commits in this format; this skill itself is the ad-hoc splitter for leftover or hand-made changes, not a step of the main flow.
+
+## Commit format
+
+```
+<emoji> [#<issue> <stage>] <type>(<project>[/<domain>]): <imperative subject>
+
+<body: why, not what — optional>
+
+Refs: #N
+Epic: #M
+Co-Authored-By: <the exact line from this session's attribution reminder>
+```
+
+- **Types** — only commitlint `config-conventional` types, each with a fixed emoji:
+
+  | Emoji | Type | For |
+  |---|---|---|
+  | 🎸 | `feat` | new feature |
+  | 🐛 | `fix` | bug fix |
+  | 🔒 | `fix` | security fix |
+  | 🍎 | `ref` | refactor, no behavior change (`refactor` is a legacy alias — never emit it) |
+  | ⚡ | `perf` | performance |
+  | ✅ | `test` | tests only |
+  | 📚 | `docs` | documentation |
+  | 🎨 | `chore` | tooling, dependencies, housekeeping |
+  | 📦 | `build` | build system |
+  | 👷 | `ci` | CI config |
+  | 💄 | `style` | formatting only |
+  | ⏪ | `revert` | revert |
+
+- **Story tag** `[#<issue> <stage>]` — optional. Stage `s<N>` = step N of `4-tasks/issue-<N>/step-<N>-*.plan.md`; `plan` = task/test plans; `review` = changes answering review. Omit for `Refs: none` work or commits that fit no stage. The tag's issue must also appear in `Refs:`.
+- **Trailers** — `Refs: #N` for the issue the commit belongs to; `Epic: #M` when the epic is known; `Refs: none` when unrelated to any issue. If `docs/agents/issue-tracker.md` names a different partial trailer, use that name instead.
+- **Never close from a commit.** No `Closes #N` / `Ships: #N` and no GitHub closing keyword (`close[sd]`, `fix(e[sd])`, `resolve[sd]` before `#N`) anywhere in the message — the PR body owns `Closes #N`.
+- Imperative mood, subject explains *why* when it fits.
+- Full rule (tag, scope, trailers, enforcement): `docs/agents/issue-tracker.md#issue-references` — link, don't restate.
+
 ## 1. Preconditions
 
+- **Not on the default branch.** Resolve it (`git symbolic-ref --short refs/remotes/origin/HEAD`, strip `origin/`; fall back to `main`/`master`). If `git branch --show-current` equals it, stop: "commits go on a feature branch — start one first (see /to-tasks start-branch)". Never commit on the default branch.
 - `git status` and `git diff HEAD --stat` (covers both staged and unstaged changes to tracked files). Also note any untracked files (`??` lines in `git status --porcelain`) — treat them as whole-file buckets. If there are no staged changes, no unstaged changes, and no untracked files, stop and tell the user.
 - `git log --oneline -20` to pick up this repo's commit message style/conventions (and check `CLAUDE.md` / `CONTRIBUTING.md` for documented conventions).
 - Save a safety copy of the full current diff before touching anything: `git diff HEAD > <scratchpad>/pre-split.patch`. This is the recovery path if anything goes wrong. (Untracked files aren't captured by this diff — `git reset` won't touch them anyway, so they're safe regardless.)
@@ -36,13 +74,9 @@ Ask: "If a reviewer asks to undo this commit, what would they be undoing?" If th
 
 For each bucket, draft:
 - files (and, for hunk-level buckets, which hunks — reference them by their `@@ -a,b +c,d @@` header)
-- a commit message: **conventional commit format with emoji** in imperative mood, explains *why* not *what*, matches the repo's existing style pulled from `git log`. Format: `<emoji> <type>(scope): <description>` where emoji matches the commit type (e.g., `🎸 feat`, `🐛 fix`, `📚 docs`, `🎨 chore`, `🍎 ref`)
+- a commit message per § Commit format (emoji + type + scope, `Refs:`/`Epic:` trailers).
 
-**Scope naming:** In monorepo/multi-domain repos, include the app/lib and domain path in the scope for clarity:
-- `(app-name/domain/component)` — e.g., `(issa-landing/ds/card)`, `(issa-landing/sections/mission)`
-- `(lib-name/domain)` — e.g., `(shared-ds/table)`, `(shared-ds/forms)`
-- `(root)` — for root-level changes (settings, config, docs at repo level)
-- Single-app/single-domain repos: just `(domain-or-component)` — e.g., `(button)`, `(homepage)`
+**Scope:** `<project>[/<domain>]` — `<project>` e.g. `table`, `root`, `deps`. `<domain>` is the one the work *belongs to*: the folder under `libs/table/docs/1-state/work/<domain>/` holding the issue's workspace, even if the diff touches other folders. No single owner → project only. Never a list. Repos without that layout: see `docs/agents/issue-tracker.md#issue-references`, else `(root)` / `(component)`.
 
 Order buckets so the history reads sensibly (e.g. foundational/type changes before the code that uses them).
 
@@ -61,26 +95,18 @@ Show the user the bucket breakdown (files/hunks + draft message per commit) befo
      ```
      If a single hunk itself mixes two concerns, answer `s` (split) at that prompt and continue with `y`/`n` for the resulting pieces; fall back to `e` (manual hunk edit) only if `s` can't separate them cleanly.
    - Verify the staged result matches the bucket's intent: `git diff --staged`.
-   - Commit with a heredoc, following conventional commit format with emoji (message via heredoc, plus the `Co-Authored-By:` trailer exactly as this session's system reminder specifies it — the model varies per session, so never hardcode one):
+   - Commit with a heredoc in § Commit format (the `Co-Authored-By:` line exactly as this session's system reminder specifies — the model varies per session, never hardcode one):
      ```bash
      git commit -m "$(cat <<'EOF'
-     <emoji> <type>(scope): <description>
+     <emoji> [#N stage] <type>(<project>[/<domain>]): <description>
 
      <body if needed>
 
+     Refs: #N
      Co-Authored-By: <the exact line from this session's attribution reminder>
      EOF
      )"
      ```
-     **Emoji reference:**
-     - 🎸 `feat` — new feature
-     - 🐛 `fix` — bug fix
-     - 📚 `docs` — documentation
-     - 🎨 `chore` — build/tooling/dependencies
-     - 🍎 `ref` — code refactoring
-     - ⚡ `perf` — performance improvement
-     - ✅ `test` — test changes
-     - 🔒 `security` — security fix
 3. After the last bucket, verify nothing was lost or duplicated:
    - `git status` — working tree and index should be clean (no staged, unstaged, or untracked files left over).
    - `git diff <original-HEAD>..HEAD` should equal the saved `pre-split.patch` (same net change, now spread across commits).
@@ -88,4 +114,4 @@ Show the user the bucket breakdown (files/hunks + draft message per commit) befo
 
 ## 5. Report
 
-List the commits created (short SHA + subject, in order). Do not push — pushing is a separate, explicit request.
+List the commits created (short SHA + subject, in order). Do not push — pushing and opening the PR is `/ship`.

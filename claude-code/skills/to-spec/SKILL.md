@@ -6,6 +6,10 @@ disable-model-invocation: true
 
 This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`) and the ticket it was grilled from — and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
 
+**Branch guard, first.** The spec is committed on the epic's planning branch, `docs/<slug>`
+(the `slug` in `state.json`), in its worktree. On the default branch or an issue branch, stop
+and point the user to `/to-ticket`, which starts it via `to-tasks/references/start-branch.md`.
+
 If a ticket workspace's `state.json` exists, validate it per `to-ticket/references/state-schema.md` before reading it.
 
 If it carries a non-null `capabilityLogPath`, **read that log too.** It holds what earlier efforts on the same capability already settled, superseded or left open — which this workspace's own decisions file does not, and which a spec is worse than useless for contradicting. Any decision the spec makes that binds the capability beyond this ticket gets a row in that log, per `doc-contracts/decisions-log.md`.
@@ -28,7 +32,7 @@ Check with the user that these seams match their expectations.
    `haiku` writer**, per `to-ticket/references/file-writes.md`. Compose every file's full text
    here and hand it over verbatim, so the write is mechanical. Continue with step 5's tracker
    search and publish while it writes — you already hold the content. Join the writer before
-   the final message.
+   step 6's commit.
 
    Update the source issue's `## Pipeline` block (contract: `to-issues/references/pipeline-block.md`): set
    `workspace` to the workspace root, set `grill: done: <decisionsPath>` and
@@ -122,6 +126,11 @@ A description of the things that are out of scope for this spec.
 Any further notes about the feature.
 
 </spec-template>
+
+6. **Commit.** Join the writer, then make one commit on `docs/<slug>`, staged by path:
+   `2-spec.md`, `3-architecture.md` (if written), `state.json`, any capability-log row. Never
+   `-A`. Message per `atomic-commit` § Commit format: `📚 docs(<scope>): spec <slug>`, trailer
+   `Refs: #<spec issue>` from step 5. Do not push — `/ship` does, after `/to-issues`.
 
 End your final message with a one-line pointer, as the very last line — nothing after it:
 

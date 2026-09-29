@@ -38,7 +38,7 @@ planner — the step file is the contract.
 5. Typecheck via the project config (`nx run <project>:typecheck`, else `npx tsc -p
    <project>/tsconfig.json --noEmit`). Fix errors before returning.
 6. Do **not** start Storybook or any dev server — the user has asked not to serve unprompted.
-7. Do **not** commit. `/implement` commits.
+7. Do **not** commit. `/implement` commits after your step is verified.
 
 ## Output
 

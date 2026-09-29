@@ -16,7 +16,12 @@ The issue tracker should have been provided to you — run `/setup-skills` if `d
 
 ### 1. Pin the fixed point
 
-Whatever the user said is the fixed point — a commit SHA, branch name, tag, `main`, `HEAD~5`, etc. If they didn't specify one, ask for it.
+Whatever the user (or the calling skill) said is the fixed point — a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.
+
+If none was given:
+
+- **On a feature branch** (not the default branch): default to the branch's merge-base with the remote default — `git merge-base origin/<default> HEAD`, where `<default>` comes from `git symbolic-ref --short refs/remotes/origin/HEAD`. That is the whole branch, i.e. the PR. Say which base you used. Run `git fetch origin` first if `origin/<default>` may be stale.
+- **On the default branch**, or detached: ask for it.
 
 Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
 
@@ -29,7 +34,7 @@ This repo colocates docs by domain (`CLAUDE.md` → "Docs by Responsibility"): e
 DS-pipeline components (built via `ds-wayfinder`) use the same roles under different filenames — `docs/prd.md` is that domain's `spec.md`, `docs/decisions.md` matches directly, and `docs/architecture.md` (complex components) matches directly. Treat `prd.md` as an alias for `spec.md` wherever it's found; there's no DS equivalent of `narrative.md`, skip it for those domains.
 
 1. For each file touched in the diff, walk up from it to the nearest ancestor `docs/` folder that contains `spec.md`/`prd.md`/`narrative.md`/`decisions.md`. Collect the distinct set of domain doc folders hit by the diff.
-2. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — fetch via the workflow in `docs/agents/issue-tracker.md`.
+2. Issue references in the commit messages (`#123`, `Refs: #45`, `Closes #45`, `Ships: #45`, GitLab `!67`, etc.) and, when the branch already has a PR, its body's `Closes #N` (`gh pr view --json body`) — fetch via the workflow in `docs/agents/issue-tracker.md`.
 3. A path the user passed as an argument.
 4. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature, if no domain docs were found in step 1.
 5. If nothing is found in any of the above, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".

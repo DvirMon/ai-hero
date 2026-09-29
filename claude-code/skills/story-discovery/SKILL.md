@@ -64,19 +64,22 @@ Two rules that carry regardless of house shape:
 
 ### 2. Map the graph, then dispatch in parallel
 
-Per `decompose-by-dependency-graph`: list nodes, map edges, rank. The standard shape is three
+Per `decompose-by-dependency-graph`: list nodes, map edges, rank. The standard shape is four
 independent discovery nodes feeding one dependent writing node.
 
 ```
 N1 community pain (web)     ─┐
-N2 competitor capabilities  ─┼─→ N4 write the doc (you, in the PM role)
-N3 internal coverage audit  ─┘
+N2 competitor capabilities  ─┤
+N3 product UX (end-user     ─┼─→ N5 write the doc (you, in the PM role)
+   products)                 │
+N4 internal coverage audit  ─┘
 ```
 
-N1–N3 are parallel-safe — dispatch them in **one message, multiple tool calls**.
+N1–N4 are parallel-safe — dispatch them in **one message, multiple tool calls**.
 
 **Dispatch the `story-discovery` agent** (`~/.claude/agents/story-discovery.md`), once per node,
-passing `mode` (`community-pain` | `competitor-capabilities` | `internal-coverage`), `feature`,
+passing `mode` (`community-pain` | `competitor-capabilities` | `product-ux` |
+`internal-coverage`), `feature`,
 `outputPath`, and `competitorSet` where you have one. That agent carries the source-reliability
 notes, the citation rules and the output shape — give it the question and the constraints, not the
 method. The per-node briefs below are what it already knows; keep them here as the contract, but do
@@ -104,7 +107,16 @@ the libraries disagree** — disagreement is exactly where a product decision li
 there was no obvious answer. Tier splits matter (free vs paid), because a capability behind a
 paywall is evidence of what people will pay for.
 
-**N3 — internal coverage audit.** Read-only. What the repo already decided, already documented,
+**N3 — product UX.** End-user SaaS products with a table in their UI (Monday.com, Jira, Asana,
+ClickUp, Notion, Airtable, Smartsheet, and similar) — what a person actually clicks and sees, not
+what an integrator configures. The signal is the **everyday expectation** set by the most widely
+used products, plus plan-gating where a behavior is tier-locked. Sources are the product's own
+help center, docs, release notes, or official community forum, each with a **read date** (SaaS UIs
+change without versions). Optional per run — dispatch it when the question is a UX behavior a
+person would meet in tools they already use (tree, grouping, filtering, bulk edit); skip it for
+integrator-only questions.
+
+**N4 — internal coverage audit.** Read-only. What the repo already decided, already documented,
 and can already demonstrate. Ask for: every settled decision in one line each, tagged
 **product-visible** or **internal-only** (a person can perceive the difference, or cannot);
 anything the older reference doc still states that newer decisions contradict; **every place a

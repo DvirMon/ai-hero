@@ -10,6 +10,22 @@ Turn one issue's slice of work into an ordered, step-by-step implementation plan
 
 ## Process
 
+### 0. Start the issue branch
+
+`/to-tasks` is where work on one issue begins, so it is where the issue's branch begins. Nothing
+in this skill writes to the default branch.
+
+1. **Blockers merged.** Read the issue's blocked-by links (`gh issue view <n>`, plus the
+   tracker's dependency relation). Any blocker still open → stop: `Next: /to-tasks <#blocker>`
+   or wait for its PR to merge. Every branch starts from `origin/main`, so a blocker's code
+   must already be there.
+2. **Planning PR merged.** The epic's `docs/<epic-slug>` PR (spec, `issue-graph.md`) must be
+   merged — `gh pr list --state merged --head docs/<epic-slug>`. Still open → stop and point at
+   it. An issue with no epic workspace skips this check.
+3. **Branch + worktree.** Run `references/start-branch.md` with
+   `<type>/<issue#>-<slice-slug>`. It prunes merged work, creates the worktree off
+   `origin/<default>` and enters it. Every later step in this skill works inside it.
+
 ### 1. Gather context
 
 Read the target issue in full (body + comments), via the issue tracker convention from `docs/agents/issue-tracker.md`. If the ticket workspace's `state.json` exists, also read `specPath` and, if set, `architecturePath` — the task plan must stay consistent with both, not just the issue's own text.
@@ -55,9 +71,22 @@ inside the code step.
 
 ### 5. Write the plan
 
-If the ticket workspace's `state.json` does not exist, ask the user whether to create it (with `specPath`, `architecturePath` if known) before writing the plan. Always write the plan as files — never present it inline only.
+If the ticket workspace's `state.json` does not exist, ask the user whether to create it (with `specPath`, `architecturePath` if known) before writing the plan — unless the issue's Pipeline block says `workspace: null` (see **Tasks root** below). Always write the plan as files — never present it inline only.
 
-Write all task files under `<workspaceRoot>/4-tasks/`, colocated with the domain's other docs (spec, architecture, decisions).
+**Tasks root** — where this issue's plan lives. `/implement` and `/ship` resolve it the same way:
+
+- Issue has a workspace → `<workspaceRoot>/4-tasks/issue-<N>/` (committed, below).
+- Pipeline block says `workspace: null` (a standalone issue, no epic) →
+  `$(git rev-parse --git-dir)/pipeline/issue-<N>/`, inside the issue's worktree. That folder is
+  per-worktree and never tracked, so the plan can't dirty the tree or leak into the PR, and it is
+  deleted with the worktree after merge. No plan commit; the issue body stays the record of
+  intent.
+
+Write all task files under `<workspaceRoot>/4-tasks/issue-<N>/`, colocated with the domain's
+other docs (spec, architecture, decisions), inside the issue's worktree. One folder per issue:
+an epic's workspace holds many issues, and each issue's branch must touch only its own folder,
+so parallel branches never conflict on task files. The writer brief's absolute paths point
+into the worktree.
 
 **Dispatch every write in this step — step files, test plans, `progress.md`, the `state.json`
 update — to one `sonnet` writer**, per `to-ticket/references/file-writes.md`. It renders step
@@ -74,6 +103,7 @@ One `step-N-<slug>.plan.md` per step, in this shape:
 ---
 step: 1
 type: code
+commit: feat
 depends_on: []
 files:
   - libs/table/src/api/features/with-sorting/types.ts (new)
@@ -112,10 +142,16 @@ sortable(path.id, { enable: () => false });
 
 Section rules:
 
-- **Frontmatter** holds `step`, `type`, `depends_on`, `files` — nothing
-  else. Skills and scaffolding agent are not written: `/implement`
-  derives them from `type` + the ticket's `stack`. No PR-scope prose;
-  every step leaves the tree green anyway.
+- **Frontmatter** holds `step`, `type`, `commit`, `depends_on`, `files`
+  — nothing else. Skills and scaffolding agent are not written:
+  `/implement` derives them from `type` + the ticket's `stack`. No
+  PR-scope prose; every step leaves the tree green anyway.
+- **`commit`** — the conventional-commit type of the one commit
+  `/implement` makes when this step is done. One of `feat`, `fix`,
+  `ref`, `perf`, `test`, `docs`, `chore`, `build`, `ci`, `style`,
+  `revert`. It is decided here because `type: code` can't tell feat
+  from fix from refactor. Emoji and message format:
+  `atomic-commit/SKILL.md`.
 - **Summary** — two plain lines under the title: what the step does,
   and what it leaves for later steps.
 - **Decisions** — one line of decision IDs, linked to the capability's
@@ -208,12 +244,14 @@ what makes `/implement` run the step test-first, so never write one that wasn't 
 
 #### Progress file
 
-Write `<workspaceRoot>/4-tasks/progress.md` to track `/implement` execution:
+Write `<workspaceRoot>/4-tasks/issue-<N>/progress.md` to track `/implement` execution:
 
 ````markdown
 # Implementation Progress — <issue title>
 
 **Issue:** #<number>
+**Branch:** <type>/<number>-<slice-slug>
+**Worktree:** <repoRoot>/.claude/worktrees/<type>-<number>-<slice-slug>
 **Status:** 0 / N complete
 
 ## Graph
@@ -228,32 +266,52 @@ Parallel-safe: [4] · Dependency: 1 → 2 → 3
 
 ## Steps
 
-| Step | Title | Status | PR |
-|---|---|---|---|
-| 1 | <title> | ⬚ pending | — |
-| 2 | <title> | ⬚ pending | — |
-| ... | ... | ... | ... |
+| Step | Title | Status |
+|---|---|---|
+| 1 | <title> | ⬚ pending |
+| 2 | <title> | ⬚ pending |
+| ... | ... | ... |
 ````
+
+`**Branch:**` and `**Worktree:**` are what `/implement` guards on and `/ship` pushes. There is no
+PR column: the PR is looked up from the branch (`gh pr list --head <branch>`), not written down.
 
 The graph is the one place parallel-safety is written — derived from
 the same ranking as every step's `depends_on`, so the two never
 disagree. `/implement` schedules from it.
 
-Status values: `⬚ pending`, `▶ in progress`, `✅ done`, `⏭ skipped`.
+Status values: `⬚ pending`, `▶ in progress`, `✅ done`, `🧪 awaiting CI` (committed; its
+`Done when` is proven only by the PR's CI), `⏭ skipped`.
 `/implement` updates this file as it works through steps.
 
 #### State update
 
-If `state.json` exists (or was just created), refresh `updatedAt` per `to-ticket/references/state-schema.md`'s validation routine — `tasks` status itself is tracked on the issue's `## Pipeline` block below, not in `state.json`.
+Don't touch an existing `state.json` from an issue branch. It is epic-level and was settled by
+the planning PR; bumping `updatedAt` from several issue branches at once only makes rebase
+conflicts. `tasks` status is tracked on the issue's `## Pipeline` block below. The one exception
+is a `state.json` this run had to create (§1) — it is committed with the plan.
 
 **Update the source issue's `## Pipeline` block** (contract: `to-issues/references/pipeline-block.md`):
-set `tasks: done: <workspaceRoot>/4-tasks/` and `readiness: ready-for-agent`, and swap the
-`needs:tasks` label for `ready-for-agent`.
+set `tasks: done: <workspaceRoot>/4-tasks/issue-<N>/` (no workspace: `tasks: done: local, in the
+issue's worktree`) and `readiness: ready-for-agent`, and
+swap the `needs:tasks` label for `ready-for-agent`.
 
 This is the one promotion to `ready-for-agent` an agent may make unasked — a step plan either
 exists on disk or it does not, so it is an observation, not the judgement call
 `to-issues/references/pipeline-block.md` reserves for the user.
 
+#### Plan commit
+
+After the writer's report, commit the plan on the issue branch — the first commit of the PR's
+story. Skip this when the tasks root is the untracked no-workspace folder (§5). Stage only `4-tasks/issue-<N>/` (plus a `state.json` this run created), never `-A`:
+
+```
+📚 [#<N> plan] docs(<scope>): plan tasks for #<N>
+
+Refs: #<N>
+```
+
+`<scope>` and emoji per `atomic-commit/SKILL.md`. Don't push — `/ship` pushes.
 
 End your final message with a one-line pointer, as the very last line — nothing after it:
 

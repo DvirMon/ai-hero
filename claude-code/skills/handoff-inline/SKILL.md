@@ -11,7 +11,8 @@ the user wants something a fresh session can pick up later.
 
 1. **Next step** — the single next action, one sentence.
 2. **Source** — path/URL to the doc/commit/issue holding the real context (omit only if truly
-   nothing exists yet).
+   nothing exists yet). On a feature branch, append the git position on the same line: branch,
+   worktree path, PR URL (or "no PR"), unpushed commit count.
 3. **Watch for** — one boundary or risk, only if non-obvious (skip the line otherwise — 2 lines
    beats a padded 3rd).
 
@@ -23,6 +24,6 @@ instead.
 
 ```
 Next: <one sentence>.
-Source: <path or URL>.
+Source: <path or URL> · <branch> @ <worktree> · PR <url|none> · <N> unpushed.
 Watch for: <one thing>.
 ```

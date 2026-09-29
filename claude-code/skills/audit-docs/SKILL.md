@@ -50,12 +50,11 @@ ground truth there.
 
 - **Folder-completion claims** — when a target is itself an episodic work folder (an
   `active/<slug>/` directory sibling to an `archive/`), don't read the whole folder to form
-  this claim. Read only its checklist/task-list file (`state.json`'s `checklist`, or a
-  `- [ ]` list in a plan/step file) and turn **each item** into its own claim, naming the
-  exact symbol/file/export the item points at (e.g. "`withComputed` is exported from
-  `index.ts`", not "computed feature is done"). One claim per item, not one per folder — this
-  is what makes step 4's verification a grep instead of a read. This is the one claim type in
-  this skill you're hoping comes back false — a false verdict (item already done) is an
+  this claim. Completion is GitHub state, not a file: read the folder's epic issue list
+  (`state.json`'s `githubIssues`, or the nodes of `issue-graph.md`) and turn **each issue**
+  into its own claim ("#105 is closed"). One claim per issue, not one per folder — this is
+  what makes step 4's verification a `gh` call instead of a read. This is the one claim type
+  in this skill you're hoping comes back true — every issue closed makes the folder an
   archive candidate, not a defect.
 
 ### 3. Track every claim as a todo
@@ -91,20 +90,13 @@ Each agent's brief:
 - Verdict per claim: **STALE** (doc says X, current state is Y — quote both), **CONFIRMED**
   (still matches), or **CANNOT VERIFY** (claim isn't checkable — e.g. references something
   external, or a symbol that no longer exists anywhere to compare against).
-- For a folder-completion claim, verify cheap-first — never open the folder's full source tree
-  or history to answer this:
-  1. **Hypothesis, not verdict:** the item's own recorded mark (checkbox, `state.json`
-     checklist flag) says which way to check, nothing more — a checked box is not evidence.
-  2. **One targeted grep per item:** search for the exact symbol/file the claim names (from
-     step 2 — this is why that claim had to name it). A single hit that matches the claimed
-     shape (exported, wired, called where the item says) is enough to verdict; stop there.
-  3. **Escalate only on ambiguity:** open the specific file grep pointed at (not the whole
-     folder, not the whole `src/`) only when the grep is empty, has multiple candidates, or
-     the match doesn't obviously satisfy the claim. This is the exception path, not the
-     default one.
-  Verdict per item: **SHIPPED** (grep or the one escalated file confirms it), **IN PROGRESS**
-  (confirmed absent/incomplete), or **CANNOT VERIFY** (grep inconclusive even after escalating).
-  A folder is a **SHIPPED** folder only once every one of its items verdicts SHIPPED.
+- For a folder-completion claim, one call per issue — never open the folder's source tree or
+  history to answer this: `gh issue view <n> --json state,stateReason`. Closed as completed
+  means its PR merged (the PR body's `Closes #N` closed it). A checkbox or status line in a
+  workspace file is not evidence.
+  Verdict per issue: **SHIPPED** (closed, completed), **IN PROGRESS** (open), or **CANNOT
+  VERIFY** (closed as not planned, or `gh` unavailable). A folder is a **SHIPPED** folder only
+  once every one of its issues verdicts SHIPPED.
 
 As each agent returns, update the corresponding todo items to completed with their verdicts.
 
@@ -142,10 +134,18 @@ or they say so after seeing the report, **and** the report actually flagged that
 candidate. Never move a folder as a side effect of an unrelated fix request, and never act on an
 **IN PROGRESS** or **CANNOT VERIFY** folder.
 
-For each candidate to act on, dispatch the `doc-archiver` agent (parallel, one per folder, in a
-single message, if there's more than one) with: the folder's path, the project root, and the
-completion evidence step 4 already established (the verified checklist, quoted — the agent does
-not re-derive completeness, so hand it the verdict, not just "it's done"). The agent gate-checks
+Normally the repo's `issue-flow.yml` GitHub Action opens the archive PR itself when an epic's
+last issue closes — check `gh pr list --search "<slug> archive"` first and point at that PR
+instead of duplicating it. This step is the manual path for when the Action did not run.
+
+The move goes through a branch and PR, never onto the default branch. Start
+`chore/<slug>-archive` via the start-branch procedure (`/to-tasks`
+`references/start-branch.md`), then dispatch the `doc-archiver` agent inside that worktree
+(parallel, one per folder, in a single message, if there's more than one) with: the folder's
+path, the project root, and the completion evidence step 4 already established (the closed
+issues, quoted — the agent does not re-derive completeness, so hand it the verdict, not just
+"it's done"). Commit the move (`🎨 chore(<domain>): archive <slug> workspace`, per
+`atomic-commit`'s format), then hand off to `/ship` for the PR. The agent gate-checks
 the move itself (e.g. a project may require every decision in the folder to be logged first
 before it can move) and reports back moved-or-blocked; relay that verdict per folder rather than
 assuming every dispatch succeeded.

@@ -53,6 +53,10 @@ before writing the handoff.
 - **Scope** — boundaries that are not obvious from the source: which files are in play, what must
   not be touched, any part of the source doc that must *not* be applied, and any uncommitted work
   or dirty tree state the next session would otherwise inherit unwarned.
+- **Git** — branch, worktree path, PR URL (or "no PR yet"), and unpushed commits
+  (`git log --oneline @{u}..HEAD`, or `origin/main..HEAD` before the first push). Work lives on a
+  per-issue branch in its own worktree; the next session must start there, never on the default
+  branch.
 - **Suggested skills** — which skills the agent should invoke, and when.
 
 Redact sensitive information: API keys, passwords, tokens, personally identifiable information.
@@ -74,6 +78,8 @@ and tailor the doc accordingly.
 **Source:** <path or URL>
 
 **Scope:** <files in play; what not to touch; what not to apply>
+
+**Git:** <branch> · worktree <path> · PR <url | none> · <N unpushed commits | all pushed>
 
 **Suggested skills:** <skill, and when to run it>
 ```

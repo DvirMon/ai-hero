@@ -66,7 +66,7 @@ Steps 1, 3, 6 and 8 below apply in both phases.
    tsconfig); do not edit the tsconfig mid-step.
 7. Run **only the spec files this step produced** (e.g. `nx test <project> --testFile=<path>`,
    or `vitest run <path>`). Not the full suite — the dispatcher runs that once at the end.
-8. Do **not** commit. `/implement` commits.
+8. Do **not** commit. `/implement` commits after your step is verified.
 
 ## Output
 

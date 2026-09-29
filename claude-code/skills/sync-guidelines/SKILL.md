@@ -7,7 +7,7 @@ description: Mirror general (non-project-specific) code-generation guidelines �
 
 Mirrors general, non-project-specific coding guidance from local AI harness configs into
 `~/repos/ai-coding-guidelines` (GitHub: `DvirMon/ai-coding-guidelines`, private), then commits
-and pushes.
+on a `chore/sync-<date>` branch and opens a PR. Never commits or pushes on `master`.
 
 **Scope — general guidance only.** Never sync per-project CLAUDE.md files, project memory,
 session history, or credentials (mcp.json, settings.json with tokens). Only:
@@ -23,7 +23,8 @@ session history, or credentials (mcp.json, settings.json with tokens). Only:
   synced — rules there are usually project-scoped dupes of global rules, and settings/hooks can
   carry project-specific or credential content.
 - `~/.claude/conventions/` (opt-in / project-dependent — NOT auto-loaded like `rules/` is) → `claude-code/conventions/`
-- `~/.claude/plugins/marketplaces/*/{skills,agents,commands,docs}` → `claude-code/plugins/<marketplace>/`
+- `~/.claude/plugins/marketplaces/*/{skills,agents,commands,docs}` → `claude-code/plugins/<marketplace>/`,
+  except `ai-coding-guidelines` — that marketplace *is* this repo; its plugins live in `plugins/`.
   (excludes `.git`, `dist`, `node_modules`, `bin`, `tests`, `benchmarks`, `evals`, `src`,
   `.github`, `.changeset`, `.codex`, `.out-of-scope` — those are the plugin's own source/build
   tree, not guideline docs, and already live upstream)
@@ -56,16 +57,35 @@ every Cursor install, not authored by you.
    Cursor has its own copy of this skill (`~/.cursor/skills/sync-guidelines/`) — an independent
    sibling, not a port. Either side can run either job.
 
-1. Run the sync script:
+1. Start from a fresh default branch, so the sync branch has no stale base:
+   ```bash
+   cd ~/repos/ai-coding-guidelines
+   git switch master
+   git pull --ff-only
+   ```
+   Dirty tree here → stop and report; don't carry unknown changes into the sync.
+2. Run the sync script:
    ```bash
    bash ~/.claude/skills/sync-guidelines/sync.sh
    ```
-2. `cd ~/repos/ai-coding-guidelines && git status` — review the diff before committing. If
-   nothing changed, stop (no empty commits).
-3. `git add -A`
-4. Commit with a message summarizing what changed (e.g. "sync: update rules/, add new ds-* skills").
-5. **Ask the user before `git push`** — pushing updates a shared/remote repo, confirm each time
-   unless the user has said to always push automatically.
+3. `git status` — review the diff. If nothing changed, stop (no empty commits, no branch).
+4. Move the changes onto a branch (the working tree carries over):
+   ```bash
+   git switch -c chore/sync-$(date +%Y-%m-%d)
+   ```
+   Same-day re-run → suffix `-2`, `-3`.
+5. `git add -A`, then commit per `atomic-commit`'s format (e.g.
+   `🎨 chore(sync): update rules/, add new ds-* skills`, `Refs: none`).
+6. **Ask the user before pushing** — it updates a shared remote; confirm each time unless the
+   user has said to always push automatically. Then:
+   ```bash
+   git push -u origin HEAD
+   gh pr create --fill
+   gh pr merge --auto --rebase
+   ```
+   Report the PR URL. The next run's step 1 fast-forwards `master` once it merged; delete the
+   merged local branch then (`git branch -D chore/sync-<date>` — rebase-merge changes SHAs, so
+   `-d` refuses; confirm the PR is `MERGED` first).
 
 ## Notes
 

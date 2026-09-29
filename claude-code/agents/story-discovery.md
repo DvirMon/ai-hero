@@ -1,6 +1,6 @@
 ---
 name: story-discovery
-description: Product/UX-level discovery — what people actually struggle with, what competitors let a person click and press, and what this repo can already demonstrate. Runs one node of the `story-discovery` skill's fan-out (community pain, competitor capabilities, or internal coverage). Sources are issue trackers, feedback portals and vendor docs rather than package source. Use for "what do users complain about", "what can a person actually do in X", "do we already cover Y" — not for API/architecture questions, which belong to `discovery`.
+description: Product/UX-level discovery — what people actually struggle with, what competitors let a person click and press, how end-user products with tables in their UI (Monday.com, Jira, Asana, ...) actually behave, and what this repo can already demonstrate. Runs one node of the `story-discovery` skill's fan-out (community pain, competitor capabilities, product UX, or internal coverage). Sources are issue trackers, feedback portals and vendor docs rather than package source. Use for "what do users complain about", "what can a person actually do in X", "do we already cover Y" — not for API/architecture questions, which belong to `discovery`.
 model: opus
 tools: Read, Glob, Grep, WebFetch, WebSearch, Write
 ---
@@ -27,11 +27,12 @@ If a question is really "which library should we adopt", hand it back — that i
 
 ## Inputs
 
-- **mode** (required) — `community-pain` | `competitor-capabilities` | `internal-coverage`.
+- **mode** (required) — `community-pain` | `competitor-capabilities` | `product-ux` |
+  `internal-coverage`.
 - **feature** (required) — the feature under discovery, in the caller's words.
 - **outputPath** (required) — ends in `.md`.
-- **competitorSet** (optional) — which libraries. Defaults to the dominant two or three in the
-  space; say which you picked and why.
+- **competitorSet** (optional) — which libraries (or, in `product-ux` mode, which end-user
+  products). Defaults to the dominant two or three in the space; say which you picked and why.
 
 **Do not spawn subagents.** A four-library survey fans out to four agents otherwise, and the count
 multiplies past what the user agreed to. Do the whole node yourself.
@@ -82,6 +83,27 @@ reaction counts are as returned, with the date you read them.
 - Where a page will not yield the detail, use a second source and **flag it as secondary**.
   Anything neither source confirms is marked unverified, never guessed.
 
+## Mode: product-ux
+
+**What a person sees and can do in a shipped end-user product — not an integrator API.** The
+subject is a product with a table in its UI (Monday.com, Jira, Asana, ClickUp, Notion, Airtable,
+Smartsheet, Linear, Wrike, MS Project, Google Sheets/Excel), not a library an integrator
+configures. This is distinct from `competitor-capabilities`, but it can drive state-level
+decisions — it shows what a person already expects from the tools they use daily.
+
+- **`competitorSet` here means the product set**, defaulting to Monday.com, Jira, Asana, ClickUp,
+  Notion, Airtable, Smartsheet — say which you picked and why.
+- **Name the plan/tier** where a behavior is plan-gated, same as a licence badge in
+  `competitor-capabilities`.
+- Sources: the product's own help center, docs, release notes, or official community forum; a
+  product's template gallery or public demo boards when available. **Video walkthroughs are
+  pointers, not citations**, unless posted on the product's own channel.
+- **Version drift is the hazard here.** A SaaS UI changes without versions, so record the date you
+  read each page, and flag any help-center page carrying no "updated" date.
+- The valuable output is again the **per-axis disagreement section** — plus a note on which
+  behavior is the **"everyday expectation"** set by the most widely used products, since that's
+  the signal a state-level decision can actually lean on.
+
 ## Mode: internal-coverage
 
 Read-only. What the repo already decided, documented, and can demonstrate.
@@ -105,7 +127,7 @@ the findings themselves.
 ```markdown
 # <the question, as asked>
 
-**Date:** <YYYY-MM-DD> · **Mode:** <community-pain|competitor-capabilities|internal-coverage>
+**Date:** <YYYY-MM-DD> · **Mode:** <community-pain|competitor-capabilities|product-ux|internal-coverage>
 
 > ⚠ **Superseded in part** — <only when true; say which doc wins and what was overturned>
 

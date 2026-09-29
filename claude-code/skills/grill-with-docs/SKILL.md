@@ -8,6 +8,18 @@ disable-model-invocation: true
 
 Sharpen a rough ask into something precise enough to spec, by interviewing — one question at a time, not a form to fill in bulk. Every answer either resolves a question or opens a sharper one; keep pulling the thread until nothing looks fuzzy.
 
+## Branch guard
+
+Run this before anything else. Planning docs are committed on the epic's planning branch,
+never on the default branch.
+
+- On `docs/<slug>` (the `slug` in `state.json`), in its worktree → proceed.
+- On the default branch, or on an issue branch (`<type>/<N>-<slug>`) → stop. Point the user
+  to `/to-ticket`, which starts `docs/<slug>` via `to-tasks/references/start-branch.md`.
+- **Exception — a scoped grill on a sub** (`needs:grill` on one slice, after the planning PR
+  merged): start `docs/<slug>-<N>` via `to-tasks/references/start-branch.md` and grill there.
+  It ships as its own small docs PR before `/to-tasks #N`.
+
 ## Starting material
 
 If a ticket workspace's `state.json` exists in context (created by `/to-ticket`; its root is `<domain-path>/docs/work/<slug>/` — see `/to-ticket`), validate it per `to-ticket/references/state-schema.md`, then fetch the ticket it points at (`ticketRef`, via `docs/agents/ticket-tracker.md`'s "fetch the intake ticket" convention) and use it as the interview's starting material — this is what you're sharpening.
@@ -35,7 +47,7 @@ If no `state.json` exists yet, don't just fall back silently — create the work
    per `to-ticket/references/file-writes.md` — you hand it the finished line, so the write is
    mechanical. The first write spawns it, every later one resumes it with `SendMessage`. Ask
    the next question straight away — don't wait on the write. Join the writer before step 6's
-   Pipeline-block update and the final message. `/domain-modeling` keeps its own writers.
+   Pipeline-block update, step 7's commit and the final message. `/domain-modeling` keeps its own writers.
 
    **Before opening the first question, read that log.** It is what stops the interview re-deciding something already settled, or reversing it without noticing. If the capability has no log yet, say so rather than treating its absence as "nothing was decided before".
 4. Before finishing, verify failure modes are exhausted. Don't use a fixed question list — first reason about what kind of system this is (UI component, form field, API endpoint, background job, state machine, webhook, etc.), then derive what can go wrong *for that specific domain*. A button has different failure surfaces than a file uploader, a Node.js job, or a multi-step wizard. Pull each failure thread until nothing is left fuzzy, then record the answers in `1-decisions.md`.
@@ -56,7 +68,14 @@ in the same turn.
 
 Since the workspace is now created (either by `/to-ticket` or by step 0 above), steps 3 and 5 always apply — write `1-decisions.md` and update `state.json` as you go.
 
-7. `/to-spec` has `disable-model-invocation: true` — it cannot be launched programmatically from here, only typed by the user. Reference whatever grounds the synthesis: name the workspace's `decisionsPath` (and `ticketRef`, if set). Then end your final message with a one-line pointer, as the very last line — nothing after it:
+7. **Commit.** Join the writer (and any `/domain-modeling` writers), then make one commit for
+   this stage's artifacts, staged by path — `1-decisions.md`, `state.json`, the capability-log
+   row, and any ADR/glossary files `/domain-modeling` wrote. Never `-A`. Message per
+   `atomic-commit` § Commit format: `📚 docs(<scope>): record <slug> decisions`, trailer
+   `Refs: #<source issue>` (or `Refs: none` if there is none yet). Do not push — `/ship` does,
+   after `/to-issues`.
+
+8. `/to-spec` has `disable-model-invocation: true` — it cannot be launched programmatically from here, only typed by the user. Reference whatever grounds the synthesis: name the workspace's `decisionsPath` (and `ticketRef`, if set). Then end your final message with a one-line pointer, as the very last line — nothing after it:
 
 ```
 Next: /to-spec <ticket-id-or-slug>

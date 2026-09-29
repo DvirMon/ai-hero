@@ -26,18 +26,22 @@ When set to `yes`, MRs run through the same labels and states as issues, using t
 
 Unlike GitHub, GitLab numbers issues and MRs separately, so `#42` is unambiguous once you know which surface the maintainer means.
 
-## Ship mode
+## Issue references
 
-**Direct push to default branch: no.** _(Set to `yes` if this repo pushes straight to the
-default branch instead of going through a merge request; `/ship` reads this flag.)_
+Every change reaches the default branch through a merge request (fast-forward
+/ rebase merge — see `CLAUDE.md` § Git workflow). Issues close when that MR
+merges.
 
-When set to `no` (default), `/ship` branches, pushes, and opens a merge request — the MR carries
-CI, and `Closes #N` in its description is what the closing-on-merge automation acts on.
+- **Commits** carry a `Refs: #N` trailer (`Refs: none` for the planning
+  workspace-open commit). Never a closing keyword (`Closes`, `Fixes`,
+  `Resolves`, `Ships:`).
+- **MR description** carries `Closes #N` for an issue the MR completes, or
+  `Refs #N` for one it only partly delivers. Planning MRs (`docs/<slug>`)
+  use `Refs #<epic>` and close nothing.
 
-When set to `yes`, `/ship` pushes the current commit(s) straight to the default branch — no
-branch, no MR. `Closes #N` must already be present in a pushed commit message (GitLab closes on
-a direct push to the default branch too, not only on a merged MR) — `/ship` checks for this and
-stops rather than rewriting commit history if it's missing.
+The GitHub Actions templates in `templates/` have no GitLab CI equivalent
+yet — on GitLab, set the project's merge method to fast-forward and protect
+the default branch by hand.
 
 ## When a skill says "publish to the issue tracker"
 

@@ -1,6 +1,6 @@
 ---
 name: setup-skills
-description: Configure this repo for the engineering skills — set up its issue tracker, ticket tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/implement` → `/ship`.
+description: Configure this repo for the engineering skills — set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/implement` → `/ship`.
 disable-model-invocation: true
 ---
 
@@ -12,6 +12,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Ticket tracker** — where intake tickets live, if `to-ticket` is installed (Jira, Linear, or local markdown)
 - **Triage labels** — the strings used for the five canonical triage roles
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
+- **Branch workflow** — the enforcement for one issue = one branch = one PR, rebase-merge only: git hooks, commitlint, PR template, GitHub Actions, ruleset and repo settings
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -29,6 +30,8 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 - Is the `to-ticket` skill installed? (a `to-ticket` skill folder alongside this one, or `to-ticket` in your available skills.) This decides whether Section B runs at all.
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section C runs at all.
+- Hook mechanism — `.husky/` (and `"prepare": "husky"`), `.githooks/` (and `core.hooksPath`), or none. Also `commitlint.config.*`, `tools/validate-branch-name.*`, `.github/workflows/*`, `.github/pull_request_template.md`, `.gitignore` entry for `.claude/worktrees/`.
+- Remote enforcement (read-only): `gh api repos/<o>/<r> --jq '{allow_merge_commit,allow_squash_merge,allow_rebase_merge,allow_auto_merge,delete_branch_on_merge,default_branch}'` and `gh api repos/<o>/<r>/rulesets`; `gh secret list` for `ANTHROPIC_API_KEY` / `PIPELINE_TOKEN`.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
 ### 2. Present findings and ask
@@ -50,10 +53,7 @@ Default posture: these skills were designed for GitHub. If a `git remote` points
 
 Record the choice in `docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off** — leave it off and don't raise it; a user who wants external PRs in the triage queue can flip the flag in the file later.
 
-The GitHub and GitLab templates also carry a "Ship mode" flag (direct push to default branch vs.
-PR-gated), defaulted **off** (PR-gated). Ask it explicitly, one line: "Does `/ship` open a PR for
-review, or push straight to the default branch? (recommended: **PR**)". Only ask for GitHub/
-GitLab — local markdown and "other" trackers have no PR/MR concept to gate on.
+There is no ship-mode question: every change goes through a PR (`CLAUDE.md` § Git workflow). If an existing `docs/agents/issue-tracker.md` still has a `## Ship mode` or `## Closing trailer` section, replace it with the template's `## Issue references` section.
 
 **Section B — Ticket tracker.** Skip this section entirely if the `to-ticket` skill isn't installed (exploration told you) — an uninstalled skill needs no tracker.
 
@@ -80,6 +80,25 @@ The defaults are the five canonical roles, each label string equal to its name: 
 
 Offer **multi-context** — a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files — only when exploration found monorepo signals. Then confirm which layout they want.
 
+**Section E — Branch workflow bootstrap.** GitHub only (GitLab: point at the note in `issue-tracker-gitlab.md`; local/other: skip). Templates and their verified sources: [templates/README.md](./templates/README.md).
+
+Build one change list from exploration, diffing each template against what exists — adapt, don't overwrite repo-specific content:
+
+| Piece | Template | Target |
+|---|---|---|
+| Branch rule | `templates/tools/validate-branch-name.mjs` | `tools/validate-branch-name.mjs` (merge the type list with an existing one) |
+| Hooks | `templates/hooks/pre-commit`, `pre-push` | `.husky/` when husky is present; `.githooks/` (+ `core.hooksPath` via the repo's `prepare` script) when that's the mechanism; none found → propose `.githooks/`. Append to an existing hook rather than replacing it; mark `.githooks/*` executable (`git update-index --chmod=+x`). |
+| Commit format | `templates/commitlint.config.js` | root; add `@commitlint/cli` + `@commitlint/config-conventional` to devDependencies if missing (the user installs) |
+| PR template | `templates/pull_request_template.md` | `.github/pull_request_template.md` |
+| Actions | `templates/workflows/*.yml` | `.github/workflows/` — pin `uses:` by SHA; `pr-conventions.yml` supersedes a `commitlint.yml` / trailer-check job (remove those after confirm) |
+| CI gate | `templates/snippets/ci-gate.yml` | merged into `ci.yml`, `needs:` = every job there; `ci.yml` must also run on `pull_request` |
+| Worktrees | — | `.gitignore` gains `.claude/worktrees/` |
+| Obsolete | — | `close-linked-issue-on-ci-green.yml` (and its helper scripts) deleted — `Closes #N` + merge closes the issue |
+| Server | `templates/rulesets/main.json`, `templates/repo-settings.md` | `gh api` calls, in the order `repo-settings.md` gives |
+| Secrets | — | list `ANTHROPIC_API_KEY`, `PIPELINE_TOKEN` as the user's to create (`gh secret set`) — never ask for or handle the values |
+
+Show the full list — every file diff and every `gh api` command — and apply nothing until the user confirms. Confirm the server-side calls separately from the file edits: they change the remote repo and are visible to others. Never create the ruleset before the workflows exist on the default branch (required checks must have run once).
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
@@ -87,8 +106,11 @@ Show the user a draft of:
 - The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
 - The contents of `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
 - The contents of `docs/agents/ticket-tracker.md` (only when `to-ticket` is installed)
+- The Section E change list (only when Section E ran)
 
 Let them edit before writing.
+
+These edits are themselves a change to the repo: make them on a branch (`chore/setup-skills`), never on the default branch, and ship them with `/ship`. The `gh api` server calls run after that PR merges.
 
 ### 4. Write
 
@@ -141,4 +163,6 @@ For "other" issue or ticket trackers, write the corresponding file from scratch 
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch trackers or restart from scratch.
+Tell the user the setup is complete and which engineering skills will now read from these files. If Section E ran, list what is still theirs to do: install the new devDependencies, create the two secrets, and approve the `gh api` calls once the setup PR has merged. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch trackers or restart from scratch.
+
+The code-review config (`docs/agents/code-review.md`) is not written here — the `code-review` plugin owns it. Point the user to `/code-review:code-review init` if the repo has none.

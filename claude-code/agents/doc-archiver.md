@@ -20,12 +20,17 @@ precondition, and leaving stale paths behind after the move.
 - **archivePath** (optional): sibling `archive/<slug>` target — if omitted, derive it by
   replacing the last `active/` path segment with `archive/`
 - **completionEvidence** (required): the dispatcher's already-verified basis for calling this
-  folder done (e.g. "all N checklist items confirmed shipped in src/, see commit X") — quote
+  folder done (e.g. "all N epic issues closed as completed: #101, #105, #106") — quote
   it in your report, don't re-derive it
 - **projectRoot** (required): repo root, so you can find its `CLAUDE.md` / doc-contract files
 
 ## Process
 
+0. **Refuse on the default branch.** Resolve it (`git symbolic-ref --short
+   refs/remotes/origin/HEAD`, strip `origin/`; fall back to `main`/`master`). If
+   `git -C projectRoot branch --show-current` equals it, stop and report "archive moves go on a
+   `chore/<slug>-archive` branch — the dispatcher starts it". Never move files on the default
+   branch.
 1. **Find and honor any archiving gate the project itself declares.** Read the nearest
    `CLAUDE.md` up from `folderPath` (and any doc-contract file it points to for episodic work
    or decision logs). Search for gating language near the word "archive" — phrasing like "may

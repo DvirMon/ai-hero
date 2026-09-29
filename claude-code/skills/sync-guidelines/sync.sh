@@ -78,6 +78,9 @@ if [ -d "$CLAUDE_DIR/plugins/marketplaces" ]; then
   mkdir -p "$REPO_DIR/claude-code/plugins"
   for marketplace_dir in "$CLAUDE_DIR/plugins/marketplaces"/*/; do
     name="$(basename "$marketplace_dir")"
+    # The mirror repo is itself a marketplace (plugins/*); its plugin
+    # source lives in the repo already — never mirror it back.
+    [ "$name" = "ai-coding-guidelines" ] && continue
     dest="$REPO_DIR/claude-code/plugins/$name"
     mkdir -p "$dest"
     for sub in skills agents commands docs; do

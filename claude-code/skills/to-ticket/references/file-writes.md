@@ -59,6 +59,7 @@ as the edit, the brief is still required — the edit stays off the main session
    - a step that reads a file the writer wrote;
    - a step whose claim is "the file exists" (e.g. `/to-tasks` promoting to `ready-for-agent`
      because the plan is on disk);
+   - the stage's commit;
    - the final message, when it names files as written. Report what the writer says it wrote,
      not what you asked it to write.
 
@@ -69,6 +70,9 @@ as the edit, the brief is still required — the edit stays off the main session
 - **Tracker writes** — `gh issue create/edit`, labels, sub-issue and blocking relations. They
   are not workspace files, and the dispatcher needs their results (issue numbers) to continue.
   A temporary `--body-file` in the scratchpad is part of that call, not a workspace write.
+- **Commits.** A stage's commit runs in the main session, after joining its writer, staging
+  only the paths the stage wrote (`git add <paths>`, never `-A`). The writer never commits —
+  it cannot know which sibling writes belong in the same commit.
 - **Skills with their own writer** — `/domain-modeling` (ADRs, glossary) routes through its
   own agents; don't wrap it in a second writer.
 
