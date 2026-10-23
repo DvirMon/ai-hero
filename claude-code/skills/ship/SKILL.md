@@ -1,6 +1,6 @@
 ---
 name: ship
-description: "Take a finished feature branch to an open, auto-merging PR — show the commit story for approval, rebase onto origin/main, push (force-with-lease after a rebase), open or reuse the PR with an emoji-conventional title and a Closes #N body, then enable GitHub auto-merge (rebase). Handles issue branches (<type>/<N>-<slug>) and epic planning branches (docs/<epic-slug>). Never pushes to main, never merges manually. Use after /impel reports done, or after /to-issues on a planning branch."
+description: "Take a finished feature branch to an open, auto-merging PR — show the commit story for approval, rebase onto origin/main, push (force-with-lease after a rebase), open or reuse the PR/MR (gh or glab, from git remote) with an emoji-conventional title and the closing line from the repo's issue-tracker.md, record it in state.json units[].pr, then enable auto-merge (rebase). Handles issue branches (<type>/<N>-<slug>) and epic planning branches (docs/<epic-slug>). Never pushes to main, never merges manually. Use after /impel reports done, or after /to-issues on a planning branch."
 disable-model-invocation: true
 ---
 
@@ -12,8 +12,10 @@ This skill turns that branch into a PR that GitHub merges on its own once requir
 There is one mode. No push to the default branch, ever — the Claude hook, the repo's git hooks
 and the `main` ruleset all block it; this skill never tries.
 
-This skill never merges and never closes an issue. `Closes #N` in the PR body plus a rebase-merge
-is the mechanism; GitHub auto-merge on green CI is the trigger. A skill that merges or closes
+This skill never merges and never closes an issue. The closing line in the PR body (per the
+repo's `docs/agents/issue-tracker.md` `## Issue references` — `Closes #N` on GitHub/GitLab; on
+Jira no keyword, the ticket closes by transition) plus a rebase-merge is the mechanism;
+auto-merge on green CI is the trigger. A skill that merges or closes
 before that has happened is asserting a result it has no evidence for.
 
 ## 1. Preconditions
@@ -28,11 +30,15 @@ Check in order, before touching git. Any failure stops here — say which one an
 2. **Clean tree.** `git status --porcelain` is empty. Leftover changes → stop and suggest
    `atomic-commit` to turn them into commits first.
 3. **`state.json` resolves** in the workspace (`<domain-path>/docs/work/<slug>/state.json`, per
-   `/to-ticket`'s workspace-root rule). Read `specPath`, `githubIssues`, `workspaceRoot`.
+   `/to-ticket`'s workspace-root rule). Read `specPath`, `ticketRef`, `units[]`, `workspaceRoot`;
+   a version-3 file is read through `to-ticket/references/state-schema.md` § Reading version 3
+   (never rewritten as v3). **This unit** is the `units[]` entry whose `branch` equals the
+   current branch, else whose `remoteRef` is `#N`.
    **No workspace** — issue `#N`'s Pipeline block says `workspace: null`: skip this check; there
-   is no spec and no `githubIssues` list, only issue `#N`.
+   is no spec and no `units[]`, only issue `#N`.
 4. **Issue branch only — work is finished.** Find `progress.md` in the tasks root
-   (`/to-tasks` §5: `<workspaceRoot>/4-tasks/issue-<N>/`, or
+   (`/to-tasks` §5: `<workspaceRoot>/tasks/issue-<N>/` — a version-3 workspace's older step
+   folder per the schema's § Reading version 3 — or
    `$(git rev-parse --git-dir)/pipeline/issue-<N>/` with no workspace).
    - **Found:** its `**Branch:**` header must equal the current branch. Every row is `✅ done`,
      `🧪 awaiting CI` (CI on this PR proves it) or `⏭ skipped`; any `▶ in progress` or
@@ -43,6 +49,9 @@ Check in order, before touching git. Any failure stops here — say which one an
      partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/impel` hasn't closed
      out.
 5. **Something to ship.** `git log --oneline origin/main..HEAD` is non-empty.
+6. **Code host.** `git remote get-url origin`: a GitHub host → `gh`; a GitLab host → `glab`
+   (merge requests; same steps, the `glab mr` equivalents of the `gh pr` commands below).
+   Anything else → stop and name it.
 
 ## 2. Gate — the developer approves the story
 
@@ -85,9 +94,9 @@ lease failure) is a signal — fix the cause, don't route around it. A lease fai
 gh pr list --head <branch> --state open --json number,url
 ```
 
-- **Open PR exists:** step 4 already updated it. Skip to step 6 with its number — do not run
+- **Open PR exists:** step 4 already updated it. Skip to 5c with its number — do not run
   `gh pr create`.
-- **None:** draft, review, create (5a / 5b).
+- **None:** draft, review, create (5a / 5b), then 5c.
 
 **Title** — emoji-conventional, same format as a commit subject, ending in the issue ref:
 `<emoji> [#N stage] <type>(<project>[/<domain>]): <summary> (#N)` (story tag optional;
@@ -118,12 +127,14 @@ gh pr create --base main --head <branch> --title "<title>" --body-file <tmpfile>
 - Spec: <specPath>                               (no workspace: omit)
 - Design: <designPath>                           (omit when null)
 - Figma frames: node IDs from the issue **Figma frames** table (when present)
-- Steps: <workspaceRoot>/4-tasks/issue-<N>/      (no workspace: "issue body")
+- Steps: <workspaceRoot>/tasks/issue-<N>/        (no workspace: "issue body")
 
 Closes #<N>
 ```
 
-Exactly one `Closes #<N>` — this issue only. Exception: if `/impel` reported acceptance
+The closing line follows the repo's `issue-tracker.md` `## Issue references`. Jira: the ticket
+key and its URL, no keyword — closing is a Jira transition, not this skill's job. GitHub/GitLab:
+exactly one `Closes #<N>` — this issue only. Exception: if `/impel` reported acceptance
 criteria left unchecked on the issue (partially satisfied), write `Refs #<N>` instead and say so
 in the Summary — the issue stays open. `Closes` is what closes the issue on merge; a bare
 `#N` only links. Commits carry `Refs: #N`, never a closing keyword.
@@ -131,9 +142,15 @@ in the Summary — the issue stays open. `Closes` is what closes the issue on me
 ### 5b. Planning branch body
 
 Same shape, but it closes nothing: the planning PR lands the decisions, spec and issue graph
-that the slice issues build on. Replace the closing line with
-`Refs: #<spec-or-epic-issue>` (from `state.json`'s `githubIssues` / the spec issue `/to-spec`
-created), and list the created slice issues under **Evidence**.
+that the slice issues build on. Replace the closing line with a reference to `state.json`'s
+`ticketRef` (the intake item the slices sit under), in the `## Issue references` form without a
+closing keyword, and list the created slice issues under **Evidence**.
+
+### 5c. Record the PR
+
+Write the PR/MR number to this unit's `units[].pr` in `state.json` — v4 only; a version-3 file is
+upgraded on this write. Already set to the same number → no-op. No workspace, or a planning
+branch with no matching unit → skip.
 
 ## 6. Enable auto-merge
 
@@ -143,7 +160,7 @@ gh pr merge <number> --auto --rebase
 
 Rebase is the only allowed method (repo settings disable merge commits and squash). GitHub merges
 when the required checks (`ci-gate`, `pr-conventions`) and any required review pass, deletes the
-branch, and `Closes #N` closes the issue.
+branch, and the closing line closes the issue (GitHub/GitLab).
 
 If `gh` reports auto-merge isn't allowed on this repo, stop and say so — the repo hasn't had the
 `setup-skills` branch-workflow bootstrap (rulesets + `allow_auto_merge`). Do not merge by hand

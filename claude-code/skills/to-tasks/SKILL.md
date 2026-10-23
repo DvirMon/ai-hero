@@ -22,10 +22,15 @@ in this skill writes to the default branch.
 2. **Planning PR merged.** The epic's `docs/<epic-slug>` PR (spec, `issue-graph.md`) must be
    merged — `gh pr list --state merged --head docs/<epic-slug>`. Still open → stop and point at
    it. An issue with no epic workspace skips this check.
-3. **Branch + worktree.** Run `references/start-branch.md` with
-   `<type>/<issue#>-<slice-slug>` and **`useWorktree: true`** (default for issue work). It
-   prunes merged work, creates the worktree off `origin/<default>` and enters it. Every later
-   step in this skill works inside it.
+3. **Branch (+ worktree).** Resolve `prUnit` and `isolation` from the workflow config
+   (`conventions/doc-contracts/workflow-config.md`).
+   - `prUnit: ticket` — the unit is the ticket. If its `units[]` entry already has a `branch`
+     (started by `/to-ticket`), switch to it — or enter its worktree — and don't create one.
+     The Jira sub-tasks become steps on that branch, not branches of their own.
+   - Otherwise run `references/start-branch.md` with `<type>/<issue#>-<slice-slug>` and the
+     resolved `isolation`. It prunes merged work and creates the branch off
+     `origin/<default>` — in its own worktree, which it enters (`worktree`), or in place
+     (`branch`, no worktree). Every later step in this skill works there.
 
 ### 1. Gather context
 
@@ -80,13 +85,13 @@ If the ticket workspace's `state.json` does not exist, ask the user whether to c
 
 | Case | `<tasks-root>` |
 |------|----------------|
-| `state.json` with `workspaceRoot` | `<workspaceRoot>/tasks/` |
+| `state.json` with `workspaceRoot` | `<workspaceRoot>/tasks/` (a v3 workspace's legacy step folder is read in place — `state-schema.md` § Reading version 3) |
 | Pipeline `workspace: null` (standalone issue, no epic) | `$(git rev-parse --git-dir)/pipeline/issue-<N>/` inside the issue worktree (untracked; deleted with worktree) |
 | No ticket workspace | `.cursor/plans/<slug>/` at the repo root when `.cursor/rules/plan-format.mdc` exists (Org server default) |
 
 Write all plan files under `<tasks-root>/`, colocated with the ticket's other docs when a workspace
 exists. One epic workspace may hold many issues — each issue branch should touch only its own
-`tasks/` (or pipeline folder). Do **not** use repo-root `4-tasks/` (legacy scratch).
+`tasks/` (or pipeline folder). Do **not** use a repo-root scratch folder.
 
 **Org server:** canonical procedure is `.claude/skills/to-tasks/SKILL.md` in that repo; hand off
 to `/implement`, not `/impel`.
@@ -134,10 +139,19 @@ Legacy layout: issue header (`**Issue:**`, `**Branch:**`, `**Worktree:**`), ASCI
 
 #### State update
 
-Don't touch an existing `state.json` from an issue branch. It is epic-level and was settled by
-the planning PR; bumping `updatedAt` from several issue branches at once only makes rebase
-conflicts. `tasks` status is tracked on the issue's `## Pipeline` block below. The one exception
-is a `state.json` this run had to create (§1) — it is committed with the plan.
+From an issue branch, touch `state.json` only to record this unit's own `units[].branch` and
+`.worktree` (`null` under `isolation: branch`) when §0 started the branch — nothing else. It is
+epic-level and was settled by the planning PR; editing other fields from several issue branches
+at once only makes rebase conflicts. Write v4 only: a v3 file is upgraded on this write, per
+`to-ticket/references/state-schema.md`. `tasks` status is tracked on the issue's `## Pipeline`
+block below. A `state.json` this run had to create (§1) is written in full and committed with
+the plan.
+
+#### Decisions
+
+Append every outcome this run settled with the user — a trade-off, an agreed how-to, a challenge
+that changed the plan — to `1-decisions.md` (`decisionsPath`) as it settles, phase `tasks`, per
+`conventions/doc-contracts/ticket-decisions.md`. No workspace → no log.
 
 **Update the source issue's `## Pipeline` block** (contract: `to-issues/references/pipeline-block.md`):
 set `tasks: done: <tasks-root>/` (no workspace: `tasks: done: local, in the issue's worktree`) and
@@ -152,7 +166,7 @@ exists on disk or it does not, so it is an observation, not the judgement call
 
 After the writer's report, commit the plan on the issue branch — the first commit of the PR's
 story. Skip this when the tasks root is the untracked no-workspace folder (§5). Stage only
-`<tasks-root>/` (plus a `state.json` this run created), never `-A`:
+`<tasks-root>/` (plus `state.json` when this run created it or recorded its unit), never `-A`:
 
 ```
 📚 [#<N> plan] docs(<scope>): plan tasks for #<N>

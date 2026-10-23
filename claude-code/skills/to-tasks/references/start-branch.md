@@ -1,19 +1,24 @@
 <!-- Shared procedure. Cited by to-ticket, to-tasks, implement (fallback) and the epic
      archive chore. Edit here, never restate in a skill body. -->
 
-# Start a branch in its own worktree
+# Start a branch (in its own worktree, by default)
 
-One issue = one branch = one worktree = one PR. Work never starts on the default branch, and
-never in the primary checkout. Every branch starts from fresh `origin/<default>` — no stacked
-branches; a blocked issue waits until its blocker's PR is merged.
+One PR unit = one branch = one PR; what a unit is follows `prUnit` in
+`conventions/doc-contracts/workflow-config.md`. Work never starts on the default branch. Every
+branch starts from fresh `origin/<default>` — no stacked branches; a blocked issue waits until
+its blocker's PR is merged.
 
-This procedure is the workflow's explicit instruction to work in a worktree: the calling skill
-runs it, then enters the worktree with `EnterWorktree`.
+`isolation` (same config) picks the shape:
+- `worktree` (default) — the branch gets its own worktree; the calling skill enters it with
+  `EnterWorktree`. Work never happens in the primary checkout.
+- `branch` — the branch is checked out in place, in the primary checkout. No worktree is
+  created and `worktreePath` is `null`.
 
 ## Input
 
 - `branch` — the full branch name (see Naming). The caller decides it.
 - `repoRoot` — the primary checkout (`git worktree list --porcelain`, first `worktree` entry).
+- `isolation` — `worktree` · `branch`, from the merged workflow config.
 
 ## Naming
 
@@ -31,7 +36,7 @@ runs it, then enters the worktree with `EnterWorktree`.
   `chore`/`ci`/`build`; otherwise `feat`. Say the inferred type in the report — renaming a
   branch before its first push is cheap.
 - The whole name must match `^<type>/[a-z0-9][a-z0-9-]*$`.
-- Worktree path: `<repoRoot>/.claude/worktrees/<branch with "/" → "-">`, e.g.
+- Worktree path (`isolation: worktree` only): `<repoRoot>/.claude/worktrees/<branch with "/" → "-">`, e.g.
   `.claude/worktrees/feat-105-delete-coupled-surface`.
 
 ## Procedure
@@ -58,7 +63,18 @@ Run from `repoRoot`.
 
 Report what was pruned, one line per branch.
 
-### 2. Create the worktree
+### 2. Create the branch
+
+**`isolation: branch`** — no worktree:
+
+1. If `branch` already exists → `git -C <repoRoot> switch <branch>`. Resuming is normal.
+2. If the primary checkout is dirty, stop: name the files and ask the user to commit, stash or
+   discard them.
+3. `git -C <repoRoot> switch -c <branch> origin/<default>` — always from the fresh remote
+   default, never from local HEAD.
+4. Skip §3. Work stays in `repoRoot`.
+
+**`isolation: worktree`:**
 
 1. If `branch` already exists (local or `origin/<branch>`) and has a worktree → don't create
    anything; enter that worktree (step 3). Resuming is normal.
@@ -69,19 +85,21 @@ Report what was pruned, one line per branch.
 4. Confirm `.claude/worktrees/` is gitignored (`git check-ignore -q <path>`). If not, say so
    — the repo bootstrap in `/setup-skills` adds it; don't edit `.gitignore` from here.
 
-### 3. Enter it
+### 3. Enter it (`isolation: worktree`)
 
 `EnterWorktree` with `path: <path>`. Every later read, write, writer-agent brief (absolute
 paths) and commit in the calling skill targets the worktree, not the primary checkout.
 
 ### 4. Dependencies
 
-A fresh worktree has no `node_modules`. **Don't install.** Print the command for the user to
+A fresh worktree has no `node_modules` (`isolation: branch` keeps the checkout's own; skip this). **Don't install.** Print the command for the user to
 run (the repo's lockfile decides: `npm ci`, `pnpm install --frozen-lockfile`, `yarn install
 --immutable`), per `never-run-build-serve-test-unprompted`. A typecheck before that install
 fails for reasons unrelated to the change — say so rather than debugging it.
 
 ## Output to the caller
 
-`branch`, `worktreePath`, the default branch name, and the prune report. The caller records
-`branch` and `worktreePath` where its contract says (`/to-tasks`: `progress.md` header).
+`branch`, `worktreePath` (`null` when `isolation` is `branch`), the default branch name, and the
+prune report. The caller records `branch` and `worktreePath` where its contract says
+(`/to-tasks`: the unit's `units[].branch` / `.worktree` in `state.json`, and the `progress.md`
+header).

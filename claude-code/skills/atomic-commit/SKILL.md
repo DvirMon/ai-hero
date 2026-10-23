@@ -51,7 +51,7 @@ Co-Authored-By: <the exact line from this session's attribution reminder>
   | 💄 | `style` | formatting only |
   | ⏪ | `revert` | revert |
 
-- **Story tag** `[#<issue> <stage>]` — optional. Stage `s<N>` = step N of `4-tasks/issue-<N>/step-<N>-*.plan.md`; `plan` = task/test plans; `review` = changes answering review. Omit for `Refs: none` work or commits that fit no stage. The tag's issue must also appear in `Refs:`.
+- **Story tag** `[#<issue> <stage>]` — optional. Stage `s<N>` = step N of `tasks/issue-<N>/step-<N>-*.plan.md`; `plan` = task/test plans; `review` = changes answering review. Omit for `Refs: none` work or commits that fit no stage. The tag's issue must also appear in `Refs:`.
 - **Trailers** — `Refs: #N` for the issue the commit belongs to; `Epic: #M` when the epic is known; `Refs: none` when unrelated to any issue. If `docs/agents/issue-tracker.md` names a different partial trailer, use that name instead.
 - **Never close from a commit.** No `Closes #N` / `Ships: #N` and no GitHub closing keyword (`close[sd]`, `fix(e[sd])`, `resolve[sd]` before `#N`) anywhere in the message — the PR body owns `Closes #N`.
 - Imperative mood, subject explains *why* when it fits.

@@ -11,6 +11,20 @@ It exists because `state.json` only tracks issues that came from a workspace. An
 mid-work — noticed while building something else, written down so a future session picks it up
 — has no workspace, so nothing records what was *not* done to it.
 
+## Where the rung lives
+
+The repo's `docs/agents/issue-tracker.md` `## Readiness` (per `doc-contracts/tracker.md`) says
+which form applies. `/impel` reads the rung from that place and nowhere else.
+
+| Form | Trackers | Rung + `assessed:` live in | `/impel` reads |
+|---|---|---|---|
+| **Body block** | GitHub, GitLab, local | the item's `## Pipeline` block (below) | the block |
+| **State form** | any tracker whose description must not be edited — e.g. Jira | `state.json` `units[].readiness` / `units[].assessed` | `units[]` |
+
+The state form never edits the item's description — product owns it. It uses the same rungs,
+triggers and dated `assessed:` reason as below, with labels mirroring the rung; on conflict,
+`units[]` wins. The rest of this file describes the body block.
+
 ## Two kinds
 
 **Epic** — owns its pipeline: grill, spec, slicing. Children are optional; an epic with no
@@ -172,7 +186,8 @@ and will end up competing with releases; a sub-issue relation asserts that the p
 spec cover the child, which for a late-filed enhancement is false. Rationale and the survey behind
 it: `docs/agents/discovery/issue-feature-taxonomy.md`.
 
-**The body block is authoritative; the labels are a projection.** `/impel` reads the block,
+**The body block (or `units[]`, in the state form) is authoritative; the labels are a
+projection.** `/impel` reads the block,
 never a label — a label is one edit away from being stale and carries no reason. Every skill that
 writes the block re-syncs both labels in the same turn. On conflict the body wins and the label
 gets corrected.

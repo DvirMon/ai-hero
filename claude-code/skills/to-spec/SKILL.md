@@ -1,22 +1,37 @@
 ---
 name: to-spec
-description: Turn the current conversation (and, when one exists, a ticket workspace's decisions) into a spec — plus an architecture doc when the work is complex — and publish it to the project issue tracker. No interview, just synthesis of what's already been decided.
+description: Turn the current conversation (and, when one exists, a ticket workspace's decisions) into a spec checklist — plus an architecture doc when the work is complex and a design doc when Figma frames exist. The spec stays local; it is never published to a tracker. No interview, just synthesis of what's already been decided.
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`, format `doc-contracts/ticket-decisions.md` — a settled entry is never re-asked) and the ticket it was grilled from — and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
+This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`, format `doc-contracts/ticket-decisions.md` — a settled entry is never re-asked) and the ticket it was grilled from — and produces a spec: a checklist for the agent, derived from the decisions. User stories live in the PRD (`prdPath`, `doc-contracts/prd.md`), never in the spec. Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
 
 **Branch guard, first.** The spec is committed on the epic's planning branch, `docs/<slug>`
 (the `slug` in `state.json`), in its worktree. On the default branch or an issue branch, stop
 and point the user to `/to-ticket`, which starts it via `to-tasks/references/start-branch.md`.
 
-If a ticket workspace's `state.json` exists, validate it per `to-ticket/references/state-schema.md` before reading it.
+If a ticket workspace's `state.json` exists, validate it per `to-ticket/references/state-schema.md` before reading it. A version-3 file is read through that schema's § Reading version 3 mapping; every write is version 4.
 
 If it carries a non-null `capabilityLogPath`, **read that log too.** It holds what earlier efforts on the same capability already settled, superseded or left open — which this workspace's own decisions file does not, and which a spec is worse than useless for contradicting. Any decision the spec makes that binds the capability beyond this ticket gets a row in that log, per `doc-contracts/decisions-log.md`.
 
 If no ticket workspace's `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket).
 
-The issue tracker and triage label vocabulary should have been provided to you — run `/setup-skills` if not.
+The repo's `docs/agents/ticket-tracker.md` and `docs/agents/issue-tracker.md` (contract: `doc-contracts/tracker.md`) should have been provided to you — run `/setup-skills` if not.
+
+**PRD gate, before step 1.** When `prdPath` is set:
+
+1. **Re-fetch the remote ACs once**, through `ticket-tracker.md` `## Fetch` for `ticketRef`.
+   Compare each against its `[<ticketRef> · MM-DD]` line in `prd.md`. A changed AC gets its new
+   text and today's pull date; list every changed line to the user before building the
+   checklist. A new remote AC is added with its tag; a removed one is listed, not deleted.
+2. **Stop on an open `⚠ Dn`.** Any line still marked `⚠` blocks the spec — product owns the AC.
+   It clears only per `doc-contracts/prd.md` § Conflict marker: the re-fetch above shows product
+   updated the ticket, or `decisionsPath` holds an override entry `Dm` naming `Dn` (then rewrite
+   the line to the decision, tag `[Dm]`, drop the marker). Otherwise name the open lines and
+   stop.
+
+`prdPath` null (a v3 workspace, or no PRD): ask the user for the path or confirm there is none,
+then skip the gate.
 
 ## Process
 
@@ -26,7 +41,7 @@ The issue tracker and triage label vocabulary should have been provided to you �
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below. If the ticket workspace's `state.json` exists, also write it to `<workspaceRoot>/2-spec.md` (using `state.json`'s `workspaceRoot`) and update `state.json`'s `specPath` and `updatedAt`.
+3. Write the spec using the checklist template below. If the ticket workspace's `state.json` exists, also write it to `<workspaceRoot>/2-spec.md` (using `state.json`'s `workspaceRoot`) and update `state.json`'s `specPath` and `updatedAt`.
 
    **Design reference (`design.md`).** When `figma[]` is non-empty, or `{workspaceRoot}/design.draft/`
    has fragments, or `decisionsPath` records a locked FE design-check aspect, also write
@@ -40,14 +55,13 @@ Check with the user that these seams match their expectations.
 
    **These writes — step 3's `design.md`, step 4's `3-architecture.md`, any decisions entry and
    any capability-log row — go to one `haiku` writer**, per `to-ticket/references/file-writes.md`. Compose every
-   file's full text here and hand it over verbatim, so the write is mechanical. Continue with
-   step 5's tracker search and publish while it writes — you already hold the content. Join the
-   writer before step 6's commit.
+   file's full text here and hand it over verbatim, so the write is mechanical. Join the
+   writer before step 5's commit.
 
-   Update the source issue's `## Pipeline` block (contract: `to-issues/references/pipeline-block.md`): set
-   `workspace` to the workspace root, set `grill: done: <decisionsPath>` and
-   `spec: done: <specPath>`, and set `readiness` per `to-issues`' ladder. Re-sync the rung label
-   in the same turn.
+   Record the stage through `issue-tracker.md` `## Readiness` (contract:
+   `to-issues/references/pipeline-block.md`): `workspace` = the workspace root,
+   `grill: done: <decisionsPath>`, `spec: done: <specPath>`, and `readiness` per `to-issues`'
+   ladder, with the `assessed:` line. You set every rung yourself, `ready-for-agent` included.
 
    Rate the work's **difficulty**, not its breadth, and let that set the rung. Full trigger
    list and the breadth-vs-difficulty rule: `to-issues/references/pipeline-block.md`. Applied
@@ -66,42 +80,18 @@ Check with the user that these seams match their expectations.
 
 4. If the ticket workspace's `state.json` exists and `isComplex` is `true`, also write `<workspaceRoot>/3-architecture.md`: the decisions that are settled and not open for relitigation, grounded against the actual current source (cite real file paths, not assumptions), the types/interfaces/contracts involved, a file-layout table for the implementation session, and open questions still unresolved. Unlike the spec template below — which bans file paths and code snippets because a spec can sit unimplemented for a while — the architecture doc **may** include exact paths, types, and snippets: it's consumed immediately by `/to-tasks`, not left to go stale. Update `state.json`'s `architecturePath`.
 
-5. Before publishing, check whether a spec issue for this `ticketRef` already exists: look at
-   `state.json.githubIssues` for a prior spec issue reference, and search the tracker directly
-   (`gh issue list --state all --search "<ticketRef> in:body" --json number,title,body`). If
-   found, update that issue's body in place rather than creating a new one.
-
-   `githubIssues[]` is read here — this is one of its two documented consumers (the other is
-   `ship`); see `to-ticket/references/state-schema.md`. The tracker search remains the
-   authoritative half regardless — `githubIssues[]` is a fast path, not the source of truth.
-
-   Publish the spec to the project issue tracker (creating only if no existing issue was found)
-   and re-sync the rung label to the readiness step 3 assessed. You set every rung yourself,
-   `ready-for-agent` included, with the difficulty evidence in the `assessed:` line
-   (`to-issues/references/pipeline-block.md`). If `3-architecture.md` was written, link it from the issue body rather
-   than inlining it.
-
 <spec-template>
 
-## Problem Statement
+## Goal
 
-The problem that the user is facing, from the user's perspective.
+One line, linking the PRD (`prdPath`) for the problem and the user stories. Do not restate
+them.
 
-## Solution
+## Checklist
 
-The solution to the problem, from the user's perspective.
-
-## User Stories
-
-A LONG, numbered list of user stories. Each user story should be in the format of:
-
-1. As an <actor>, I want a <feature>, so that <benefit>
-
-<user-story-example>
-1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
-</user-story-example>
-
-This list of user stories should be extremely extensive and cover all aspects of the feature.
+A numbered list of what the agent must make true, each item derived from a decision or a PRD
+requirement and carrying its source tag (`[Dn]` or `[<ticketRef> · MM-DD]`). One checkable
+behavior or edge case per item.
 
 ## Implementation Decisions
 
@@ -142,10 +132,10 @@ frames, component map, tokens, typography, and copy → i18n keys. Do not restat
 
 </spec-template>
 
-6. **Commit.** Join the writer, then make one commit on `docs/<slug>`, staged by path:
-   `2-spec.md`, `design.md` (if written), `3-architecture.md` (if written), `state.json`, any
-   capability-log row. Never `-A`. Message per `atomic-commit` § Commit format: `📚 docs(<scope>): spec <slug>`, trailer
-   `Refs: #<spec issue>` from step 5. Do not push — `/ship` does, after `/to-issues`.
+5. **Commit.** Join the writer, then make one commit on `docs/<slug>`, staged by path:
+   `2-spec.md`, `design.md` (if written), `3-architecture.md` (if written), `prd.md` (if the gate
+   changed it), `state.json`, any capability-log row. Never `-A`. Message per `atomic-commit` § Commit format: `📚 docs(<scope>): spec <slug>`, trailer
+   `Refs:` the `ticketRef`, per `issue-tracker.md` `## Issue references`. Do not push — `/ship` does, after `/to-issues`.
 
 End your final message with a one-line pointer, as the very last line — nothing after it:
 

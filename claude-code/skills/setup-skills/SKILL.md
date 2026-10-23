@@ -1,6 +1,6 @@
 ---
 name: setup-skills
-description: Configure this repo for the engineering skills — set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/impel` → `/ship`.
+description: Configure this repo for the engineering skills — write its workflow config (`.claude/workflow.json`), set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/impel` → `/ship`.
 disable-model-invocation: true
 ---
 
@@ -8,11 +8,14 @@ disable-model-invocation: true
 
 Scaffold the per-repo configuration that the engineering skills assume:
 
-- **Issue tracker** — where engineering issues live (GitHub by default; local markdown is also supported out of the box)
-- **Ticket tracker** — where intake tickets live, if `to-ticket` is installed (Jira, Linear, or local markdown)
+- **Workflow config** — `.claude/workflow.json` per `conventions/doc-contracts/workflow-config.md`: project kind, PR unit, isolation
+- **Issue tracker** — where engineering issues live, and how the pipeline's operations run against it (`docs/agents/issue-tracker.md`)
+- **Ticket tracker** — where intake tickets live, if `to-ticket` is installed (`docs/agents/ticket-tracker.md`)
 - **Triage labels** — the strings used for the five canonical triage roles
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
 - **Branch workflow** — the enforcement for one issue = one branch = one PR, rebase-merge only: git hooks, commitlint, PR template, GitHub Actions, ruleset and repo settings
+
+Both tracker files implement the operations in `conventions/doc-contracts/tracker.md`. No stage branches on a tracker name; each reads these files. `examples/` holds filled-in files for common trackers — setup starts from the matching one.
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -27,6 +30,8 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `CONTEXT.md` and `CONTEXT-MAP.md` at the repo root
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/` — does this skill's prior output already exist?
+- `.claude/workflow.json` / `.claude/workflow.local.json` — prior config; a `.gitignore` entry for `.claude/workflow.local.json`
+- Tracker access — which CLIs are on `PATH` (`gh`, `glab`, `acli`, …) and which MCP servers are connected (Atlassian, Linear, GitHub). Tracker operations are filled from what is actually available.
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 - Is the `to-ticket` skill installed? (a `to-ticket` skill folder alongside this one, or `to-ticket` in your available skills.) This decides whether Section B runs at all.
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section C runs at all.
@@ -42,18 +47,21 @@ Lead each section with the recommended answer so the user can accept it in a wor
 
 **Section A — Issue tracker.**
 
-> Explainer: The "issue tracker" is where engineering issues live for this repo. Skills like `to-issues`, `triage`, `to-spec`, and `qa` read from and write to it — they need to know whether to call `gh issue create`, write a markdown file under `.scratch/`, or follow some other workflow you describe. Pick the place you actually track work for this repo.
+> Explainer: The "issue tracker" is where engineering issues live for this repo. Skills like `to-issues`, `triage`, `impel`, and `ship` read from and write to it — `docs/agents/issue-tracker.md` tells them how to fetch an item, create a child, record readiness, and reference an item from a commit or PR. Pick the place you actually track work for this repo.
 
 Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
 
 - **GitHub** — issues live in the repo's GitHub Issues (uses the `gh` CLI)
 - **GitLab** — issues live in the repo's GitLab Issues (uses the [`glab`](https://gitlab.com/gitlab-org/cli) CLI)
 - **Local markdown** — issues live as files under `.scratch/<feature>/` in this repo (good for solo projects or repos without a remote)
-- **Other** (Jira, Linear, etc.) — ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose
+- **Jira** — engineering work is sub-tasks of the intake ticket (REST API, `acli`, or an MCP server)
+- **Other** — any other tracker: see "Filling a tracker file" below
 
-Record the choice in `docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off** — leave it off and don't raise it; a user who wants external PRs in the triage queue can flip the flag in the file later.
+Write `docs/agents/issue-tracker.md` from the matching example. For **Jira**, run the example's `## Setup check` against the project and write its result (sub-task type id, parent JQL) into `issue-tracker.md` itself — never into `workflow.json`. The GitHub and GitLab examples carry a "PRs as a request surface" flag, defaulted **off** — leave it off and don't raise it; a user who wants external PRs in the triage queue can flip the flag in the file later.
 
-There is no ship-mode question: every change goes through a PR (`CLAUDE.md` § Git workflow). If an existing `docs/agents/issue-tracker.md` still has a `## Ship mode` or `## Closing trailer` section, replace it with the template's `## Issue references` section.
+There is no ship-mode question: every change goes through a PR (`CLAUDE.md` § Git workflow). If an existing `docs/agents/issue-tracker.md` still has a `## Ship mode` or `## Closing trailer` section, replace it with the example's `## Issue references` section.
+
+**Filling a tracker file.** For a tracker with no example, or when the example's commands don't match what this machine has: name the tracker, show which CLIs and MCP tools exploration found for it, then propose a command or tool for each operation section `tracker.md` requires. A section the tracker can't do says `Not supported` plus what the stage does instead. An org's own tooling goes in as `skill:<name>` / `agent:<name>`. Confirm the filled sections with the user before writing.
 
 **Section B — Ticket tracker.** Skip this section entirely if the `to-ticket` skill isn't installed (exploration told you) — an uninstalled skill needs no tracker.
 
@@ -63,10 +71,11 @@ Offer:
 
 - **Jira** — intake tickets live in a Jira project (REST API or an MCP server, whichever the user has available)
 - **Linear** — intake tickets live in a Linear team (API or an MCP server)
+- **GitHub** — intake items are GitHub issues, epics linked as parents (uses the `gh` CLI)
 - **Local markdown** — intake tickets live as files under `.scratch/tickets/` (good for solo projects, or before real tracker access is set up)
-- **Other** — ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose
+- **Other** — any other tracker: see "Filling a tracker file" above
 
-For Jira or Linear, also collect: base URL / workspace, project key or team, and auth method (an API token env var, or the name of an already-configured MCP server). Record the choice in `docs/agents/ticket-tracker.md`.
+For Jira or Linear, also collect: base URL / workspace, project key or team, and auth method (an API token env var, or the name of an already-configured MCP server). Write them into `docs/agents/ticket-tracker.md`, filled from the matching example.
 
 **Section C — Triage label vocabulary.** Skip this section entirely if the `triage` skill isn't installed (exploration told you) — an uninstalled skill needs no labels.
 
@@ -80,7 +89,7 @@ The defaults are the five canonical roles, each label string equal to its name: 
 
 Offer **multi-context** — a root `CONTEXT-MAP.md` pointing to per-context `CONTEXT.md` files — only when exploration found monorepo signals. Then confirm which layout they want.
 
-**Section E — Branch workflow bootstrap.** GitHub only (GitLab: point at the note in `issue-tracker-gitlab.md`; local/other: skip). Templates and their verified sources: [templates/README.md](./templates/README.md).
+**Section E — Branch workflow bootstrap.** GitHub only (GitLab: point at the note in `examples/issue-tracker-gitlab.md`; local/other: skip). Templates and their verified sources: [templates/README.md](./templates/README.md).
 
 Build one change list from exploration, diffing each template against what exists — adapt, don't overwrite repo-specific content:
 
@@ -99,6 +108,23 @@ Build one change list from exploration, diffing each template against what exist
 
 Show the full list — every file diff and every `gh api` command — and apply nothing until the user confirms. Confirm the server-side calls separately from the file edits: they change the remote repo and are visible to others. Never create the ruleset before the workflows exist on the default branch (required checks must have run once).
 
+**Section F — Workflow config.** Always runs. One key at a time, recommended answer first:
+
+- `projectKind` — `library` · `design-system` · `app`. Propose from exploration (a published package or DS components → library / design-system; routes and pages → app).
+- `prUnit` — `sub-issue` (each sub-issue its own branch and PR) · `ticket` (one branch per ticket; work items are steps on it). Propose `ticket` when the issue tracker is Jira, else `sub-issue`.
+- `isolation` — `worktree` · `branch`. Default `worktree`.
+
+Write `version`, `projectKind`, and only the keys that differ from the contract's defaults. `intake.epic`, `docs.prd`, `baseBranch` and `stages.<stage>.skill` are written only when the user raises them. The file names no tracker — that lives in `docs/agents/*-tracker.md`.
+
+```json
+{
+  "version": 1,
+  "projectKind": "library"
+}
+```
+
+Also add `.claude/workflow.local.json` to `.gitignore` — it holds one teammate's overrides.
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
@@ -106,6 +132,7 @@ Show the user a draft of:
 - The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
 - The contents of `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
 - The contents of `docs/agents/ticket-tracker.md` (only when `to-ticket` is installed)
+- `.claude/workflow.json`, and the `.gitignore` line for `.claude/workflow.local.json`
 - The Section E change list (only when Section E ran)
 
 Let them edit before writing.
@@ -148,22 +175,23 @@ The block:
 
 Include the `### Ticket tracker` sub-block, and write `docs/agents/ticket-tracker.md`, only when `to-ticket` is installed and Section B ran. Include the `### Triage labels` sub-block, and write `docs/agents/triage-labels.md`, only when `triage` is installed and Section C ran. When either isn't, its sub-block and file are omitted.
 
-Then write the docs files using the seed templates in this skill folder as a starting point:
+Write `.claude/workflow.json` (Section F) and the `.gitignore` line. Then write the docs files, starting from the examples in this skill folder. Each tracker file keeps the operation headings `tracker.md` requires; repo-only rules (key casing, extra labels, epic conventions) go after them:
 
 - [issue-tracker-github.md](./examples/issue-tracker-github.md) — GitHub issue tracker
 - [issue-tracker-gitlab.md](./examples/issue-tracker-gitlab.md) — GitLab issue tracker
 - [issue-tracker-local.md](./examples/issue-tracker-local.md) — local-markdown issue tracker
 - [issue-tracker-jira.md](./examples/issue-tracker-jira.md) — Jira sub-tasks under the intake ticket
+- [ticket-tracker-github.md](./examples/ticket-tracker-github.md) — GitHub ticket tracker (only if `to-ticket` is installed)
 - [ticket-tracker-jira.md](./examples/ticket-tracker-jira.md) — Jira ticket tracker (only if `to-ticket` is installed)
 - [ticket-tracker-linear.md](./examples/ticket-tracker-linear.md) — Linear ticket tracker (only if `to-ticket` is installed)
 - [ticket-tracker-local.md](./examples/ticket-tracker-local.md) — local-markdown ticket tracker (only if `to-ticket` is installed)
 - [triage-labels.md](./triage-labels.md) — label mapping (only if `triage` is installed)
 - [domain.md](./domain.md) — domain doc consumer rules + layout
 
-For "other" issue or ticket trackers, write the corresponding file from scratch using the user's description.
+For other issue or ticket trackers, write the file from `tracker.md`'s operation list, filled as "Filling a tracker file" describes.
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. If Section E ran, list what is still theirs to do: install the new devDependencies, create the two secrets, and approve the `gh api` calls once the setup PR has merged. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch trackers or restart from scratch.
+Tell the user the setup is complete and which engineering skills will now read from these files. `.claude/workflow.json` must exist and parse with every key valid per `workflow-config.md` — every stage resolves it first. If Section E ran, list what is still theirs to do: install the new devDependencies, create the two secrets, and approve the `gh api` calls once the setup PR has merged. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch trackers or restart from scratch. A teammate's own preferences (e.g. `isolation`) go in `.claude/workflow.local.json`.
 
 The code-review config (`docs/agents/code-review.md`) is not written here — the `code-review` plugin owns it. Point the user to `/code-review:code-review init` if the repo has none.

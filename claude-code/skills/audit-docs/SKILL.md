@@ -51,7 +51,7 @@ ground truth there.
 - **Folder-completion claims** — when a target is itself an episodic work folder (an
   `active/<slug>/` directory sibling to an `archive/`), don't read the whole folder to form
   this claim. Completion is GitHub state, not a file: read the folder's epic issue list
-  (`state.json`'s `githubIssues`, or the nodes of `issue-graph.md`) and turn **each issue**
+  (`state.json`'s `units[].remoteRef`, or the nodes of `issue-graph.md`) and turn **each issue**
   into its own claim ("#105 is closed"). One claim per issue, not one per folder — this is
   what makes step 4's verification a `gh` call instead of a read. This is the one claim type
   in this skill you're hoping comes back true — every issue closed makes the folder an
