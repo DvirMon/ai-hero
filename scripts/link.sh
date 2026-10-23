@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Make this repo the source of truth for ~/.claude: symlink the synced
-# paths into claude-code/ and install the 60s launchd autosync agent.
+# paths into claude-code/. Pushing is manual (push.sh); pulling happens
+# on SessionStart (pull.sh, wired in ~/.claude/settings.json).
 # Safe to re-run. Existing real files/dirs are moved to
 # ~/.claude/backups/pre-sync-<timestamp>/ first, never deleted.
 #   bash scripts/link.sh [--adopt]
@@ -40,31 +41,3 @@ fi
 
 for d in "${DIRS[@]}"; do link "$d"; done
 for f in "${FILES[@]}"; do link "$f"; done
-
-# launchd agent (macOS)
-if [ "$(uname)" = "Darwin" ]; then
-  LABEL="com.dvirmon.guidelines-sync"
-  PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
-  mkdir -p "$HOME/Library/LaunchAgents" "$HOME/Library/Logs"
-  cat > "$PLIST" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-  <key>Label</key><string>$LABEL</string>
-  <key>ProgramArguments</key><array>
-    <string>/bin/bash</string><string>$REPO/scripts/autosync.sh</string>
-  </array>
-  <key>EnvironmentVariables</key><dict>
-    <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
-  </dict>
-  <key>StartInterval</key><integer>60</integer>
-  <key>RunAtLoad</key><true/>
-  <key>StandardErrorPath</key><string>$HOME/Library/Logs/guidelines-sync.log</string>
-</dict></plist>
-EOF
-  launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
-  launchctl bootstrap "gui/$(id -u)" "$PLIST"
-  echo "launchd agent $LABEL installed (every 60s)"
-else
-  echo "non-macOS: schedule 'bash $REPO/scripts/autosync.sh' every minute (cron/systemd/Task Scheduler)"
-fi
