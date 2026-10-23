@@ -13,8 +13,10 @@ claude-code/
 ├── conventions/        — opt-in, project-dependent conventions (NOT auto-loaded — pull into
 │                          a project's own CLAUDE.md when it fits, e.g. file/doc organization
 │                          patterns that don't suit every repo)
-├── skills/             — own skills (symlinks dereferenced)
+├── skills/             — own skills (symlinks dereferenced); skills/synced/ is
+│                          Claude Code's claude.ai skill cache, gitignored
 ├── agents/             — subagent definitions
+├── statusline.js       — status line script (settings.json `statusLine` runs it)
 └── plugins/<name>/     — installed plugin skills/agents/commands/docs (source excluded)
 
 cursor/
@@ -27,6 +29,12 @@ plugins/                — plugins authored HERE (source of truth), not mirrore
 └── code-review/        — impact-ranked code review: orchestrator skill + reviewer agents
 .claude-plugin/
 └── marketplace.json    — makes this repo a plugin marketplace
+
+scripts/
+├── link.sh             — symlink ~/.claude paths into claude-code/, wire pull.sh
+├── pull.sh             — fast-forward pull; runs from the SessionStart hook
+├── push.sh             — commit claude-code/ edits and push
+└── install.sh          — copy-based install (no symlinks), any harness
 ```
 
 Not mirrored: `~/.cursor/skills-cursor/` — Cursor's own built-in skill bundle, ships with every
@@ -35,7 +43,8 @@ Cursor install automatically, not authored by you.
 ## Live sync across machines (Claude Code)
 
 This repo is the source of truth for `~/.claude`. On each machine, `~/.claude/{CLAUDE.md,
-RTK.md, rules, skills, agents, conventions}` are symlinks into `claude-code/`, so edits are live.
+RTK.md, statusline.js, rules, skills, agents, conventions}` are symlinks into `claude-code/`, so
+edits are live. `settings.json` is not synced: each machine sets its own `statusLine` entry.
 Pushing is manual; pulling is automatic at session start. No background job, no polling.
 
 ### Set up a new machine

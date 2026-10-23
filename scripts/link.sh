@@ -16,7 +16,7 @@ ADOPT=false
 [ "${1:-}" = "--adopt" ] && ADOPT=true
 
 DIRS=(skills rules agents conventions)
-FILES=(CLAUDE.md RTK.md)
+FILES=(CLAUDE.md RTK.md statusline.js)
 
 mkdir -p "$CLAUDE" "$BACKUP"
 
