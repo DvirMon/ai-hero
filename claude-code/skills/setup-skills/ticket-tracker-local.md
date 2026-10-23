@@ -1,16 +1,32 @@
 # Ticket tracker: Local Markdown
 
-Intake tickets for this repo live as markdown files in `.scratch/tickets/`.
+Intake items for this repo live as markdown files in `.scratch/tickets/`. Picked when
+`workflow.json` has `intake.source: "local"` (the default).
 
 ## Conventions
 
-- One ticket per file: `.scratch/tickets/<slug>.md`
-- The file body is the ticket content, using the template `to-ticket` provides
+- One item per file: `.scratch/tickets/<slug>.md`. The body is the item content, using the
+  template `/to-intake` provides.
+- An epic is an item file too. A child names it on its first line: `Parent: <epic-slug>`.
+- No stage rewrites the body; comments are appended.
 
-## When a skill says "create an intake ticket"
+## Fetch
 
-Create a new file at `.scratch/tickets/<slug>.md` (creating the directory if needed).
+Read `.scratch/tickets/<slug>.md`. The user normally passes the slug or path directly.
 
-## When a skill says "fetch the intake ticket"
+## Create an intake item
 
-Read the file at `.scratch/tickets/<slug>.md`. The user will normally pass the slug or path directly.
+Create `.scratch/tickets/<slug>.md` (creating the directory if needed).
+
+Parent epic, per `intake.epic` (unset → ask):
+
+- **link** — add `Parent: <epic-slug>`; the epic file must exist.
+- **create** — create `.scratch/tickets/<epic-slug>.md` first, then link as above.
+- **none** — no `Parent:` line.
+
+Return the slug.
+
+## Post a comment
+
+Append to a `## Comments` section at the end of the file (create it if missing), one entry per
+comment: `### <YYYY-MM-DD>` followed by the body.

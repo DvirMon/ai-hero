@@ -1,24 +1,43 @@
 # Ticket tracker: Jira
 
-Intake tickets for this repo live in Jira. `to-ticket` is the only skill that writes here; every later stage reads the ticket once, then works from the domain-colocated workspace `<domain-path>/docs/work/<slug>/`.
+Intake items for this repo live in Jira. Picked when `workflow.json` has `intake.source: "jira"`.
+`/to-intake` creates items, `/to-ticket` fetches them, `grill-with-docs` posts comments. No stage
+edits a ticket description. Every later stage works from the domain-colocated workspace
+`<domain-path>/docs/work/<slug>/`.
 
 ## Configuration
 
-- **Base URL**: `<https://yourteam.atlassian.net>`
-- **Project key**: `<KEY>`
-- **Auth**: `<API token env var, e.g. JIRA_API_TOKEN — or the name of a configured Jira MCP server>`
+Site and project come from `trackers.jira.site` / `trackers.jira.project`. Auth is the Jira MCP
+server if one is configured, otherwise `curl` with the `JIRA_API_TOKEN` + `JIRA_EMAIL` env vars
+(basic auth). Every call is Jira Cloud REST **v3**: `https://<site>/rest/api/3/...`.
 
-## Conventions
+Source for every endpoint below: Atlassian's OpenAPI spec,
+`https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json`.
 
-- **Create a ticket**: `POST <baseUrl>/rest/api/3/issue` with `fields.project.key`, `fields.summary`, `fields.description` (Atlassian Document Format), `fields.issuetype.name` — via `curl` with the configured auth, or the MCP server's create-issue tool if one is configured.
-- **Read a ticket**: `GET <baseUrl>/rest/api/3/issue/<key>`.
-- **Comment on a ticket**: `POST <baseUrl>/rest/api/3/issue/<key>/comment`.
-- **Ticket URL**: `<baseUrl>/browse/<key>`.
+## Fetch
 
-## When a skill says "create an intake ticket"
+`GET /rest/api/3/issue/<key>`, or the MCP server's get-issue tool. When `intake.fetch` names a
+skill or agent, run that instead; this section is the fallback.
 
-Create a Jira issue in the configured project using the template `to-ticket` provides for the body.
+## Create an intake item
 
-## When a skill says "fetch the intake ticket"
+`POST /rest/api/3/issue` with `fields.project.key`, `fields.summary`, `fields.description`
+(Atlassian Document Format) and `fields.issuetype` (Story / Task), using the template `/to-intake`
+provides for the body. Or the MCP server's create-issue tool.
 
-Fetch the Jira issue by key using the method configured above.
+Parent epic, per `intake.epic` (unset → ask):
+
+- **link** — set `fields.parent` to the existing epic. Read the field's shape from
+  `GET /rest/api/3/issue/createmeta/<project>/issuetypes/<typeId>` for the item's type; do not
+  assume it. No `parent` field there → stop: this type cannot sit under an epic in this project.
+- **create** — first create the epic: pick its type from
+  `GET /rest/api/3/issue/createmeta/<project>/issuetypes` (ask if it isn't clear by name), create
+  it with `POST /rest/api/3/issue`, then link the item to it as above.
+- **none** — no parent.
+
+Return the item's key and `https://<site>/browse/<key>`.
+
+## Post a comment
+
+`POST /rest/api/3/issue/<key>/comment`. The body is **ADF**
+(`{"type":"doc","version":1,"content":[...]}`), not plain text or Markdown.

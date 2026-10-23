@@ -23,6 +23,11 @@ stories get added ad hoc and start overlapping, and nobody has a table showing w
 story maps to which `.stories.ts` file. This skill produces that table and a plan to close the
 gap, favoring the smallest number of stories that gives honest coverage.
 
+The doc is `prd.md` at the `docs.prd` path from `.claude/workflow.json` (default
+`{componentDir}/docs/prd.md`), in the **capability variant** of `doc-contracts/prd.md`. Its
+FROZEN rows are what this skill reads and re-derives; keep each line's source tag when you
+correct a coverage mark.
+
 ## Why read the story-host code, not the `.mdx`
 
 A Storybook `.mdx` file is almost always a thin wrapper — `<Meta>`, `<Canvas>`, a `<Source>`
@@ -44,7 +49,7 @@ community-pain writeups, internal-coverage audits.
 
 Before inventorying anything, sweep for them. Don't read one folder and treat it as the whole
 surface — discovery and product docs frequently live in different parts of a docs tree
-(a `0-product/` folder and a `work/<feature>/` folder, say):
+(a component's `docs/prd.md` and a `work/<feature>/` folder, say):
 
 ```
 find <docs-root> \( -iname "*discovery*" -o -iname "*research*" \)
@@ -152,7 +157,7 @@ and cheap to add. A story may cover several product stories at once only when th
 to the surface being shown as a whole — a "live table" story demonstrating sort + edit + delete
 together, because that's what a live table *is* — not because bundling a nearby feature was
 convenient. When auditing an existing story, check every element it renders against which
-product-doc entry it actually serves; a host's doc-comment claiming which decision it proves is
+PRD entry it actually serves; a host's doc-comment claiming which decision it proves is
 a strong signal (per the note above) but not proof by itself — verify the claim against that
 product story's own acceptance criteria, since a comment can misattribute a flow to the wrong
 entry just as easily as it can correctly name one. Design-only stories (a component's visual

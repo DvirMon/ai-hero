@@ -1,6 +1,9 @@
 # Ticket tracker: Linear
 
-Intake tickets for this repo live in Linear. `to-ticket` is the only skill that writes here; every later stage reads the ticket once, then works from the domain-colocated workspace `<domain-path>/docs/work/<slug>/`.
+Intake items for this repo live in Linear. Picked when `workflow.json` has
+`intake.source: "linear"`. `/to-intake` creates items, `/to-ticket` fetches them,
+`grill-with-docs` posts comments. No stage edits an issue description. Every later stage works
+from the domain-colocated workspace `<domain-path>/docs/work/<slug>/`.
 
 ## Configuration
 
@@ -8,17 +11,28 @@ Intake tickets for this repo live in Linear. `to-ticket` is the only skill that 
 - **Team**: `<team key, e.g. ENG>`
 - **Auth**: `<API key env var, e.g. LINEAR_API_KEY — or the name of a configured Linear MCP server>`
 
-## Conventions
+Every call is Linear's GraphQL API, via an authenticated request with the configured key, or the
+MCP server's matching tool if one is configured. Source for the fields below: Linear's published
+schema, `packages/sdk/src/schema.graphql` in `github.com/linear/linear`.
 
-- **Create a ticket**: Linear's GraphQL API, `issueCreate` mutation with `teamId`, `title`, `description` — via an authenticated request with the configured key, or the MCP server's create-issue tool if one is configured.
-- **Read a ticket**: `issue(id: "<id>")` query, or search by identifier (`ENG-123`).
-- **Comment on a ticket**: `commentCreate` mutation.
-- **Ticket URL**: returned as `issue.url` on creation.
+## Fetch
 
-## When a skill says "create an intake ticket"
+`issue(id: "<id>")` query — `id` takes the UUID or the identifier (`ENG-123`). When
+`intake.fetch` names a skill or agent, run that instead; this section is the fallback.
 
-Create a Linear issue on the configured team using the template `to-ticket` provides for the description.
+## Create an intake item
 
-## When a skill says "fetch the intake ticket"
+`issueCreate` mutation with `teamId`, `title`, `description`, using the template `/to-intake`
+provides for the description.
 
-Fetch the Linear issue by identifier using the method configured above.
+Linear has no epic issue type; the epic is a Linear **project**. Per `intake.epic` (unset → ask):
+
+- **link** — pass the project's id as `projectId` on `issueCreate`.
+- **create** — first `projectCreate` with `name` and `teamIds`, then pass its id as `projectId`.
+- **none** — no project.
+
+Return the identifier and `issue.url`.
+
+## Post a comment
+
+`commentCreate` mutation with the issue id and a Markdown body.

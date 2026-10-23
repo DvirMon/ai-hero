@@ -21,6 +21,18 @@ Source for every endpoint below: Atlassian's OpenAPI spec,
 `state.json` `units[]` holds one row for the ticket (`remoteRef: "<KEY>"`, branch, worktree,
 PR). Sub-task keys are recorded on the step files that implement them, not as units.
 
+**No stage edits a Jira description** — the ticket's or a sub-task's after creation. Product
+owns that text. New requirements go out as one comment; status goes to labels.
+
+## Readiness
+
+The readiness rung and its dated `assessed:` reason live in `state.json`
+`units[].readiness` / `units[].assessed` — the source `/impel` reads. Jira labels **mirror**
+the rung so it is visible without the repo: on every rung change, add the new rung label and
+remove the old one in one labels update (below). Rung names are the ones in
+`to-issues/references/pipeline-block.md`. If label and `units[]` disagree, `units[]` wins and
+the label is corrected.
+
 ## Setup check — run once, store the result
 
 A wrong issue type or a missing `parent` field is a setup error: it fails on the first create,
@@ -39,11 +51,12 @@ every time. Resolve it at setup, never at first use.
 ## Conventions
 
 - **Create a sub-task**: `POST /rest/api/3/issue` with `fields.project.key`,
-  `fields.issuetype.id` = `subtaskTypeId`, `fields.summary`, `fields.description` (ADF), and
-  `fields.parent` in the shape setup step 2 read. The parent must be in the same project.
+  `fields.issuetype.id` = `trackers.jira.subtaskTypeId`, `fields.summary`,
+  `fields.description` (ADF, written once at creation), and `fields.parent` in the shape setup
+  step 2 read. The parent must be in the same project.
 - **Read a ticket**: `GET /rest/api/3/issue/<key>`.
-- **List a ticket's sub-tasks**: `POST /rest/api/3/search/jql` with the parent clause that
-  setup step 3 confirmed. `/rest/api/3/search` is deprecated and being removed — never use it.
+- **List a ticket's sub-tasks**: `POST /rest/api/3/search/jql` with
+  `trackers.jira.subtaskJql`, `<key>` replaced by the ticket key. `/rest/api/3/search` is deprecated and being removed — never use it.
 - **Comment**: `POST /rest/api/3/issue/<key>/comment`. The body is **ADF**
   (`{"type":"doc","version":1,"content":[...]}`), not plain text or Markdown.
 - **Labels**: `PUT /rest/api/3/issue/<key>` with
@@ -58,11 +71,12 @@ every time. Resolve it at setup, never at first use.
 
 ## Issue references
 
-- **Commits**: `Refs: <KEY>` trailer — the sub-task key for a step commit, the ticket key
-  otherwise. Jira's development panel picks keys up from commits, branches and PR titles.
+- **Commits**: one `Refs: <KEY>` trailer, one key. The sub-task key when the commit belongs to
+  a step file that records one; the ticket key otherwise. Jira's development panel picks keys
+  up from commits, branches and PR titles.
 - **Branch**: contains the ticket key (e.g. `feat/<KEY>-<slug>`).
-- **PR / MR body**: the ticket key and its URL. Closing happens by Jira transition, not a
-  closing keyword.
+- **PR / MR body**: the ticket key and its URL — no `Closes` / `Refs` line; those keywords mean
+  nothing to Jira. Closing happens by Jira transition.
 
 Repo-specific rules (key casing, extra labels) go in `docs/agents/issue-tracker.md`.
 
