@@ -1,2 +1,6 @@
 .DS_Store
 .trash/
+
+# Claude Code's claude.ai skill sync writes here through the
+# ~/.claude/skills symlink. Per-account, per-machine cache.
+claude-code/skills/synced/
