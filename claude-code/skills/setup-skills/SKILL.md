@@ -153,6 +153,7 @@ Then write the docs files using the seed templates in this skill folder as a sta
 - [issue-tracker-github.md](./issue-tracker-github.md) — GitHub issue tracker
 - [issue-tracker-gitlab.md](./issue-tracker-gitlab.md) — GitLab issue tracker
 - [issue-tracker-local.md](./issue-tracker-local.md) — local-markdown issue tracker
+- [issue-tracker-jira.md](./issue-tracker-jira.md) — Jira sub-tasks under the intake ticket
 - [ticket-tracker-jira.md](./ticket-tracker-jira.md) — Jira ticket tracker (only if `to-ticket` is installed)
 - [ticket-tracker-linear.md](./ticket-tracker-linear.md) — Linear ticket tracker (only if `to-ticket` is installed)
 - [ticket-tracker-local.md](./ticket-tracker-local.md) — local-markdown ticket tracker (only if `to-ticket` is installed)
