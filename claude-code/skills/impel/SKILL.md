@@ -178,6 +178,11 @@ Workspace JSON/MD writes this skill makes *outside* a step (`progress.md` status
 `state.json`) are mechanical: they go to a `haiku` writer, not a fork, per
 `to-ticket/references/file-writes.md`. `docs`/`chore` steps themselves stay on the fork above.
 
+**Decisions made while executing or reviewing a step** — anything the step file, spec, design
+or architecture did not settle — are appended to the ticket's `decisionsPath` per
+`doc-contracts/ticket-decisions.md`, phase `implement` or `review`, through the same writer.
+Never a `decisions.md` inside `tasks/`; the step's `progress.md` links to the D-number.
+
 `code` + `node` remains the one row actually handled inline (see "Steps you handle directly"
 below) — everything else, including docs/chore, is dispatched.
 

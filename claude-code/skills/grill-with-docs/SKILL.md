@@ -32,12 +32,13 @@ If no `state.json` exists yet, don't just fall back silently — create the work
    `decompose-by-dependency-graph` before interviewing anything: list the sub-features, map
    dependency edges between them, rank core/independent/dependent. Grill core and independent
    nodes fully now; dependent nodes only after their upstream settles. Record the ranking in
-   `1-decisions.md` alongside the decisions it produces.
+   `1-decisions.md`'s `## Ranking` section (`doc-contracts/ticket-decisions.md`).
 
 0b. **Grill per handoff aspect, not as one spec** (rule `lock-by-aspect-for-handoff`). Split the
    ticket by what one team consumes, e.g. backend contract (model + missing endpoints), FE
    behavior requirements, FE design check, email/content, audit events. Put an `## Aspects` table
-   (aspect, hand-off team, status) at the top of `1-decisions.md`. Grill one aspect at a time,
+   (aspect, hand-off team, status) at the top of `1-decisions.md`, shaped per
+   `doc-contracts/ticket-decisions.md` § Aspects. Grill one aspect at a time,
    checking it against the **whole ticket**, and keep its open gaps as a `- [ ]` checklist under
    it. When the checklist is empty, mark it `locked <date>` and tell the user right away:
    "Aspect N is locked, ready to hand to <team>", with a short handoff summary. Don't hold it for
@@ -57,8 +58,8 @@ If no `state.json` exists yet, don't just fall back silently — create the work
 2. Ask one question at a time. Prefer questions that expose an edge case, a scenario the starting material didn't cover, or a decision that was left implicit. Keep going until you can't find another fuzzy edge — don't stop early just because the obvious questions are exhausted.
 3. The moment an answer settles something, write it down — don't wait until the end to reconstruct it from memory:
    - If it's project-wide (a term, a naming convention, an architectural stance that outlives this ticket) → invoke `/domain-modeling` to record it in the glossary or an ADR.
-   - If it's scoped to this ticket → append it to the workspace's `1-decisions.md` (its path is `state.json`'s `decisionsPath`; create the file if it doesn't exist yet) as a dated one-line bullet — the decision, not the discussion that led to it.
-   - **If it outlives this ticket but binds only one capability** (how that feature behaves, a shape it committed to, a scope-out) → it *also* gets a row in that capability's decisions log, `state.json`'s `capabilityLogPath`. Write the row when the decision settles, not at the end: a log that is only filled in at archive time is the failure this log exists to prevent. Format and numbering: `doc-contracts/decisions-log.md`. The ticket's own `1-decisions.md` keeps the full rationale; the log row is one line that links to it.
+   - If it's scoped to this ticket → append it to the workspace's `1-decisions.md` (its path is `state.json`'s `decisionsPath`; create the file if it doesn't exist yet) as an entry in the shape of `doc-contracts/ticket-decisions.md`, phase `grill` — the decision, not the discussion that led to it.
+   - **If it outlives this ticket but binds only one capability** (how that feature behaves, a shape it committed to, a scope-out) → it *also* gets a row in that capability's decisions log, `state.json`'s `capabilityLogPath`. Write the row when the decision settles, not at the end: a log that is only filled in at archive time is the failure this log exists to prevent. Format and numbering: `doc-contracts/decisions-log.md`. The log row is one line that links to the ticket's entry, and the entry's `→` tail names the row id.
 
    The three are not exclusive — an architectural stance that binds one capability is an ADR *and* a log row pointing at it.
 
@@ -69,7 +70,7 @@ If no `state.json` exists yet, don't just fall back silently — create the work
    Pipeline-block update, step 7's commit and the final message. `/domain-modeling` keeps its own writers.
 
    **Before opening the first question, read that log.** It is what stops the interview re-deciding something already settled, or reversing it without noticing. If the capability has no log yet, say so rather than treating its absence as "nothing was decided before".
-4. Before finishing, verify failure modes are exhausted. Don't use a fixed question list — first reason about what kind of system this is (UI component, form field, API endpoint, background job, state machine, webhook, etc.), then derive what can go wrong *for that specific domain*. A button has different failure surfaces than a file uploader, a Node.js job, or a multi-step wizard. Pull each failure thread until nothing is left fuzzy, then record the answers in `1-decisions.md`.
+4. Before finishing, verify failure modes are exhausted. Don't use a fixed question list — first reason about what kind of system this is (UI component, form field, API endpoint, background job, state machine, webhook, etc.), then derive what can go wrong *for that specific domain*. A button has different failure surfaces than a file uploader, a Node.js job, or a multi-step wizard. Pull each failure thread until nothing is left fuzzy, then record the answers in `1-decisions.md`, one entry each, phase `grill`.
 
 5. Before finishing, decide complexity: does implementing this safely need more than a PRD — new types/interfaces, a non-obvious file layout, a design that needs grounding against existing source before anyone builds it? If yes, set `isComplex: true`; otherwise `false`. This is about implementation risk, not ticket size — a small-sounding change to a shared abstraction can still need an architecture doc.
 6. If the ticket workspace's `state.json` exists, validate it per

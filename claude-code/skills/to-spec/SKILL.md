@@ -4,7 +4,7 @@ description: Turn the current conversation (and, when one exists, a ticket works
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`) and the ticket it was grilled from — and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
+This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`, format `doc-contracts/ticket-decisions.md` — a settled entry is never re-asked) and the ticket it was grilled from — and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
 
 **Branch guard, first.** The spec is committed on the epic's planning branch, `docs/<slug>`
 (the `slug` in `state.json`), in its worktree. On the default branch or an issue branch, stop
@@ -35,8 +35,11 @@ Check with the user that these seams match their expectations.
    **Design reference** section in `2-spec.md` that links to `design.md` only — do not duplicate
    the tables. When there is no Figma surface, leave `designPath` null and omit the section.
 
-   **These writes — step 3's `design.md`, step 4's `3-architecture.md`, and any capability-log
-   row — go to one `haiku` writer**, per `to-ticket/references/file-writes.md`. Compose every
+   A decision settled while writing the spec is appended to `decisionsPath` as an entry per
+   `doc-contracts/ticket-decisions.md`, phase `spec`.
+
+   **These writes — step 3's `design.md`, step 4's `3-architecture.md`, any decisions entry and
+   any capability-log row — go to one `haiku` writer**, per `to-ticket/references/file-writes.md`. Compose every
    file's full text here and hand it over verbatim, so the write is mechanical. Continue with
    step 5's tracker search and publish while it writes — you already hold the content. Join the
    writer before step 6's commit.
