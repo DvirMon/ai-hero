@@ -14,7 +14,7 @@ If a ticket workspace's `state.json` exists, validate it per `to-ticket/referenc
 
 If it carries a non-null `capabilityLogPath`, **read that log too.** It holds what earlier efforts on the same capability already settled, superseded or left open — which this workspace's own decisions file does not, and which a spec is worse than useless for contradicting. Any decision the spec makes that binds the capability beyond this ticket gets a row in that log, per `doc-contracts/decisions-log.md`.
 
-If no ticket workspace's `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket).
+If no ticket workspace's `state.json` exists, stop and point to `/to-ticket`. It is the only stage that creates a workspace.
 
 The repo's `docs/agents/ticket-tracker.md` and `docs/agents/issue-tracker.md` (contract: `doc-contracts/tracker.md`) should have been provided to you — run `/setup-skills` if not.
 

@@ -24,7 +24,7 @@ never on the default branch.
 
 If a ticket workspace's `state.json` exists in context (created by `/to-ticket`; its root is `<domain-path>/docs/work/<slug>/` — see `/to-ticket`), validate it per `to-ticket/references/state-schema.md` (a version-3 file is read through its § Reading version 3; every write is version 4), then fetch the ticket it points at (`ticketRef`, via `docs/agents/ticket-tracker.md` `## Fetch`) and use it, with the PRD at `prdPath` (`doc-contracts/prd.md`), as the interview's starting material — this is what you're sharpening.
 
-If no `state.json` exists yet, don't just fall back silently — create the workspace now, using `/to-ticket`'s `state.json` format and workspace-root rule (`<domain-path>/docs/work/<slug>/`, resolving `<domain-path>` per `/to-ticket`'s rule — ask rather than guess). Ask the user for whatever required fields you can't derive yourself — at minimum a `slug`, and whether there's an existing `ticketRef`/`ticketUrl` to link or this should start with those `null`. Then proceed with the interview from whatever's in the conversation.
+If no `state.json` exists, grill without a workspace — never create one; only `/to-ticket` does. Ask the user where to keep the decisions log (e.g. `~/.claude/work/<slug>/1-decisions.md`) and append entries there per the ticket-decisions format. Steps that need the workspace — `state.json` updates, `prd.md`, tracker comments, readiness — are skipped.
 
 ## Process
 
@@ -100,7 +100,7 @@ added to `prd.md` this run (plus any open `⚠ Dn` question). Skip it when there
 `ticketRef` is `null`. **Never edit the ticket's description** — product owns that text.
 
 
-Since the workspace is now created (either by `/to-ticket` or by step 0 above), steps 3 and 5 always apply — write `1-decisions.md` and update `state.json` as you go.
+With a workspace, steps 3 and 5 always apply — write `1-decisions.md` and update `state.json` as you go. Without one, only the decisions log is written.
 
 7. **Commit.** Join the writer (and any `/domain-modeling` writers), then make one commit for
    this stage's artifacts, staged by path — `1-decisions.md`, `prd.md`, `state.json`, the capability-log
