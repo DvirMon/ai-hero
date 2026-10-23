@@ -5,6 +5,15 @@ description: Mirror general (non-project-specific) code-generation guidelines �
 
 # sync-guidelines
 
+> **Core files are auto-synced now.** `~/.claude/{CLAUDE.md,RTK.md,rules,skills,agents,conventions}`
+> are symlinks into `~/repos/ai-coding-guidelines/claude-code/`. `scripts/autosync.sh` (launchd,
+> every 60s + `SessionStart` hook) commits, rebases and pushes straight to `master`; every
+> machine runs the same job, so edits propagate both ways. Halts and notifies on conflict —
+> fix, then `bash scripts/autosync.sh --resume`. New machine: clone the repo,
+> `bash scripts/link.sh` (add `--adopt` to push local content up first).
+> The steps below now only cover `sync.sh`'s mirror-only extras (plugins, project-level skills
+> under `claude-code/project/`, Cursor) and port drift; the PR flow in steps 1–6 applies to those.
+
 Mirrors general, non-project-specific coding guidance from local AI harness configs into
 `~/repos/ai-coding-guidelines` (GitHub: `DvirMon/ai-coding-guidelines`, private), then commits
 on a `chore/sync-<date>` branch and opens a PR. Never commits or pushes on `master`.
