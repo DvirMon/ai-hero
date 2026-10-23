@@ -24,7 +24,8 @@ its blocker's PR is merged.
 
 | Caller | Branch |
 |---|---|
-| `/to-ticket` (epic planning docs) | `docs/<epic-slug>` |
+| `/to-ticket`, `prUnit: sub-issue` (epic planning docs) | `docs/<epic-slug>` |
+| `/to-ticket`, `prUnit: ticket` (the ticket's one branch) | `<type>/<key>-<slug>` |
 | `/to-tasks`, `/impel` fallback (one issue) | `<type>/<issue#>-<slice-slug>` |
 | epic archive chore | `chore/<epic-slug>-archive` |
 

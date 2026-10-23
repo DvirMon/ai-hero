@@ -4,7 +4,7 @@
 # Workspace file writes go to a writer agent
 
 Every pipeline skill writes JSON and Markdown files: `state.json`, `1-decisions.md`, a
-capability's decisions log, `2-spec.md`, `3-architecture.md`, `issue-graph.md`, local issue
+capability's decisions log, `prd.md`, `2-spec.md`, `3-architecture.md`, `issue-graph.md`, local issue
 drafts, `<workspaceRoot>/tasks/` step files (or `.cursor/plans/<slug>/` when no workspace),
 `progress.md`. **None of those writes run inline in the main
 session.** Dispatch them to a writer agent.

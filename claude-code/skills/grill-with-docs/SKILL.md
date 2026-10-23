@@ -22,7 +22,7 @@ never on the default branch.
 
 ## Starting material
 
-If a ticket workspace's `state.json` exists in context (created by `/to-ticket`; its root is `<domain-path>/docs/work/<slug>/` — see `/to-ticket`), validate it per `to-ticket/references/state-schema.md`, then fetch the ticket it points at (`ticketRef`, via `docs/agents/ticket-tracker.md`'s "fetch the intake ticket" convention) and use it as the interview's starting material — this is what you're sharpening.
+If a ticket workspace's `state.json` exists in context (created by `/to-ticket`; its root is `<domain-path>/docs/work/<slug>/` — see `/to-ticket`), validate it per `to-ticket/references/state-schema.md` (a version-3 file is read through its § Reading version 3; every write is version 4), then fetch the ticket it points at (`ticketRef`, via `docs/agents/ticket-tracker.md` `## Fetch`) and use it, with the PRD at `prdPath` (`doc-contracts/prd.md`), as the interview's starting material — this is what you're sharpening.
 
 If no `state.json` exists yet, don't just fall back silently — create the workspace now, using `/to-ticket`'s `state.json` format and workspace-root rule (`<domain-path>/docs/work/<slug>/`, resolving `<domain-path>` per `/to-ticket`'s rule — ask rather than guess). Ask the user for whatever required fields you can't derive yourself — at minimum a `slug`, and whether there's an existing `ticketRef`/`ticketUrl` to link or this should start with those `null`. Then proceed with the interview from whatever's in the conversation.
 
@@ -63,36 +63,50 @@ If no `state.json` exists yet, don't just fall back silently — create the work
 
    The three are not exclusive — an architectural stance that binds one capability is an ADR *and* a log row pointing at it.
 
-   **Every `1-decisions.md`, capability-log and `state.json` write goes to a `haiku` writer**,
+   **The PRD at `prdPath`** (`doc-contracts/prd.md` § Source tags, § Conflict marker):
+   - **A new requirement** (an acceptance criterion or failure behavior the grill found) → add
+     it to `prd.md`, tagged `[Dn]` with its entry's number.
+   - **A decision that contradicts a remote AC** (a `[KEY · MM-DD]` line) → product owns the
+     AC, so don't overwrite it. Log the entry as *proposed*, append `⚠ Dn` to that AC line,
+     and post the question to product through `docs/agents/ticket-tracker.md`
+     `## Post a comment` (a repo may implement it as e.g. `skill:jira-grill-comment`).
+     `/to-spec` stops until the marker clears.
+
+   **Every `1-decisions.md`, capability-log, `prd.md` and `state.json` write goes to a `haiku` writer**,
    per `to-ticket/references/file-writes.md` — you hand it the finished line, so the write is
    mechanical. The first write spawns it, every later one resumes it with `SendMessage`. Ask
    the next question straight away — don't wait on the write. Join the writer before step 6's
-   Pipeline-block update, step 7's commit and the final message. `/domain-modeling` keeps its own writers.
+   readiness update, step 7's commit and the final message. `/domain-modeling` keeps its own writers.
 
    **Before opening the first question, read that log.** It is what stops the interview re-deciding something already settled, or reversing it without noticing. If the capability has no log yet, say so rather than treating its absence as "nothing was decided before".
 4. Before finishing, verify failure modes are exhausted. Don't use a fixed question list — first reason about what kind of system this is (UI component, form field, API endpoint, background job, state machine, webhook, etc.), then derive what can go wrong *for that specific domain*. A button has different failure surfaces than a file uploader, a Node.js job, or a multi-step wizard. Pull each failure thread until nothing is left fuzzy, then record the answers in `1-decisions.md`, one entry each, phase `grill`.
 
 5. Before finishing, decide complexity: does implementing this safely need more than a PRD — new types/interfaces, a non-obvious file layout, a design that needs grounding against existing source before anyone builds it? If yes, set `isComplex: true`; otherwise `false`. This is about implementation risk, not ticket size — a small-sounding change to a shared abstraction can still need an architecture doc.
 6. If the ticket workspace's `state.json` exists, validate it per
-   `to-ticket/references/state-schema.md`, then update it: set `isComplex`, refresh `updatedAt`.
+   `to-ticket/references/state-schema.md`, then update it (version 4 only): set `isComplex`,
+   refresh `updatedAt`.
 
-**Update the source issue's `## Pipeline` block** (contract: `to-issues/references/pipeline-block.md`):
-set `workspace` to the workspace root, set `grill: done: <decisionsPath>`, and move `readiness`
-down one rung — to `needs:spec`, or straight to `needs:issues` if the grilling settled the
-contract as well. Record the new rung's dated reason.
+**Record readiness** through `docs/agents/issue-tracker.md` `## Readiness` (where the rung
+lives: `to-issues/references/pipeline-block.md` § Where the rung lives): set `workspace` to the
+workspace root, set `grill: done: <decisionsPath>`, and move `readiness` down one rung — to
+`needs:spec`, or straight to `needs:issues` if the grilling settled the contract as well.
+Record the new rung's dated reason. Follow that section exactly — a body-block tracker edits
+the `## Pipeline` block; a tracker whose description must not be edited keeps the rung in
+`units[].readiness`/`assessed` and mirrors labels.
 
-The block is the single record of `grill`/`spec` status — `state.json` carries no duplicate of
-it. Edit the issue body in place (`gh issue edit <n> --body-file -`) and re-sync the rung label
-in the same turn.
+**Post the grill-end comment.** One comment on `ticketRef`, through
+`docs/agents/ticket-tracker.md` `## Post a comment`, listing every new `[Dn]` requirement
+added to `prd.md` this run (plus any open `⚠ Dn` question). Skip it when there are none or
+`ticketRef` is `null`. **Never edit the ticket's description** — product owns that text.
 
 
 Since the workspace is now created (either by `/to-ticket` or by step 0 above), steps 3 and 5 always apply — write `1-decisions.md` and update `state.json` as you go.
 
 7. **Commit.** Join the writer (and any `/domain-modeling` writers), then make one commit for
-   this stage's artifacts, staged by path — `1-decisions.md`, `state.json`, the capability-log
+   this stage's artifacts, staged by path — `1-decisions.md`, `prd.md`, `state.json`, the capability-log
    row, and any ADR/glossary files `/domain-modeling` wrote. Never `-A`. Message per
    `atomic-commit` § Commit format: `📚 docs(<scope>): record <slug> decisions`, trailer
-   `Refs: #<source issue>` (or `Refs: none` if there is none yet). Do not push — `/ship` does,
+   per `docs/agents/issue-tracker.md` `## Issue references` for the source item (or `Refs: none` if there is none yet). Do not push — `/ship` does,
    after `/to-issues`.
 
 8. `/to-spec` has `disable-model-invocation: true` — it cannot be launched programmatically from here, only typed by the user. Reference whatever grounds the synthesis: name the workspace's `decisionsPath` (and `ticketRef`, if set). Then end your final message with a one-line pointer, as the very last line — nothing after it:

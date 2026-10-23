@@ -20,10 +20,11 @@ makes each step arrive with the right conventions loaded.
    `state.json` to find; don't ask to create one. Infer `stack` from the files the issue names
    (ask only if they span stacks). Paths below use the **tasks root** as `/to-tasks` §5 defines
    it; for these issues it is `$(git rev-parse --git-dir)/pipeline/issue-<N>/`.
-2. Read all `<tasks root>/step-*.plan.md` (normally `<workspaceRoot>/4-tasks/issue-<N>/`) in order — these are the plan
-   from `/to-tasks`. **Legacy plans** sit directly in `<workspaceRoot>/4-tasks/` (one folder
-   per workspace); read them there, but treat that folder as read-only history — any rewrite
-   goes to `4-tasks/issue-<N>/`. Each step file is self-contained. Routing fields live in YAML
+2. Read all `<tasks root>/step-*.plan.md` (normally `<workspaceRoot>/tasks/issue-<N>/`) in order — these are the plan
+   from `/to-tasks`. **v3 workspaces** keep their older step folder; read it in place per
+   `to-ticket/references/state-schema.md` § Reading version 3. **Legacy plans** sit directly in
+   the workspace's step folder (one folder per workspace); read them there, but treat that folder
+   as read-only history — any rewrite goes to `tasks/issue-<N>/`. Each step file is self-contained. Routing fields live in YAML
    frontmatter: `step`, `type`, `commit`, `depends_on`, `files`. The body holds a summary, `## Do`,
    `## Watch out`, `## Out of scope` and `## Done when` (the step's own checks).
    **Legacy step files** (no frontmatter — plans written before the format change) carry
@@ -37,8 +38,8 @@ makes each step arrive with the right conventions loaded.
    one-line `Parallel-safe / Dependency` summary) — the schedule you run, see §3
    Parallelism. Older plans draw the graph in ASCII; read it the same way. Legacy
    `progress.md` files have no graph.
-4. If no `4-tasks/` folder exists, **do not fall through to implementing anyway.** Read the
-   issue's `## Pipeline` block and obey the readiness ladder — see step 1b.
+4. If no step folder exists, **do not fall through to implementing anyway.** Read the
+   issue's readiness rung and obey the ladder — see step 1b.
 5. Read `designPath` when set (before the first UI step). Only read `specPath`/`architecturePath`
    if a step is ambiguous — step files are the pre-digested version, not the spec itself.
 
@@ -61,18 +62,20 @@ Check before any dispatch. **Stop** if any of these holds:
 
 Say which check fired, and stop — never "just this once" on `main`.
 
-**No branch yet** — a `ready-for-agent` issue with no `4-tasks/` plan (§1b), or a legacy
+**No branch yet** — a `ready-for-agent` issue with no `tasks/` plan (§1b), or a legacy
 `progress.md` with no `**Branch:**` line: run `to-tasks/references/start-branch.md` with
 `<type>/<issue#>-<slice-slug>` first, then continue inside the new worktree. For a legacy plan,
-write `**Branch:**`/`**Worktree:**` into the new `progress.md` copy under `4-tasks/issue-<N>/`.
+write `**Branch:**`/`**Worktree:**` into the new `progress.md` copy under `tasks/issue-<N>/`.
 
 ## 1b. The readiness gate
 
 An issue with no task plan is not automatically an issue you may implement. It is either an issue
 the pipeline decided needs no plan, or an issue nobody has looked at yet — opposite situations.
-The `## Pipeline` block on the issue body separates them. Its form, the rungs and the
-assessment triggers are defined in `to-issues/references/pipeline-block.md` — the SSOT.
-Read the block, never the labels; labels are a projection.
+The readiness rung separates them. Read it where the repo's `docs/agents/issue-tracker.md`
+`## Readiness` says it lives — the issue's `## Pipeline` block, or `state.json`
+`units[].readiness` + `assessed` for a tracker whose description is never edited. The rungs, both
+forms and the assessment triggers are defined in `to-issues/references/pipeline-block.md` — the
+SSOT. Read the rung, never the labels; labels are a projection.
 
 **An epic with children is never implemented directly.** Check the tracker's sub-issue relation
 first; if it has children, refuse and point at the frontier child.
@@ -99,13 +102,13 @@ leaves one question scoped to one slice. Refuse and point at the child, not the 
 siblings read `needs:grill` at once, say so — that is the epic's grill having failed, and the
 regrill belongs there.
 
-On `needs:triage`: apply the triggers in `to-issues/references/pipeline-block.md`, write the rung and its dated reason into the
-block via `gh issue edit`, re-sync the rung label, then stop and ask. **You may not promote an
+On `needs:triage`: apply the triggers in `to-issues/references/pipeline-block.md`, record the rung and its dated reason through
+`issue-tracker.md` `## Readiness` (it re-syncs the rung label), then stop and ask. **You may not promote an
 issue to `ready-for-agent` yourself** — you are the party that benefits from the answer, so it is
 not yours to give. Ambiguity resolves upward.
 
-**No `## Pipeline` block at all** (an issue predating the convention): treat it as `needs:triage`
-and stamp a block while you assess.
+**No rung recorded at all** (an issue predating the convention): treat it as `needs:triage`
+and record one while you assess.
 
 If the user explicitly says to implement a refused issue anyway, that is their call — proceed, and
 note in your final report which stage was bypassed.
@@ -355,8 +358,9 @@ the default branch, ahead of review and CI.
 
 If the work came from a tracked ticket/issue, check off each satisfied item
 in its "Acceptance criteria" section (`- [ ]` → `- [x]`, per the `to-issues` issue template) by
-editing the issue body — follow `docs/agents/issue-tracker.md` (Jira: `getJiraIssue` then
-`editJiraIssue` with the full description; GitHub: `gh issue view` + `gh issue edit --body-file -`).
+editing the issue body — read it through `docs/agents/issue-tracker.md` `## Fetch`, and edit it
+the way that file says. A tracker whose description is never edited (the state form in
+`pipeline-block.md`, e.g. Jira) gets no checkbox edit: list met and unmet criteria in the report.
 Leave unmet criteria
 unchecked and flag them. A partially satisfied issue is still shippable, but say so — `/ship`
 then writes `Refs #<N>` in the PR body instead of `Closes #<N>`. When there is no `progress.md`

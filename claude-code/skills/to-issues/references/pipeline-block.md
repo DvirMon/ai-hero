@@ -1,5 +1,5 @@
 <!-- Shared contract. Cited by to-issues, grill-with-docs, to-spec, to-tasks,
-     implement and ship. Edit here, never restate in a skill body. -->
+     impel and ship. Edit here, never restate in a skill body. -->
 
 # The Pipeline block
 

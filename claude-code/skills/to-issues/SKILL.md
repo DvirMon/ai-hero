@@ -8,7 +8,12 @@ disable-model-invocation: true
 
 Break a spec, plan, or conversation into a set of **issues** — tracer-bullet vertical slices, each declaring the issues that **block** it.
 
-Read `docs/agents/issue-tracker.md` for publish/fetch conventions (run `/setup-skills` if that file is missing).
+Every child is created **under the intake item** (`state.json` `ticketRef`) — this skill never
+creates a parent item. Capturing a new item is `/to-intake`.
+
+Read `docs/agents/issue-tracker.md` — the repo's implementation of
+`conventions/doc-contracts/tracker.md` — for every tracker operation (run `/setup-skills` if
+that file is missing). Never branch on a tracker name: follow the file's section.
 
 ## Process
 
@@ -16,14 +21,16 @@ Read `docs/agents/issue-tracker.md` for publish/fetch conventions (run `/setup-s
 
 The issue graph and `state.json` update are committed on the epic's planning branch,
 `docs/<slug>`, in its worktree. On the default branch or an issue branch, stop and point the
-user to `/to-ticket`, which starts it via `to-tasks/references/start-branch.md`. (An ad-hoc
-issue — § Opening an ad-hoc issue — writes no repo files and needs no branch.)
+user to `/to-ticket`, which starts it via `to-tasks/references/start-branch.md`.
 
 ### 1. Gather context
 
-If a ticket workspace's `state.json` exists in context, validate it per `to-ticket/references/state-schema.md`, then default to its `specPath` (and `architecturePath`, if set) as the source — read both fully. When `designPath` is set, read `design.md` for frame and DS routing (do not restate it in slice prose). Otherwise, work from whatever is already in the conversation context, or if the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+**Requires a ticket workspace.** With no `state.json`, or a `state.json` whose `ticketRef` is
+`null`, stop and point the user to `/to-ticket` — do not create either here. Validate
+`state.json` per `to-ticket/references/state-schema.md`; a version-3 file is read through its
+§ Reading version 3, and every write is version 4.
 
-If no `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket). Backfill `specPath`/`architecturePath` from whatever source you actually used.
+Default to its `specPath` (and `architecturePath`, if set) as the source — read both fully. When `designPath` is set, read `design.md` for frame and DS routing (do not restate it in slice prose). Also use what is already in the conversation context.
 
 ### 2. Explore the codebase (optional)
 
@@ -83,51 +90,57 @@ Iterate until the user approves the breakdown.
 Every create in this skill is guarded. Re-running `/to-issues` on a spec that was already sliced
 must converge on the existing issues, never produce a second set.
 
-1. **Slice issues.** Each created issue body carries `<!-- slice: <parent-key>/<slice-slug> -->`.
-   Before creating, search per `docs/agents/issue-tracker.md` § Idempotent re-slice (Jira JQL on
-   this repo). On GitHub-only repos: `gh issue list --state all --search "<parent> in:body"`.
-   Reuse an existing key on match; do not create a duplicate.
-2. **Labels.** Jira: labels are created on first use. GitHub: `gh label list --json name` once;
-   create only absent names.
-3. **Parent attachment.** Jira: set `parent` on create. GitHub: query sub-issues before
-   `addSubIssue`; skip when already attached.
-4. **Blocking edges.** Jira: read existing **Blocks** links before `createJiraIssueLink`. GitHub:
-   query `blocked_by` before POST; skip duplicates.
+1. **Slice issues.** Each created issue body carries `<!-- slice: <ticketRef>/<slice-slug> -->`.
+   Before creating, list the intake item's existing children (`issue-tracker.md` § Fetch on
+   `ticketRef`, or its re-slice search when the file has one). Reuse an existing ref on match;
+   do not create a duplicate.
+2. **Labels.** Create only names the tracker does not already have, as the file says.
+3. **Parent attachment.** `## Create a child` attaches the child to `ticketRef`; when that is a
+   separate call, check the existing children first and skip what is already attached.
+4. **Blocking edges.** Read the existing blocking links before writing one; skip duplicates.
 
 Report at the end how many issues were created versus reused. A run that reuses everything is a
 success, not a no-op to be worked around.
 
 ### 6. Publish the issues to the configured tracker
 
-Publish the approved issues, applying the existence checks from step 5 above. **How** depends on the tracker `/setup-skills` configured — the issues are the same either way, only the shape of the blocking edges changes:
+Publish the approved issues, applying the existence checks from step 5 above. Create each one
+through `docs/agents/issue-tracker.md` `## Create a child`, with `ticketRef` as the parent, one
+per slice in dependency order (blockers first) so each issue's blocking edges can reference
+real identifiers. Use the issue template below; when the file creates children as local files,
+use the per-issue file template instead — one issue per file, never a single combined file.
+Apply the `ready-for-agent` triage label unless instructed otherwise — the issues are
+agent-grabbable by construction.
 
-- **Local files** → write one file per issue under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-issue file template below — one issue per file, never a single combined file. `.scratch/` is git-ignored: these are drafts consumed by this publishing step, and the published issues on the tracker are the durable artifact.
-- **A real issue tracker** (whichever this repo configured — see `docs/agents/issue-tracker.md`) → publish one issue per slice in dependency order (blockers first) so each issue's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each issue's "Blocked by" to the blocking issues. Apply the `ready-for-agent` triage label unless instructed otherwise — the issues are agent-grabbable by construction.
+  **Set both relations, not just one** — they are different axes. Both are guarded by step 5
+  above: query before writing, skip what's already there.
 
-  **Set both native relations, not just one** — they are different axes, and the tracker doc has
-  `docs/agents/issue-tracker.md` § Parent and hierarchy and § Sequencing (Blocks). Both are
-  guarded by step 5 above: query before writing, skip what's already there.
-
-  - **Hierarchy** — attach every slice to the epic as a sub-issue, so the epic shows a progress
-    rollup and each slice shows a parent breadcrumb. When the tracker has this, it **replaces**
-    the `## Parent` prose section; keep that section only as a fallback where it doesn't. Check
-    the parent's existing sub-issues first (step 5.3) — skip `addSubIssue` when already attached.
-  - **Sequencing** — record each blocking edge natively, so "is this unblocked" is a query
-    rather than prose someone has to read. Keep the `## Blocked by` body section too: it is what
-    survives a tracker migration and what a reader sees without an API call. Check existing
-    `blocked_by` entries first (step 5.4) — skip the POST when the edge already exists.
+  - **Hierarchy** — every slice is a child of the intake item, so it shows a progress rollup and
+    each slice shows a parent breadcrumb. Where the tracker has a native parent link, it
+    **replaces** the `## Parent` prose section; keep that section only as a fallback where it
+    doesn't.
+  - **Sequencing** — record each blocking edge natively where the tracker can, so "is this
+    unblocked" is a query rather than prose someone has to read. Keep the `## Blocked by` body
+    section too: it is what survives a tracker migration and what a reader sees without an API
+    call.
 
   Setting these is not optional cleanup — an epic published without them has its structure in
   prose only, which is exactly the state `issue-graph.md` then has to be reconciled against by hand.
 
 Work the **frontier**: any issue whose blockers are all merged. For a purely linear chain that means top to bottom.
 
-Do NOT close the parent issue. Its only edit: once every slice is published, set its
-Pipeline block to `readiness: in-progress`, add `graph: <workspaceRoot>/issue-graph.md`, and
-swap its rung label to `in-progress` (per `references/pipeline-block.md` § Epic form). Nothing
-else in its body changes.
+Do NOT close the intake item. Its only change: once every slice is published, record
+`readiness: in-progress` on it through `issue-tracker.md` `## Readiness` (on the body-block form
+also add `graph: <workspaceRoot>/issue-graph.md`, per `references/pipeline-block.md` § Epic form).
+Never edit its description otherwise.
 
-If the ticket workspace's `state.json` exists, append the created issue numbers/references to its `githubIssues` array and refresh `updatedAt` — per `to-ticket/references/state-schema.md`'s validation routine.
+Update `state.json` `units[]` per `prUnit`, then refresh `updatedAt` — per
+`to-ticket/references/state-schema.md`'s validation routine:
+
+- **`prUnit: sub-issue`** — append one unit per created child (`remoteRef` = its ref; the rest
+  `null` until `/to-tasks` starts its branch). Reuse an existing unit on a re-slice.
+- **`prUnit: ticket`** (e.g. Jira sub-tasks) — append nothing; the ticket is the one unit. The
+  child refs go in `issue-graph.md`, and `/to-tasks` puts each on its step file.
 
 **File writes go to one `sonnet` writer**, per `to-ticket/references/file-writes.md`: the
 local-issue drafts, the `state.json` update above, and step 7's `issue-graph.md` — the graph
@@ -164,7 +177,7 @@ with those in the brief. Join it before the final message.
 
 ## Parent
 
-A reference to the parent issue on the tracker (if the source was an existing issue, otherwise omit this section).
+A reference to the intake item (`ticketRef`). Omit when the tracker links the parent natively.
 
 ## What to build
 
@@ -199,17 +212,17 @@ restate acceptance criteria or per-issue task steps — those live on the tracke
 `/to-tasks` step files.
 
 **Edges only, never state.** The file carries no open/closed column and no current frontier:
-issue and PR state live on GitHub, which is canonical, and a committed copy would need a
-commit on `main` every time a child merges. Readers derive state live — `gh issue list`
-against the edges gives the frontier. Rewrite the file only when the epic's **shape** changes
+issue and PR state live on the tracker, which is canonical, and a committed copy would need a
+commit on `main` every time a child merges. Readers derive state live — `issue-tracker.md`
+§ Fetch against the edges gives the frontier. Rewrite the file only when the epic's **shape** changes
 (an issue added or split, an edge corrected), and that rewrite goes through a branch + PR like
 any other change.
 
 <issue-graph-template>
 
-# Issue graph — <epic-slug> epic (#<epic>)
+# Issue graph — <epic-slug> epic (<ticketRef>)
 
-Epic: [#<epic>](<url>) — <one-line epic summary>.
+Epic: [<ticketRef>](<url>) — <one-line epic summary>.
 
 ## Nodes
 
@@ -242,7 +255,8 @@ from the configured issue tracker on <date>. Related docs: <spec/architecture/de
 
 Join the writer, then make one commit on `docs/<slug>`, staged by path: `issue-graph.md` and
 `state.json`. Never `-A`. Message per `atomic-commit` § Commit format:
-`📚 docs(<scope>): slice <slug> into issues`, trailer `Refs: #<epic>`.
+`📚 docs(<scope>): slice <slug> into issues`, trailer `Refs: <ticketRef>` per
+`issue-tracker.md` `## Issue references`.
 
 The planning branch now holds the epic's whole planning story — workspace, decisions, spec,
 graph — one commit per stage. `/ship` pushes it and opens the planning PR; GitHub auto-merges
@@ -277,14 +291,8 @@ Two rules that govern this skill's own steps, repeated here because steps 5-7 de
   the rung and its evidence into `assessed:`; never cite the user's approval of the breakdown
   as the reason. The closing `Next:` line follows the frontier issue's rung — `/impel` for
   `ready-for-agent` (it starts the issue branch itself), `/to-tasks` for `needs:tasks`.
-- **The body block is authoritative; labels are a projection.** Re-sync both labels in the same
-  turn you write the block. On conflict the body wins.
+- **The record is authoritative; labels are a projection.** Where the record lives is
+  `issue-tracker.md` `## Readiness` (body block, or `units[]` in the state form). Re-sync
+  labels in the same turn you write it. On conflict the record wins.
 
-
-## Opening an ad-hoc issue
-
-When the user asks to open a single issue with no spec behind it — mid-work, to park something
-for later — publish it with the epic form, `readiness: needs:triage`, labels `kind:epic` +
-`needs:triage`. Do not assess it in the same breath as creating it; assessment happens when
-someone actually wants to build it. Skip the issue graph and the frontier machinery — neither
-applies to one parked issue.
+Opening a single item with no spec behind it is `/to-intake`, not this skill.

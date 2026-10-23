@@ -23,8 +23,8 @@ tell the PR's story step by step. One commit at the end on whatever branch was c
 (usually `main`) produced neither: no branch until `/ship`, and no story.
 
 **How to apply:** a step isn't done until its commit exists. Stage only the step's own files —
-parallel steps finish at different times. Plans live in `4-tasks/issue-<N>/`; the old
-per-workspace `4-tasks/` is read-only legacy.
+parallel steps finish at different times. Plans live in `tasks/issue-<N>/`; a v3 workspace's
+older step folder is read in place, and a per-workspace legacy folder is read-only.
 
 ## The closing reference comes from the repo's issue-tracker.md
 
