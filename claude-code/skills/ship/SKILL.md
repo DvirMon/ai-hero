@@ -26,6 +26,9 @@ Check in order, before touching git. Any failure stops here — say which one an
    (`git symbolic-ref refs/remotes/origin/HEAD`). Classify it:
    - **Issue branch** `<type>/<N>-<slug>` → issue `#N`.
    - **Planning branch** `docs/<epic-slug>` → the epic's planning PR (step 5b).
+   - **No-issue branch** `chore/<slug>` (e.g. `chore/setup-skills`) → only when every commit in
+     `origin/main..HEAD` carries `Refs: none`; a commit naming an issue → stop, it belongs on
+     that issue's branch. Skips checks 3–4; body per step 5d.
    - Anything else → stop; renaming a branch is the developer's call.
 2. **Clean tree.** `git status --porcelain` is empty. Leftover changes → stop and suggest
    `atomic-commit` to turn them into commits first.
@@ -104,9 +107,10 @@ gh pr list --head <branch> --state open --json number,url
 
 - **Open PR exists:** step 4 already updated it. Skip to 5c with its number — do not run
   `gh pr create`.
-- **None:** draft, review, create (5a / 5b), then 5c.
+- **None:** draft, review, create (5a / 5b / 5d), then 5c.
 
-**Title** — emoji-conventional, same format as a commit subject, ending in the issue ref:
+**Title** — emoji-conventional, same format as a commit subject, ending in the issue ref
+(no-issue branch: no ref):
 `<emoji> [#N stage] <type>(<project>[/<domain>]): <summary> (#N)` (story tag optional;
 usually omit on a PR title). Format SSOT: `skills/atomic-commit/SKILL.md`, rule at
 `docs/agents/issue-tracker.md#issue-references` — don't restate them here. The repo's `pr-conventions.yml` checks this.
@@ -157,8 +161,13 @@ closing keyword, and list the created slice issues under **Evidence**.
 ### 5c. Record the PR
 
 Write the PR/MR number to this unit's `units[].pr` in `state.json` — v4 only; a version-3 file is
-upgraded on this write. Already set to the same number → no-op. No workspace, or a planning
+upgraded on this write. Already set to the same number → no-op. No workspace, a no-issue branch, or a planning
 branch with no matching unit → skip.
+
+### 5d. No-issue branch body
+
+Same shape as 5a without the closing line and without a spec or steps: **Evidence** names what
+produced the change (e.g. `/setup-skills`) and says the PR closes nothing.
 
 ## 6. Enable auto-merge
 
