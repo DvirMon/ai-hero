@@ -5,12 +5,13 @@ description: Mirror general (non-project-specific) code-generation guidelines �
 
 # sync-guidelines
 
-> **Core files are auto-synced now.** `~/.claude/{CLAUDE.md,RTK.md,rules,skills,agents,conventions}`
-> are symlinks into `~/repos/ai-coding-guidelines/claude-code/`. `scripts/autosync.sh` (launchd,
-> every 60s + `SessionStart` hook) commits, rebases and pushes straight to `master`; every
-> machine runs the same job, so edits propagate both ways. Halts and notifies on conflict —
-> fix, then `bash scripts/autosync.sh --resume`. New machine: clone the repo,
-> `bash scripts/link.sh` (add `--adopt` to push local content up first).
+> **Core files are symlinked, pull is automatic, push is manual.**
+> `~/.claude/{CLAUDE.md,RTK.md,rules,skills,agents,conventions}` are symlinks into
+> `~/repos/ai-coding-guidelines/claude-code/`, so edits are live. Push when you choose:
+> `bash ~/repos/ai-coding-guidelines/scripts/push.sh ["message"]` (commit + rebase + push to
+> `master`). Other machines run `scripts/pull.sh` from a `SessionStart` hook (no polling).
+> New machine: clone the repo, `bash scripts/link.sh` (`--adopt` pushes local content up first),
+> add the same `SessionStart` hook.
 > The steps below now only cover `sync.sh`'s mirror-only extras (plugins, project-level skills
 > under `claude-code/project/`, Cursor) and port drift; the PR flow in steps 1–6 applies to those.
 
