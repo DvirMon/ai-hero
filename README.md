@@ -27,18 +27,55 @@ cursor/
 Not mirrored: `~/.cursor/skills-cursor/` — Cursor's own built-in skill bundle, ships with every
 Cursor install automatically, not authored by you.
 
-## Sync (local → repo)
+## Live sync across machines (Claude Code)
 
-Source of truth is local (`~/.claude`, `~/.cursor`). This repo is a read-mostly mirror, updated
-manually via the `sync-guidelines` Claude Code skill:
+This repo is the source of truth for `~/.claude`. On each machine, `~/.claude/{CLAUDE.md,
+RTK.md, rules, skills, agents, conventions}` are symlinks into `claude-code/`, so edits are live.
+Pushing is manual; pulling is automatic at session start. No background job, no polling.
+
+### Set up a new machine
+
+```bash
+gh auth login   # the repo is private; skip if already authenticated
+gh repo clone DvirMon/ai-coding-guidelines ~/repos/ai-coding-guidelines
+bash ~/repos/ai-coding-guidelines/scripts/link.sh
+```
+
+`link.sh` is idempotent and does everything:
+- moves any existing real files/dirs to `~/.claude/backups/pre-sync-<timestamp>/` (never deletes)
+- symlinks the paths above into `claude-code/`
+- adds a `SessionStart` hook to `~/.claude/settings.json` that runs `scripts/pull.sh`
+  (the only change it makes to `settings.json`)
+
+Add `--adopt` only on the machine whose `~/.claude` is the newest copy: it copies local content
+into the repo first (local wins, deletes repo-only files).
+
+Windows: symlinks need Developer Mode; otherwise use `scripts/install.sh` below.
+
+### Day to day
+
+| Action | Command |
+|---|---|
+| Publish local edits | `bash ~/repos/ai-coding-guidelines/scripts/push.sh ["message"]` |
+| Receive edits | automatic: `scripts/pull.sh` runs when a Claude Code session starts |
+| Pull right now | `bash ~/repos/ai-coding-guidelines/scripts/pull.sh` |
+
+`push.sh` commits only `claude-code/`, rebases onto `origin/master` and pushes to `master`.
+`pull.sh` is a fast-forward pull; it warns (never force-merges) on unpushed commits or conflicts.
+
+## Mirror-only extras (local → repo)
+
+Plugins, project-level skills (`~/git/*/.claude/{skills,agents}` → `claude-code/project/`) and
+Cursor (`~/.cursor`) are not symlinked. The `sync-guidelines` skill copies them in via
+`~/.claude/skills/sync-guidelines/sync.sh`; review, commit and push those by hand.
 
 ```
 /sync-guidelines
 ```
 
-Runs `~/.claude/skills/sync-guidelines/sync.sh`, then review + commit + push manually.
+## Install (repo → a new/other local machine, copy mode)
 
-## Install (repo → a new/other local machine)
+One-time copy instead of symlinks (Windows, or Cursor). No live sync afterwards.
 
 ```bash
 git clone https://github.com/DvirMon/ai-coding-guidelines.git

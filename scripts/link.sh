@@ -41,3 +41,25 @@ fi
 
 for d in "${DIRS[@]}"; do link "$d"; done
 for f in "${FILES[@]}"; do link "$f"; done
+
+# SessionStart hook -> pull.sh. Adds only this one entry to settings.json;
+# idempotent, leaves every other setting untouched.
+install_pull_hook() {
+  command -v python3 >/dev/null 2>&1 || {
+    echo "python3 not found: add a SessionStart hook running 'bash $REPO/scripts/pull.sh' to $CLAUDE/settings.json by hand"
+    return
+  }
+  python3 -I - "$CLAUDE/settings.json" "bash \"$REPO/scripts/pull.sh\"" <<'PY'
+import json, os, sys
+path, cmd = sys.argv[1], sys.argv[2]
+data = json.load(open(path)) if os.path.exists(path) else {}
+entries = data.setdefault("hooks", {}).setdefault("SessionStart", [])
+if any("scripts/pull.sh" in h.get("command", "") for e in entries for h in e.get("hooks", [])):
+    print("SessionStart pull hook already present")
+else:
+    entries.append({"hooks": [{"type": "command", "command": cmd}]})
+    json.dump(data, open(path, "w"), indent=2)
+    print("added SessionStart pull hook to " + path)
+PY
+}
+install_pull_hook
