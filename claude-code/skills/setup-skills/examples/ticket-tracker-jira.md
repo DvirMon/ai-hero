@@ -1,23 +1,12 @@
 # Ticket tracker: Jira
 
-Intake items for this repo live in Jira. Picked when `workflow.json` has `intake.source: "jira"`.
-`/to-intake` creates items, `/to-ticket` fetches them, `grill-with-docs` posts comments. No stage
+Intake items for this repo live in Jira. `/to-intake` creates items, `/to-ticket` fetches them, `grill-with-docs` posts comments. No stage
 edits a ticket description. Every later stage works from the domain-colocated workspace
 `<domain-path>/docs/work/<slug>/`.
 
-## Configuration
-
-Site and project come from `trackers.jira.site` / `trackers.jira.project`. Auth is the Jira MCP
-server if one is configured, otherwise `curl` with the `JIRA_API_TOKEN` + `JIRA_EMAIL` env vars
-(basic auth). Every call is Jira Cloud REST **v3**: `https://<site>/rest/api/3/...`.
-
-Source for every endpoint below: Atlassian's OpenAPI spec,
-`https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json`.
-
 ## Fetch
 
-`GET /rest/api/3/issue/<key>`, or the MCP server's get-issue tool. When `intake.fetch` names a
-skill or agent, run that instead; this section is the fallback.
+`GET /rest/api/3/issue/<key>`, or the MCP server's get-issue tool.
 
 ## Create an intake item
 
@@ -41,3 +30,12 @@ Return the item's key and `https://<site>/browse/<key>`.
 
 `POST /rest/api/3/issue/<key>/comment`. The body is **ADF**
 (`{"type":"doc","version":1,"content":[...]}`), not plain text or Markdown.
+
+## Configuration
+
+Site: `<site>`. Project: `<PROJECT>`. Auth is the Jira MCP
+server if one is configured, otherwise `curl` with the `JIRA_API_TOKEN` + `JIRA_EMAIL` env vars
+(basic auth). Every call is Jira Cloud REST **v3**: `https://<site>/rest/api/3/...`.
+
+Source for every endpoint below: Atlassian's OpenAPI spec,
+`https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json`.

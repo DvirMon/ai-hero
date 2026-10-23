@@ -2,6 +2,38 @@
 
 Issues and PRDs for this repo live as GitLab issues. Use the [`glab`](https://gitlab.com/gitlab-org/cli) CLI for all operations.
 
+## Fetch
+
+Run `glab issue view <number> --comments`.
+
+## Create a child
+
+Create a GitLab issue (`glab issue create`, see Conventions) with `Part of #<parent>` at the top
+of its description. Return the issue number.
+
+## Readiness
+
+The rung and its dated `assessed:` reason live in the issue description's `## Pipeline` block — see
+`to-issues/references/pipeline-block.md`. `/impel` reads it there. That block is the one description
+section a stage updates.
+
+## Issue references
+
+Every change reaches the default branch through a merge request (fast-forward
+/ rebase merge — see `CLAUDE.md` § Git workflow). Issues close when that MR
+merges.
+
+- **Commits** carry a `Refs: #N` trailer (`Refs: none` for the planning
+  workspace-open commit). Never a closing keyword (`Closes`, `Fixes`,
+  `Resolves`, `Ships:`).
+- **MR description** carries `Closes #N` for an issue the MR completes, or
+  `Refs #N` for one it only partly delivers. Planning MRs (`docs/<slug>`)
+  use `Refs #<epic>` and close nothing.
+
+The GitHub Actions templates in `templates/` have no GitLab CI equivalent
+yet — on GitLab, set the project's merge method to fast-forward and protect
+the default branch by hand.
+
 ## Conventions
 
 - **Create an issue**: `glab issue create --title "..." --description "..."`. Use a heredoc for multi-line descriptions. Pass `--description -` to open an editor.
@@ -25,31 +57,6 @@ When set to `yes`, MRs run through the same labels and states as issues, using t
 - **Comment / label / close**: `glab mr note`, `glab mr update --label`/`--unlabel`, `glab mr close`.
 
 Unlike GitHub, GitLab numbers issues and MRs separately, so `#42` is unambiguous once you know which surface the maintainer means.
-
-## Issue references
-
-Every change reaches the default branch through a merge request (fast-forward
-/ rebase merge — see `CLAUDE.md` § Git workflow). Issues close when that MR
-merges.
-
-- **Commits** carry a `Refs: #N` trailer (`Refs: none` for the planning
-  workspace-open commit). Never a closing keyword (`Closes`, `Fixes`,
-  `Resolves`, `Ships:`).
-- **MR description** carries `Closes #N` for an issue the MR completes, or
-  `Refs #N` for one it only partly delivers. Planning MRs (`docs/<slug>`)
-  use `Refs #<epic>` and close nothing.
-
-The GitHub Actions templates in `templates/` have no GitLab CI equivalent
-yet — on GitLab, set the project's merge method to fast-forward and protect
-the default branch by hand.
-
-## When a skill says "publish to the issue tracker"
-
-Create a GitLab issue.
-
-## When a skill says "fetch the relevant ticket"
-
-Run `glab issue view <number> --comments`.
 
 ## Wayfinding operations
 

@@ -1,17 +1,15 @@
 # Ticket tracker: GitHub
 
-Intake items for this repo live as GitHub issues. Picked when `workflow.json` has
-`intake.source: "github"`. `/to-intake` creates items, `/to-ticket` fetches them,
-`grill-with-docs` posts comments. Use the `gh` CLI; it infers the repo from `git remote -v`
-(`trackers.github.repo` overrides with `--repo`).
+Intake items for this repo live as GitHub issues. `/to-intake` creates items, `/to-ticket`
+fetches them, `grill-with-docs` posts comments. Use the `gh` CLI; it infers the repo from
+`git remote -v` (pass `--repo <owner>/<repo>` to override).
 
 The issue body's `## Pipeline` block is the one body section stages update — see
 `to-issues/references/pipeline-block.md`. Nothing else in the body is edited.
 
 ## Fetch
 
-`gh issue view <number> --comments`, also fetching labels. When `intake.fetch` names a skill or
-agent, run that instead; this section is the fallback.
+`gh issue view <number> --comments`, also fetching labels.
 
 ## Create an intake item
 

@@ -2,6 +2,25 @@
 
 Issues and specs (you may know a spec as a PRD) for this repo live as markdown files in `.scratch/`.
 
+## Fetch
+
+Read the file at the referenced path. The user will normally pass the path or the issue number directly.
+
+## Create a child
+
+Create a new file under `.scratch/<feature-slug>/issues/` (creating the directory if needed),
+numbered after the last one. Its first line is `Parent: <parent path or slug>`. Return the path.
+
+## Readiness
+
+The rung and its dated `assessed:` reason live in the file's `## Pipeline` block — see
+`to-issues/references/pipeline-block.md`. `/impel` reads it there.
+
+## Issue references
+
+Commits carry a `Refs: <feature-slug>/<NN>` trailer. Nothing closes automatically: set the
+file's `Status:` line to `resolved` when its PR merges.
+
 ## Conventions
 
 - One feature per directory: `.scratch/<feature-slug>/`
@@ -9,14 +28,6 @@ Issues and specs (you may know a spec as a PRD) for this repo live as markdown f
 - Implementation issues are one file per ticket at `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` — never a single combined tickets file
 - Triage state is recorded as a `Status:` line near the top of each issue file (see `triage-labels.md` for the role strings)
 - Comments and conversation history append to the bottom of the file under a `## Comments` heading
-
-## When a skill says "publish to the issue tracker"
-
-Create a new file under `.scratch/<feature-slug>/` (creating the directory if needed).
-
-## When a skill says "fetch the relevant ticket"
-
-Read the file at the referenced path. The user will normally pass the path or the issue number directly.
 
 ## Wayfinding operations
 

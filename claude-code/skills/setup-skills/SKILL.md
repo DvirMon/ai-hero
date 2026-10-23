@@ -150,13 +150,13 @@ Include the `### Ticket tracker` sub-block, and write `docs/agents/ticket-tracke
 
 Then write the docs files using the seed templates in this skill folder as a starting point:
 
-- [issue-tracker-github.md](./issue-tracker-github.md) — GitHub issue tracker
-- [issue-tracker-gitlab.md](./issue-tracker-gitlab.md) — GitLab issue tracker
-- [issue-tracker-local.md](./issue-tracker-local.md) — local-markdown issue tracker
-- [issue-tracker-jira.md](./issue-tracker-jira.md) — Jira sub-tasks under the intake ticket
-- [ticket-tracker-jira.md](./ticket-tracker-jira.md) — Jira ticket tracker (only if `to-ticket` is installed)
-- [ticket-tracker-linear.md](./ticket-tracker-linear.md) — Linear ticket tracker (only if `to-ticket` is installed)
-- [ticket-tracker-local.md](./ticket-tracker-local.md) — local-markdown ticket tracker (only if `to-ticket` is installed)
+- [issue-tracker-github.md](./examples/issue-tracker-github.md) — GitHub issue tracker
+- [issue-tracker-gitlab.md](./examples/issue-tracker-gitlab.md) — GitLab issue tracker
+- [issue-tracker-local.md](./examples/issue-tracker-local.md) — local-markdown issue tracker
+- [issue-tracker-jira.md](./examples/issue-tracker-jira.md) — Jira sub-tasks under the intake ticket
+- [ticket-tracker-jira.md](./examples/ticket-tracker-jira.md) — Jira ticket tracker (only if `to-ticket` is installed)
+- [ticket-tracker-linear.md](./examples/ticket-tracker-linear.md) — Linear ticket tracker (only if `to-ticket` is installed)
+- [ticket-tracker-local.md](./examples/ticket-tracker-local.md) — local-markdown ticket tracker (only if `to-ticket` is installed)
 - [triage-labels.md](./triage-labels.md) — label mapping (only if `triage` is installed)
 - [domain.md](./domain.md) — domain doc consumer rules + layout
 

@@ -2,6 +2,42 @@
 
 Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
 
+## Fetch
+
+Run `gh issue view <number> --comments`, also fetching labels.
+
+## Create a child
+
+Create a GitHub issue (`gh issue create`, see Conventions), then link it to the parent as a
+**sub-issue**:
+
+    gh api --method POST repos/<owner>/<repo>/issues/<parent>/sub_issues \
+      -F sub_issue_id=<child-db-id>
+
+`<child-db-id>` is the child's numeric **database id**
+(`gh api repos/<owner>/<repo>/issues/<n> --jq .id`), not its `#number`. Source:
+`https://docs.github.com/en/rest/issues/sub-issues#add-sub-issue`. Return the issue number.
+
+## Readiness
+
+The rung and its dated `assessed:` reason live in the issue body's `## Pipeline` block — see
+`to-issues/references/pipeline-block.md`. `/impel` reads it there. That block is the one body
+section a stage updates.
+
+## Issue references
+
+Every change reaches the default branch through a PR, rebase-merged (see
+`CLAUDE.md` § Git workflow). Issues close when that PR merges.
+
+- **Commits** carry a `Refs: #N` trailer (`Refs: none` for the planning
+  workspace-open commit). Never a closing keyword (`close[sd]`,
+  `fix(e[sd])`, `resolve[sd]`, `Ships:`) — `pr-conventions.yml` rejects it.
+- **PR body** carries the closing reference: `Closes #N` for an issue the PR
+  completes, `Refs #N` for one it only partly delivers. Planning PRs
+  (`docs/<slug>`) use `Refs #<epic>` and close nothing.
+
+`/impel`, `/ship` and `code-review` read these rules.
+
 ## Conventions
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
@@ -24,28 +60,6 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 - **Comment / label / close**: `gh pr comment`, `gh pr edit --add-label`/`--remove-label`, `gh pr close`.
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either — resolve with `gh pr view 42` and fall back to `gh issue view 42`.
-
-## Issue references
-
-Every change reaches the default branch through a PR, rebase-merged (see
-`CLAUDE.md` § Git workflow). Issues close when that PR merges.
-
-- **Commits** carry a `Refs: #N` trailer (`Refs: none` for the planning
-  workspace-open commit). Never a closing keyword (`close[sd]`,
-  `fix(e[sd])`, `resolve[sd]`, `Ships:`) — `pr-conventions.yml` rejects it.
-- **PR body** carries the closing reference: `Closes #N` for an issue the PR
-  completes, `Refs #N` for one it only partly delivers. Planning PRs
-  (`docs/<slug>`) use `Refs #<epic>` and close nothing.
-
-`/impel`, `/ship` and `code-review` read these rules.
-
-## When a skill says "publish to the issue tracker"
-
-Create a GitHub issue.
-
-## When a skill says "fetch the relevant ticket"
-
-Run `gh issue view <number> --comments`.
 
 ## Wayfinding operations
 
