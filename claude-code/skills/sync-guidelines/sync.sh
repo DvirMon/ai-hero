@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # Mirror-only extras. CLAUDE.md, RTK.md, rules/, skills/, agents/ and
 # conventions/ are symlinked into the repo (scripts/link.sh) and pushed
-# by scripts/autosync.sh — they are not copied here.
+# by scripts/push.sh — they are not copied here.
 set -euo pipefail
 
 CLAUDE_DIR="$HOME/.claude"
 CURSOR_DIR="$HOME/.cursor"
-REPO_DIR="$HOME/repos/ai-coding-guidelines"
+# This file lives at <repo>/claude-code/skills/sync-guidelines/, reached
+# through the ~/.claude/skills symlink; -P resolves to the real clone.
+REPO_DIR="${GUIDELINES_REPO:-$(cd -P "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
 
-if [ ! -d "$REPO_DIR/.git" ]; then
+if [ ! -e "$REPO_DIR/.git" ]; then
   echo "error: $REPO_DIR is not a git repo. Clone it first: gh repo clone DvirMon/ai-coding-guidelines $REPO_DIR" >&2
   exit 1
 fi

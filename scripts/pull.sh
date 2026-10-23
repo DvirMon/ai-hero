@@ -3,7 +3,7 @@
 # SessionStart hook, so it never polls and costs no tokens.
 set -uo pipefail
 
-REPO="${GUIDELINES_REPO:-$HOME/repos/ai-coding-guidelines}"
+REPO="${GUIDELINES_REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 cd "$REPO" 2>/dev/null || exit 0
 [ "$(git branch --show-current)" = "master" ] || exit 0
 

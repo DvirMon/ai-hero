@@ -42,9 +42,12 @@ Pushing is manual; pulling is automatic at session start. No background job, no 
 
 ```bash
 gh auth login   # the repo is private; skip if already authenticated
-gh repo clone DvirMon/ai-coding-guidelines ~/repos/ai-coding-guidelines
-bash ~/repos/ai-coding-guidelines/scripts/link.sh
+gh repo clone DvirMon/ai-coding-guidelines ~/git/ai-coding-guidelines
+bash ~/git/ai-coding-guidelines/scripts/link.sh
 ```
+
+Any clone path works: scripts locate the repo from their own location.
+Set `GUIDELINES_REPO` only to point them somewhere else.
 
 `link.sh` is idempotent and does everything:
 - moves any existing real files/dirs to `~/.claude/backups/pre-sync-<timestamp>/` (never deletes)
@@ -61,9 +64,9 @@ Windows: symlinks need Developer Mode; otherwise use `scripts/install.sh` below.
 
 | Action | Command |
 |---|---|
-| Publish local edits | `bash ~/repos/ai-coding-guidelines/scripts/push.sh ["message"]` |
+| Publish local edits | `bash scripts/push.sh ["message"]` (from the clone) |
 | Receive edits | automatic: `scripts/pull.sh` runs when a Claude Code session starts |
-| Pull right now | `bash ~/repos/ai-coding-guidelines/scripts/pull.sh` |
+| Pull right now | `bash scripts/pull.sh` (from the clone) |
 
 `push.sh` commits only `claude-code/`, rebases onto `origin/master` and pushes to `master`.
 `pull.sh` is a fast-forward pull; it warns (never force-merges) on unpushed commits or conflicts.

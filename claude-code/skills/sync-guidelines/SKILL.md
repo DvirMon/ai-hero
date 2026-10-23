@@ -7,16 +7,16 @@ description: Mirror general (non-project-specific) code-generation guidelines �
 
 > **Core files are symlinked, pull is automatic, push is manual.**
 > `~/.claude/{CLAUDE.md,RTK.md,rules,skills,agents,conventions}` are symlinks into
-> `~/repos/ai-coding-guidelines/claude-code/`, so edits are live. Push when you choose:
-> `bash ~/repos/ai-coding-guidelines/scripts/push.sh ["message"]` (commit + rebase + push to
-> `master`). Other machines run `scripts/pull.sh` from a `SessionStart` hook (no polling).
+> the clone's `claude-code/`, so edits are live. The clone can live anywhere; scripts find it
+> from their own location (override: `$GUIDELINES_REPO`). Push when you choose:
+> `bash scripts/push.sh ["message"]` from the clone (commit + rebase + push to `master`). Other machines run `scripts/pull.sh` from a `SessionStart` hook (no polling).
 > New machine: clone the repo, `bash scripts/link.sh` (`--adopt` pushes local content up first),
 > add the same `SessionStart` hook.
 > The steps below now only cover `sync.sh`'s mirror-only extras (plugins, project-level skills
 > under `claude-code/project/`, Cursor) and port drift; the PR flow in steps 1–6 applies to those.
 
 Mirrors general, non-project-specific coding guidance from local AI harness configs into
-`~/repos/ai-coding-guidelines` (GitHub: `DvirMon/ai-coding-guidelines`, private), then commits
+the clone `~/.claude/skills` links into (GitHub: `DvirMon/ai-coding-guidelines`, private), then commits
 on a `chore/sync-<date>` branch and opens a PR. Never commits or pushes on `master`.
 
 **Scope — general guidance only.** Never sync per-project CLAUDE.md files, project memory,
@@ -69,7 +69,7 @@ every Cursor install, not authored by you.
 
 1. Start from a fresh default branch, so the sync branch has no stale base:
    ```bash
-   cd ~/repos/ai-coding-guidelines
+   cd -P ~/.claude/skills/../..   # the clone ~/.claude links into
    git switch master
    git pull --ff-only
    ```
