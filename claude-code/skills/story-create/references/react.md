@@ -1,7 +1,7 @@
 # React — story creation
 
 Generate `<Component>.stories.tsx` for a component that already exists (implemented via
-`/implement`, following `/react-developer`).
+`/impel`, following `/react-developer`).
 
 ## Process
 

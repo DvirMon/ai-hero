@@ -9,7 +9,7 @@ The unit/component test layer. This skill owns **what to test and what to skip**
 selection policy. It does not own test-runner setup or query-API mechanics; those live with
 each framework's developer skill (see "Division of labour" below).
 
-> **Role in the pipeline:** knowledge SSOT, not an executor. `/implement` dispatches
+> **Role in the pipeline:** knowledge SSOT, not an executor. `/impel` dispatches
 > `Task type: test` steps to the **`test-implementer` agent**, which loads this skill and then
 > writes the specs. DS components going through `ds-plan`/`ds-scaffold` use
 > `ds-test-scaffolder` instead — it reads the same references directly. Read this skill

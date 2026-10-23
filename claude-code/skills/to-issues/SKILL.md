@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Break a spec, plan, or conversation into a set of **issues** — tracer-bullet vertical slices, each declaring the issues that **block** it.
 
-The issue tracker and triage label vocabulary should have been provided to you — run `/setup-skills` if not.
+Read `docs/agents/issue-tracker.md` for publish/fetch conventions (run `/setup-skills` if that file is missing).
 
 ## Process
 
@@ -21,7 +21,7 @@ issue — § Opening an ad-hoc issue — writes no repo files and needs no branc
 
 ### 1. Gather context
 
-If a ticket workspace's `state.json` exists in context, validate it per `to-ticket/references/state-schema.md`, then default to its `specPath` (and `architecturePath`, if set) as the source — read both fully. Otherwise, work from whatever is already in the conversation context, or if the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+If a ticket workspace's `state.json` exists in context, validate it per `to-ticket/references/state-schema.md`, then default to its `specPath` (and `architecturePath`, if set) as the source — read both fully. When `designPath` is set, read `design.md` for frame and DS routing (do not restate it in slice prose). Otherwise, work from whatever is already in the conversation context, or if the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
 
 If no `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket). Backfill `specPath`/`architecturePath` from whatever source you actually used.
 
@@ -56,6 +56,10 @@ Break the work into **tracer bullet** issues.
 
 Give each issue its **blocking edges** — the other issues that must complete before it can start. An issue with no blockers can start immediately.
 
+**Figma-aware FE slices.** When `designPath` or `figma[]` is non-empty, apply
+`references/figma-slicing.md`: each UI slice gets a **Figma frames** table (node IDs), a
+`designPath` link, and blockers for design-system / icon / KB work routed to the right flow.
+
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change — rename a column, retype a shared symbol — whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own issue blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in an issue blocked by every migrate batch. A wide refactor is still sequenced issues off `main` — never a shared integration branch: one issue = one branch = one PR, and every branch starts from `origin/main` after its blockers merged. When a batch can't stay green alone, the batch is too big — split it further, or widen the expand step until each batch can land on its own.
 
 ### 4. Quiz the user
@@ -79,17 +83,16 @@ Iterate until the user approves the breakdown.
 Every create in this skill is guarded. Re-running `/to-issues` on a spec that was already sliced
 must converge on the existing issues, never produce a second set.
 
-1. **Slice issues.** Before creating, search for an existing issue carrying this slice's marker:
-   `gh issue list --state all --search "<epic-ref> in:body" --json number,title,body`.
-   Each created issue body carries a machine-readable marker line —
-   `<!-- slice: <epic-ref>/<slice-slug> -->` — written at creation (see the templates below). A
-   match means the slice exists: reuse its number, update the body if the spec changed, and do
-   not create.
-2. **Labels.** `gh label list --json name` once, before the loop in step 6. Create only names
-   absent from that list.
-3. **Sub-issue attachment.** Query the parent's existing sub-issues before `addSubIssue`; skip
-   when the child is already attached.
-4. **Blocking edges.** Query existing `blocked_by` entries before the POST; skip duplicates.
+1. **Slice issues.** Each created issue body carries `<!-- slice: <parent-key>/<slice-slug> -->`.
+   Before creating, search per `docs/agents/issue-tracker.md` § Idempotent re-slice (Jira JQL on
+   this repo). On GitHub-only repos: `gh issue list --state all --search "<parent> in:body"`.
+   Reuse an existing key on match; do not create a duplicate.
+2. **Labels.** Jira: labels are created on first use. GitHub: `gh label list --json name` once;
+   create only absent names.
+3. **Parent attachment.** Jira: set `parent` on create. GitHub: query sub-issues before
+   `addSubIssue`; skip when already attached.
+4. **Blocking edges.** Jira: read existing **Blocks** links before `createJiraIssueLink`. GitHub:
+   query `blocked_by` before POST; skip duplicates.
 
 Report at the end how many issues were created versus reused. A run that reuses everything is a
 success, not a no-op to be worked around.
@@ -102,7 +105,7 @@ Publish the approved issues, applying the existence checks from step 5 above. **
 - **A real issue tracker** (whichever this repo configured — see `docs/agents/issue-tracker.md`) → publish one issue per slice in dependency order (blockers first) so each issue's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each issue's "Blocked by" to the blocking issues. Apply the `ready-for-agent` triage label unless instructed otherwise — the issues are agent-grabbable by construction.
 
   **Set both native relations, not just one** — they are different axes, and the tracker doc has
-  the exact commands (for GitHub, `docs/agents/issue-tracker.md` § Epics and hierarchy). Both are
+  `docs/agents/issue-tracker.md` § Parent and hierarchy and § Sequencing (Blocks). Both are
   guarded by step 5 above: query before writing, skip what's already there.
 
   - **Hierarchy** — attach every slice to the epic as a sub-issue, so the epic shows a progress
@@ -140,6 +143,8 @@ with those in the brief. Join it before the final message.
 
 **What to build:** the end-to-end behaviour this issue makes work, from the user's perspective — not a layer-by-layer implementation list.
 
+**Figma frames:** (omit for non-UI slices.) Per `references/figma-slicing.md`.
+
 **Blocked by:** the numbers/titles of the issues that gate this one, or "None — can start immediately".
 
 **Status:** ready-for-agent
@@ -164,6 +169,10 @@ A reference to the parent issue on the tracker (if the source was an existing is
 ## What to build
 
 The end-to-end behaviour this issue makes work, from the user's perspective — not layer-by-layer implementation.
+
+## Figma frames
+
+(Omit for non-UI slices.) Per `references/figma-slicing.md` — table of frames this slice renders, node IDs, link to `designPath`.
 
 ## Acceptance criteria
 
@@ -225,7 +234,7 @@ The slice slug is what `/to-tasks` uses in the issue's branch name, `<type>/<NN>
 ## Source
 
 <how the edges were derived — user-confirmed, spec section, or grilling ranking> Titles pulled
-from `gh issue view` on <date>. Related docs: <spec/architecture/decisions paths>.
+from the configured issue tracker on <date>. Related docs: <spec/architecture/decisions paths>.
 
 </issue-graph-template>
 
@@ -242,7 +251,7 @@ it on green. **No issue branch starts until that PR has merged** — `/to-tasks`
 Then work the frontier: **one issue = one branch = one PR.** Each issue branch starts from
 fresh `origin/main`; a blocked issue starts only after every blocker's PR has merged — no
 stacked branches. Per issue, `/to-tasks` plans it (and starts its branch + worktree), then
-`/implement`, then `/ship` — clearing context between issues. End your final message with a
+`/impel`, then `/ship` — clearing context between issues. End your final message with a
 one-line pointer, as the very last line — nothing after it:
 
 ```
@@ -254,7 +263,7 @@ Next: /ship (planning PR) — once merged: /to-tasks <first-frontier-issue-#-or-
 ## The Pipeline block
 
 Every issue body ends with a `## Pipeline` section recording which upstream stages ran and
-whether the issue is ready to implement. `/implement` reads it and refuses work the pipeline
+whether the issue is ready to implement. `/impel` reads it and refuses work the pipeline
 has not prepared.
 
 **The full contract lives in [`references/pipeline-block.md`](references/pipeline-block.md)** —
@@ -266,7 +275,7 @@ Two rules that govern this skill's own steps, repeated here because steps 5-7 de
 
 - **You set the rung from your own difficulty reasoning — `ready-for-agent` included.** Write
   the rung and its evidence into `assessed:`; never cite the user's approval of the breakdown
-  as the reason. The closing `Next:` line follows the frontier issue's rung — `/implement` for
+  as the reason. The closing `Next:` line follows the frontier issue's rung — `/impel` for
   `ready-for-agent` (it starts the issue branch itself), `/to-tasks` for `needs:tasks`.
 - **The body block is authoritative; labels are a projection.** Re-sync both labels in the same
   turn you write the block. On conflict the body wins.

@@ -13,3 +13,15 @@ wait for the user's answer, record it, then move to the next.
   [[fork-doc-writes-during-discussion]], not inline. Don't wait on the fork before presenting
   the next question.
 - Do not pre-draft recommendations for all remaining questions up front — only the current one.
+
+## Exception: plan-approval reviews
+
+At a plan-approval gate, the plan may be presented with every open decision at once, each as a
+"Decide:" line with a recommendation next to the step it affects. Applies only to: `to-tasks`
+§4/§4b, `to-issues` §4, the `ds-plan` checkpoint, and the `ds-spec` checkpoint.
+
+Grilling, interviews and `story-discovery` questions stay one at a time.
+
+**Why:** user decision, 2026-10-18. Reviewing a whole plan in one pass beats approving it node
+by node. Open-ended design questions still need the one-at-a-time flow. First written for
+HTML plan pages; kept for Markdown reviews when HTML was dropped (token cost).

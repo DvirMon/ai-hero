@@ -4,7 +4,7 @@
 # The Pipeline block
 
 Every issue body ends with a `## Pipeline` section: which upstream stages actually ran, and
-whether the issue is ready to implement. `/implement` reads it and refuses to start work the
+whether the issue is ready to implement. `/impel` reads it and refuses to start work the
 pipeline has not prepared.
 
 It exists because `state.json` only tracks issues that came from a workspace. An issue opened
@@ -97,7 +97,7 @@ rather than each child.
 **An epic's rung describes the epic's own pipeline — grill, spec, slicing — never its children's
 readiness.** Once those three are done and children exist, the epic is `in-progress`
 regardless of what the children still need. Anything else double-counts a child's blocker as the
-parent's. Never `ready-for-agent` on an epic with children: that rung invites `/implement`, and
+parent's. Never `ready-for-agent` on an epic with children: that rung invites `/impel`, and
 an epic with children is never implemented directly. `in-progress` is off the ladder — it
 means the epic's own pipeline is finished, and the next action is the frontier child's rung.
 
@@ -172,7 +172,7 @@ and will end up competing with releases; a sub-issue relation asserts that the p
 spec cover the child, which for a late-filed enhancement is false. Rationale and the survey behind
 it: `docs/agents/discovery/issue-feature-taxonomy.md`.
 
-**The body block is authoritative; the labels are a projection.** `/implement` reads the block,
+**The body block is authoritative; the labels are a projection.** `/impel` reads the block,
 never a label — a label is one edit away from being stale and carries no reason. Every skill that
 writes the block re-syncs both labels in the same turn. On conflict the body wins and the label
 gets corrected.

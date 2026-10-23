@@ -10,7 +10,7 @@ metadata:
 # Angular Developer Guidelines
 
 > **Role in the pipeline:** this skill is the *knowledge* SSOT for Angular conventions — it
-> does not own execution. When `/implement` works a task plan, it dispatches `Task type: code`
+> does not own execution. When `/impel` works a task plan, it dispatches `Task type: code`
 > steps to the **`angular-implementer` agent**, which loads this skill and then writes the code.
 > Read this skill directly for ad-hoc Angular guidance; go through the agent for planned work.
 > Note the agent suppresses rule 3's `ng build` — the dispatcher runs builds and tests once, at

@@ -20,7 +20,7 @@ runs it, then enters the worktree with `EnterWorktree`.
 | Caller | Branch |
 |---|---|
 | `/to-ticket` (epic planning docs) | `docs/<epic-slug>` |
-| `/to-tasks`, `/implement` fallback (one issue) | `<type>/<issue#>-<slice-slug>` |
+| `/to-tasks`, `/impel` fallback (one issue) | `<type>/<issue#>-<slice-slug>` |
 | epic archive chore | `chore/<epic-slug>-archive` |
 
 - `<slice-slug>` — the slug in the issue body's `<!-- slice: <epic-ref>/<slice-slug> -->`

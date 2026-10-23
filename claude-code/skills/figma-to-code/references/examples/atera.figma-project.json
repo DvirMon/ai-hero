@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "project": "atera",
+  "stack": "angular",
+  "rules": ["CLAUDE.md"],
+  "designSystem": {
+    "selectorPrefix": "atera-",
+    "path": "libs/shared/ui-core/src/lib/components/2.0/",
+    "lookup": {
+      "kind": "mcp",
+      "tools": [
+        "mcp__atera-ui-mcp__getSpecificAteraComponentDetailsByKeyword",
+        "mcp__atera-ui-mcp__getAteraComponentsThroughStoriesMetadata"
+      ]
+    },
+    "componentMap": [
+      { "figma": "Button", "code": "<button atera-button>" },
+      { "figma": "Icon", "code": "<atera-icon-2 key=\"...\" size=\"md\">" },
+      { "figma": "Banner / alert bar", "code": "<atera-banner variant=\"...\">" },
+      { "figma": "Text input", "code": "<atera-input> / <mat-form-field>" },
+      { "figma": "Checkbox", "code": "<atera-checkbox>" },
+      { "figma": "Toggle", "code": "<atera-toggle>" },
+      { "figma": "Badge / chip", "code": "<atera-chip>" },
+      { "figma": "Tooltip", "code": "ateraTooltip directive" }
+    ],
+    "newComponent": "figma-ds-component"
+  },
+  "tokens": {
+    "system": "css-vars",
+    "sources": [
+      "libs/shared/ui-core/src/lib/style/atera-theme-2/apa/apa-primitives.scss",
+      "libs/shared/ui-core/src/lib/style/atera-theme-2/atera-roles.scss"
+    ],
+    "figmaNameRule": "replace '/' with '-': var(--fill\\/danger\\/subtle) -> var(--fill-danger-subtle)",
+    "tierCheck": {
+      "role": ["--fill-", "--content-", "--border-", "--action-", "--bg-", "--shadow-"],
+      "palette": ["--neutral-", "--gray-", "--blue-", "--red-", "--green-"],
+      "upgrade": "mcp__atera-ui-mcp__getAteraTokenByHexColor with the fallback hex; else grep the hex in apa-primitives.scss, then the palette token in atera-roles.scss; pick the role whose intent matches the element"
+    },
+    "missing": "role-upgrade"
+  },
+  "utilities": {
+    "prefix": "",
+    "config": "tailwind.config.js",
+    "notes": "spacing px maps 1:1 (gap-16, p-24), else arbitrary gap-[9px]; radius rounded-small (4px) / rounded-medium (8px)"
+  },
+  "typography": {
+    "kind": "classes",
+    "source": "typography-2.scss",
+    "classes": [
+      "heading-xl-semi-bold", "heading-lg-semi-bold", "heading-md-semi-bold", "heading-sm-semi-bold", "heading-xs-semi-bold",
+      "body-lg-medium", "body-lg-regular", "body-md-medium", "body-md-regular",
+      "caption-sm-medium", "caption-sm-regular"
+    ],
+    "color": "Tailwind token class, e.g. text-content-neutral-primary",
+    "status": "complete"
+  },
+  "icons": { "usage": "<atera-icon-2 key=\"uii_{name}_{weight}\" size=\"md\">", "missing": "ask" },
+  "i18n": { "file": "apps/apa/src/assets/i18n/en.json", "pipe": "translate", "keyCase": "dot.snake_case", "skill": "copy-update" },
+  "codeConnect": {
+    "available": true,
+    "figmaFileKey": "Vf0AgkW071TIvOTUpRuIaV",
+    "fileUrl": "https://www.figma.com/design/Vf0AgkW071TIvOTUpRuIaV/%F0%9F%92%A0-Components-2.0",
+    "scripts": { "validate": "npm run figma:validate", "publish": "npm run figma:publish", "unpublish": "npm run figma:unpublish" },
+    "tokenEnv": "FIGMA_ACCESS_TOKEN in ~/.zshrc",
+    "placement": "<component-dir>/<component-name>.figma.ts"
+  },
+  "traceability": "PR description",
+  "extraChecks": [
+    "Logical CSS properties for RTL (margin-inline-start, not margin-left)",
+    "Inputs via input() signals; loading/error via resource() or linkedSignal()",
+    "User actions tracked with ateraTrackableId (trackable-events skill)",
+    "Role/plan gating via ateraRoleGuard / ateraPlansGuard (permissions skill)"
+  ]
+}

@@ -28,11 +28,18 @@ Check with the user that these seams match their expectations.
 
 3. Write the spec using the template below. If the ticket workspace's `state.json` exists, also write it to `<workspaceRoot>/2-spec.md` (using `state.json`'s `workspaceRoot`) and update `state.json`'s `specPath` and `updatedAt`.
 
-   **These writes — and step 4's `3-architecture.md` and any capability-log row — go to one
-   `haiku` writer**, per `to-ticket/references/file-writes.md`. Compose every file's full text
-   here and hand it over verbatim, so the write is mechanical. Continue with step 5's tracker
-   search and publish while it writes — you already hold the content. Join the writer before
-   step 6's commit.
+   **Design reference (`design.md`).** When `figma[]` is non-empty, or `{workspaceRoot}/design.draft/`
+   has fragments, or `decisionsPath` records a locked FE design-check aspect, also write
+   `<workspaceRoot>/design.md` per `references/design-reference.md` (merge drafts + grill
+   decisions into the locked component/token/copy maps). Set `designPath` to that path and add a
+   **Design reference** section in `2-spec.md` that links to `design.md` only — do not duplicate
+   the tables. When there is no Figma surface, leave `designPath` null and omit the section.
+
+   **These writes — step 3's `design.md`, step 4's `3-architecture.md`, and any capability-log
+   row — go to one `haiku` writer**, per `to-ticket/references/file-writes.md`. Compose every
+   file's full text here and hand it over verbatim, so the write is mechanical. Continue with
+   step 5's tracker search and publish while it writes — you already hold the content. Join the
+   writer before step 6's commit.
 
    Update the source issue's `## Pipeline` block (contract: `to-issues/references/pipeline-block.md`): set
    `workspace` to the workspace root, set `grill: done: <decisionsPath>` and
@@ -125,11 +132,16 @@ A description of the things that are out of scope for this spec.
 
 Any further notes about the feature.
 
+## Design reference
+
+(Omit when `designPath` is null.) Link only — e.g. `See [design.md](./design.md) for Figma
+frames, component map, tokens, typography, and copy → i18n keys. Do not restate those tables here.
+
 </spec-template>
 
 6. **Commit.** Join the writer, then make one commit on `docs/<slug>`, staged by path:
-   `2-spec.md`, `3-architecture.md` (if written), `state.json`, any capability-log row. Never
-   `-A`. Message per `atomic-commit` § Commit format: `📚 docs(<scope>): spec <slug>`, trailer
+   `2-spec.md`, `design.md` (if written), `3-architecture.md` (if written), `state.json`, any
+   capability-log row. Never `-A`. Message per `atomic-commit` § Commit format: `📚 docs(<scope>): spec <slug>`, trailer
    `Refs: #<spec issue>` from step 5. Do not push — `/ship` does, after `/to-issues`.
 
 End your final message with a one-line pointer, as the very last line — nothing after it:

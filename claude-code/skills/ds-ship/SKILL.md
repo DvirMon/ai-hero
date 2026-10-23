@@ -23,7 +23,7 @@ Previous phase must be `ds-review` (which runs after `ds-scaffold`). If not comp
 ## Ship steps
 
 1. Ensure the component's `public-api.ts` and `index.ts` exist under its directory (`{componentPath}`, e.g. `libs/shared/ui-core/src/lib/components/2.0/atera-{name}/` for this repo's config). There is no single root barrel — each component is self-contained. To locate the correct parent path, check neighbouring components under `{dsComponentsRoot}`.
-2. Remind the user to invoke the `figma-code-connect` skill to publish the Code Connect mapping file
+2. If the project's `.claude/figma-project.json` has `codeConnect.available: true`, remind the user to invoke the `code-connect-authoring` skill to publish the Code Connect mapping file
 
 ## Final checklist
 

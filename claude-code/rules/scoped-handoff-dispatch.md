@@ -20,10 +20,10 @@ was recently touched." Concretely:
   dispatch you already made — not to spawn another agent.
 - Don't silently absorb a *different* verification step (typecheck, code review, JSDoc-contract
   conformance) into your own task just because you happen to be sitting in the file at the time.
-  That's the orchestrating session's job (see e.g. `/implement`'s own §4 "Verify"), and doing it
+  That's the orchestrating session's job (see e.g. `/impel`'s own §4 "Verify"), and doing it
   yourself duplicates work and produces a result the orchestrator never asked for or checked.
 
-**Why:** a docs-only `/implement` step (10 numbered items: decisions logs, ADR amendments,
+**Why:** a docs-only `/impel` step (10 numbered items: decisions logs, ADR amendments,
 CLAUDE.md, an issue body, `llms.txt`) was dispatched as a fork. Instead of one batched hand-off,
 it spawned at least 6 separate `doc-compressor` calls, all re-compressing the same 2-3 source
 files from an *already-finished, different* step, and additionally ran its own `source-docs`

@@ -1,12 +1,12 @@
 ---
 name: ship
-description: "Take a finished feature branch to an open, auto-merging PR — show the commit story for approval, rebase onto origin/main, push (force-with-lease after a rebase), open or reuse the PR with an emoji-conventional title and a Closes #N body, then enable GitHub auto-merge (rebase). Handles issue branches (<type>/<N>-<slug>) and epic planning branches (docs/<epic-slug>). Never pushes to main, never merges manually. Use after /implement reports done, or after /to-issues on a planning branch."
+description: "Take a finished feature branch to an open, auto-merging PR — show the commit story for approval, rebase onto origin/main, push (force-with-lease after a rebase), open or reuse the PR with an emoji-conventional title and a Closes #N body, then enable GitHub auto-merge (rebase). Handles issue branches (<type>/<N>-<slug>) and epic planning branches (docs/<epic-slug>). Never pushes to main, never merges manually. Use after /impel reports done, or after /to-issues on a planning branch."
 disable-model-invocation: true
 ---
 
 # Ship
 
-One issue = one branch = one PR. `/implement` leaves a feature branch with one commit per step.
+One issue = one branch = one PR. `/impel` leaves a feature branch with one commit per step.
 This skill turns that branch into a PR that GitHub merges on its own once required checks pass.
 
 There is one mode. No push to the default branch, ever — the Claude hook, the repo's git hooks
@@ -39,17 +39,17 @@ Check in order, before touching git. Any failure stops here — say which one an
      `⬚ pending` → stop. Do not ship unfinished steps.
    - **None** (the issue body was the step): the branch's `N` already matched in check 1. Read
      the issue's "Acceptance criteria" boxes (`gh issue view <N> --json body`). All ticked →
-     ship with `Closes #N`. Some unticked → ship only if `/implement` reported the issue as
-     partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/implement` hasn't closed
+     ship with `Closes #N`. Some unticked → ship only if `/impel` reported the issue as
+     partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/impel` hasn't closed
      out.
 5. **Something to ship.** `git log --oneline origin/main..HEAD` is non-empty.
 
 ## 2. Gate — the developer approves the story
 
-This is the pipeline's human gate (`/implement` commits per step without asking). Show:
+This is the pipeline's human gate (`/impel` commits per step without asking). Show:
 
 - `git log --reverse --format='%h %s' origin/main..HEAD` — the commit story, oldest first.
-- The latest `/code-review` outcome for this branch, if `/implement` reported one; otherwise say
+- The latest `/code-review` outcome for this branch, if `/impel` reported one; otherwise say
   none ran.
 
 Wait for explicit approval. The developer may ask for fixes first — those become new commits
@@ -116,12 +116,14 @@ gh pr create --base main --head <branch> --title "<title>" --body-file <tmpfile>
 
 ## Evidence
 - Spec: <specPath>                               (no workspace: omit)
+- Design: <designPath>                           (omit when null)
+- Figma frames: node IDs from the issue **Figma frames** table (when present)
 - Steps: <workspaceRoot>/4-tasks/issue-<N>/      (no workspace: "issue body")
 
 Closes #<N>
 ```
 
-Exactly one `Closes #<N>` — this issue only. Exception: if `/implement` reported acceptance
+Exactly one `Closes #<N>` — this issue only. Exception: if `/impel` reported acceptance
 criteria left unchecked on the issue (partially satisfied), write `Refs #<N>` instead and say so
 in the Summary — the issue stays open. `Closes` is what closes the issue on merge; a bare
 `#N` only links. Commits carry `Refs: #N`, never a closing keyword.

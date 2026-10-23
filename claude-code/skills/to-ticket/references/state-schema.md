@@ -2,14 +2,14 @@
 
 The single source of truth for a pipeline workspace's shape. Every skill that
 opens `state.json` (`to-ticket`, `grill-with-docs`, `to-spec`, `to-issues`,
-`to-tasks`, `implement`) cites this file instead of restating the schema or
+`to-tasks`, `impel`) cites this file instead of restating the schema or
 the validation routine inline.
 
-## Schema (version 2)
+## Schema (version 3)
 
 ```json
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "runId": "<slug>-<utc-timestamp>",
   "slug": "<slug>",
   "ticketRef": "<id/key returned by the repo's resolved ticket tracker>",
@@ -20,6 +20,8 @@ the validation routine inline.
   "isComplex": null,
   "decisionsPath": "<workspaceRoot>/1-decisions.md",
   "capabilityLogPath": "<path to the capability's decisions log, or null>",
+  "figma": [],
+  "designPath": null,
   "specPath": null,
   "architecturePath": null,
   "githubIssues": [],
@@ -27,6 +29,20 @@ the validation routine inline.
   "updatedAt": "<iso8601>"
 }
 ```
+
+`figma[]` entry shape (see `references/figma-capture.md`):
+
+```json
+{
+  "label": "Session row",
+  "fileKey": "g7SaJ3BzmMA4yzStMWV48m",
+  "nodeId": "4275:4279",
+  "screenshotPath": "figma/session-row.png"
+}
+```
+
+`screenshotPath` is optional when capture failed or not run yet; `label`, `fileKey`, and
+`nodeId` are required on each row.
 
 **A field with no stated consumer does not go in this schema.** That rule is
 what keeps a dead field (A14) from recurring — every row below names who
@@ -42,16 +58,24 @@ reads it, not just who writes it.
 | `ticketRef` | `to-ticket`. | `grill-with-docs` (fetches the ticket this points at); `pipeline-current-ticket.sh` (displays it in suggested context). |
 | `ticketUrl` | `to-ticket`. | `to-ticket` itself, in its own hand-off message to the user (step 5). |
 | `domainPath` | `to-ticket`, resolved during workspace creation (step 4's domain-path resolution). | No skill re-reads it today. Stated consumer: any future stage that needs the domain root without re-deriving it from `workspaceRoot` — e.g. locating the domain's own `CONTEXT.md` / `docs/adr/` for cross-referencing. Step 7 made the layout domain-colocated; this is the field that records the domain once instead of re-deriving it every stage. |
-| `workspaceRoot` | `to-ticket`. | `grill-with-docs`, `to-spec`, `to-issues`, `to-tasks`, `implement` — every path they read or write is built from this. |
-| `stack` | `to-ticket` (asked at intake); `implement` (backfills if missing, per its step 2). | `implement` (routes each step's `Task type` to the matching implementer agent); `to-tasks` (must not leave it null, since `implement` depends on it). |
+| `workspaceRoot` | `to-ticket`. | `grill-with-docs`, `to-spec`, `to-issues`, `to-tasks`, `impel` — every path they read or write is built from this. |
+| `stack` | `to-ticket` (asked at intake); `impel` (backfills if missing, per its step 2). | `impel` (routes each step's `Task type` to the matching implementer agent); `to-tasks` (must not leave it null, since `impel` depends on it). |
 | `isComplex` | `grill-with-docs`. | `to-spec` (step 4 — gates whether `3-architecture.md` gets written). |
 | `decisionsPath` | `to-ticket` (path is fixed at creation; file itself is created lazily by `grill-with-docs`). | `grill-with-docs` (appends decisions); `to-spec` (synthesizes the spec from it). |
 | `capabilityLogPath` | `to-ticket`, at creation — the permanent decisions log for the capability this work belongs to (`doc-contracts/decisions-log.md`), if the project keeps them and this work belongs to exactly one capability. `null` otherwise, which is the correct value for cross-capability work, not a missing field. | `grill-with-docs` (reads it before the first question, so the interview does not re-decide something settled; appends a row per capability-scoped decision); `to-spec` (reads it as a second input alongside `decisionsPath` — the log carries what earlier efforts settled, which the workspace's own decisions file does not). |
-| `specPath` | `to-spec`. | `to-issues` (default source, read in full); `to-tasks` (read for consistency); `implement` (read only if a step is ambiguous); `ship` (linked as evidence in the PR body). |
-| `architecturePath` | `to-spec`, only when `isComplex` is `true`. | `to-issues`, `to-tasks`, `implement` — same read pattern as `specPath`. |
+| `figma` | `to-ticket` (capture per `references/figma-capture.md`); `grill-with-docs` may append frames after user supplies missing ones. | `grill-with-docs` (Design-check aspect frame list); `to-spec` (frame table in `design.md`); `to-issues` (node IDs on FE slices); `to-tasks` (step `figma:` binding); `impel` (which nodes to fetch per UI step). |
+| `designPath` | `to-spec`, when `figma[]` is non-empty or grill left `design.draft/` / design-check decisions to promote. | `to-issues`, `to-tasks`, `impel` (component/token/copy map — UI steps treat absent mapping as stop); `ship` (MR evidence link). |
+| `specPath` | `to-spec`. | `to-issues` (default source, read in full); `to-tasks` (read for consistency); `impel` (read only if a step is ambiguous); `ship` (linked as evidence in the PR body). |
+| `architecturePath` | `to-spec`, only when `isComplex` is `true`. | `to-issues`, `to-tasks`, `impel` — same read pattern as `specPath`. |
 | `githubIssues` | `to-issues` (appends created issue numbers/references). | `to-spec` (step 5 — checks for a prior spec issue before creating a duplicate); `ship` (pulls the issue number(s) for the `Closes #N` reference in the PR body — commits carry only `Refs: #N`). |
 | `createdAt` | `to-ticket`, at workspace creation. Never updated after. | No skill reads it back today. Paired with `updatedAt`, it is what makes workspace age/staleness computable by a human or a future audit — same class of consumer as `runId`. |
 | `updatedAt` | Every skill that writes to `state.json`, on every write (validation routine step 4). `ship` no longer writes `state.json` at all — after the planning PR merges the file is static on `main`, and live status comes from GitHub. | No skill reads it back today. It is what makes staleness detectable at all — a workspace whose `updatedAt` is old relative to its `readiness` rung is a candidate for review. |
+
+### Migration: version 2 → 3
+
+Version 3 adds `figma` (default `[]`) and `designPath` (default `null`). When a skill reads a
+version-2 file, add both fields with those defaults and bump `schemaVersion` to 3 on the next
+write. Do not bulk-migrate workspaces.
 
 ### Migration: version 1 → 2
 
@@ -112,6 +136,6 @@ State it once here; cite it from the calling skill rather than restating it.
 
 ## Consuming skills
 
-`to-ticket`, `grill-with-docs`, `to-spec`, `to-issues`, `to-tasks`, `implement` — cite this file
+`to-ticket`, `grill-with-docs`, `to-spec`, `to-issues`, `to-tasks`, `impel` — cite this file
 (`to-ticket/references/state-schema.md`) for the schema shape and the validation routine. Do not
 paste either back into the calling skill.

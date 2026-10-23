@@ -5,7 +5,8 @@
 
 Every pipeline skill writes JSON and Markdown files: `state.json`, `1-decisions.md`, a
 capability's decisions log, `2-spec.md`, `3-architecture.md`, `issue-graph.md`, local issue
-drafts, `4-tasks/` step files, `progress.md`. **None of those writes run inline in the main
+drafts, `<workspaceRoot>/tasks/` step files (or `.cursor/plans/<slug>/` when no workspace),
+`progress.md`. **None of those writes run inline in the main
 session.** Dispatch them to a writer agent.
 
 **Why:** multi-file doc edits are many reads and edits whose tool-call noise the dispatcher
@@ -27,7 +28,7 @@ has to decide:
 When unsure, use `sonnet`. A run whose writes span both kinds goes to one `sonnet` writer —
 don't split one run's files across two agents to save cost.
 
-**Exception — `/implement`'s `docs`/`chore` steps stay on a fork.** Those write from a step
+**Exception — `/impel`'s `docs`/`chore` steps stay on a fork.** Those write from a step
 file and need the earlier steps' diffs, which only an inherited context carries.
 
 ## The brief must be self-contained

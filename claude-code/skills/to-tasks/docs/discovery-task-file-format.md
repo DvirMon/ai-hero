@@ -15,7 +15,7 @@
   to one line plus refs.
 - **Cut or merge 5 of our 13 sections:**
   - Scaffolding agent and Skills used: nothing reads them. [R2][R3]
-  - Parallel-safe with: `/implement` works this out from `Depends on` plus the `Files` lists. [R2]
+  - Parallel-safe with: `/impel` works this out from `Depends on` plus the `Files` lists. [R2]
   - Risks / Watchouts: merge into Implementation Notes as "Constraints". [S13]
   - PR scope: fold into a one-line summary.
 - **Terse vs verbose.** The evidence says be specific about decisions and boundaries. It also
@@ -25,7 +25,7 @@
 
 | Format | Sections | Typical length | Rationale | Acceptance | Dependencies |
 |---|---|---|---|---|---|
-| Spec Kit `tasks.md` @v1.0.11 | One line per task: `- [ ] T014 [P] [US1] <desc> in <path>`. Each story phase has **Goal**, **Independent Test** and **Checkpoint** lines [S1] | 1 line per task [S1] | Linked. `/implement` loads plan.md (required) plus data-model, contracts and research when present [S2] | Per phase: "Independent Test" and "Checkpoint" [S1]. Tests are optional unless requested [S1] | `[P]` marks parallel. Inline "(depends on T012, T013)". Phase order blocks [S1] |
+| Spec Kit `tasks.md` @v1.0.11 | One line per task: `- [ ] T014 [P] [US1] <desc> in <path>`. Each story phase has **Goal**, **Independent Test** and **Checkpoint** lines [S1] | 1 line per task [S1] | Linked. `/impel` loads plan.md (required) plus data-model, contracts and research when present [S2] | Per phase: "Independent Test" and "Checkpoint" [S1]. Tests are optional unless requested [S1] | `[P]` marks parallel. Inline "(depends on T012, T013)". Phase order blocks [S1] |
 | Kiro `tasks.md` | Numbered checkbox, sub-bullet steps, then `_Requirements: 1.1, 1.5_` [S4] | Several sub-bullets [S4] | Linked, through requirement IDs [S4][S7] | EARS (`WHEN … THE SYSTEM SHALL …`) in requirements.md, not in the task [S5] | Kiro works out dependencies and runs tasks in "waves" [S3][S6] |
 | Taskmaster @0.43.1 | Required: id, title, description, status. Optional: dependencies, priority, details, testStrategy, subtasks [S9] | Header fields plus free text [S9] | Inline, in `details` (optional) [S9] | `testStrategy` (optional) [S9] | `dependencies` field of IDs [S9] |
 | BMAD v4.44.3 story | Status, Story, Acceptance Criteria, Tasks/Subtasks, Dev Notes (+Testing), Change Log, Dev Agent Record, QA Results. Each section has an owner [S8] | Long, on purpose [S8] | **Inline.** "the dev agent should NEVER need to read the architecture documents" [S8] | Numbered list copied from the epic [S8] | Not a field [S8] |
@@ -46,12 +46,12 @@
 |---|---|---|---|
 | Title | Everywhere [S1][S7][S9] | Humans, progress.md | Keep |
 | PR scope | Spec Kit phase **Goal** line [S1] | Nobody reads it by name [R2][R3] | Merge into a one-line summary under the title |
-| Depends on | Spec Kit inline, Taskmaster field [S1][S9] | `/implement` [R2] | Keep; move to frontmatter |
-| Parallel-safe with | Spec Kit `[P]` [S1] | `/implement` works it out from Depends on + Files [R2] | Cut: it is derived, and it can drift |
-| Task type | No outside analogue. It is our routing key | `/implement` routes on it [R2] | Keep; move to frontmatter |
+| Depends on | Spec Kit inline, Taskmaster field [S1][S9] | `/impel` [R2] | Keep; move to frontmatter |
+| Parallel-safe with | Spec Kit `[P]` [S1] | `/impel` works it out from Depends on + Files [R2] | Cut: it is derived, and it can drift |
+| Task type | No outside analogue. It is our routing key | `/impel` routes on it [R2] | Keep; move to frontmatter |
 | Skills used | Claude Code `skills:` agent frontmatter preloads skills [S17] | The implementer loads `angular-developer` itself and never reads this field [R3] | Cut, or make it real by putting `skills:` in the agent file |
-| Scaffolding agent | None | `/implement` picks the agent from Task type + stack [R2] | Cut: derived |
-| Files | Spec Kit paths, Copilot, Claude Code, "Where" [S1][S18][S14][S20] | `/implement` and implementers [R2][R3] | Keep; move to frontmatter as a list |
+| Scaffolding agent | None | `/impel` picks the agent from Task type + stack [R2] | Cut: derived |
+| Files | Spec Kit paths, Copilot, Claude Code, "Where" [S1][S18][S14][S20] | `/impel` and implementers [R2][R3] | Keep; move to frontmatter as a list |
 | Why This Step Exists | ExecPlan "Purpose" [S12]; Kiro `_Requirements:_` [S4]; BMAD v6 description [S7] | `adr-writer` extracts from it [R2]; implementers do not name it [R3] | Shrink to 1-2 lines + ref links |
 | What To Do | Everywhere [S1][S4][S19] | Implementers [R3] | Keep. This is the agent detail layer |
 | Implementation Notes | Taskmaster `details`, BMAD Dev Notes, "Notes" [S9][S8][S20] | Implementers [R3] | Keep; rename to Constraints and absorb Risks |
@@ -72,7 +72,7 @@
 - It loads `angular-developer` itself. [R3]
 - It reads `specPath` and `architecturePath` "only if the step is ambiguous". [R3]
 - It typechecks as a fixed step of its own process. [R3]
-- `/implement` routes on `Task type` + `stack`. [R2]
+- `/impel` routes on `Task type` + `stack`. [R2]
 - It runs steps in parallel only when there is no `Depends on` and the `Files` lists do not
   overlap. [R2]
 
@@ -153,7 +153,7 @@
   this step exists" essay that re-tells the architecture doc. [R5] Keep "no `ngDevMode` gating
   — must fire in production". Drop the paragraph that restates settled items 4 and 8.
 - **Dependencies: explicit vs derived.** Kiro derives them [S6]. Spec Kit writes them inline
-  [S1]. Taskmaster uses a field [S9]. We write `Parallel-safe with` by hand, but `/implement`
+  [S1]. Taskmaster uses a field [S9]. We write `Parallel-safe with` by hand, but `/impel`
   already derives it [R2]. That is two hand-kept copies of one fact.
 - **Acceptance.** Every agent-era source makes it a pass/fail check. [S14][S18][S19] Opus 5
   guidance argues against also telling the agent *how* to verify when its harness already

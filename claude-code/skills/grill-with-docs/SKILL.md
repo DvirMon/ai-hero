@@ -34,6 +34,25 @@ If no `state.json` exists yet, don't just fall back silently — create the work
    nodes fully now; dependent nodes only after their upstream settles. Record the ranking in
    `1-decisions.md` alongside the decisions it produces.
 
+0b. **Grill per handoff aspect, not as one spec** (rule `lock-by-aspect-for-handoff`). Split the
+   ticket by what one team consumes, e.g. backend contract (model + missing endpoints), FE
+   behavior requirements, FE design check, email/content, audit events. Put an `## Aspects` table
+   (aspect, hand-off team, status) at the top of `1-decisions.md`. Grill one aspect at a time,
+   checking it against the **whole ticket**, and keep its open gaps as a `- [ ]` checklist under
+   it. When the checklist is empty, mark it `locked <date>` and tell the user right away:
+   "Aspect N is locked, ready to hand to <team>", with a short handoff summary. Don't hold it for
+   the other aspects. A later decision that changes a locked aspect marks it `reopened` and says
+   so explicitly. Steps 4–6 run per aspect as it locks; the grill as a whole finishes when every
+   aspect is locked.
+
+   **FE design check (Figma)** — when the ticket has a UI surface and `state.json` → `figma[]`
+   is non-empty (or the user supplied an equivalent frame table), include the **FE design check**
+   aspect and run it per `references/design-check-aspect.md`: parallel **`figma-frame-discovery`**
+   per frame, merge `design.draft/` fragments, then unmapped-node audit §3 and one question at a
+   time until the aspect checklist is empty. Prefer grilling this aspect **before** locking
+   backend/behavior contracts when frames can reopen them. Final `design.md` is **`/to-spec`**, not
+   grill — grill only locks decisions and leaves fragments under `{workspaceRoot}/design.draft/`.
+
 1. Read the starting material fully before asking anything — don't make the user repeat what they've already told you.
 2. Ask one question at a time. Prefer questions that expose an edge case, a scenario the starting material didn't cover, or a decision that was left implicit. Keep going until you can't find another fuzzy edge — don't stop early just because the obvious questions are exhausted.
 3. The moment an answer settles something, write it down — don't wait until the end to reconstruct it from memory:

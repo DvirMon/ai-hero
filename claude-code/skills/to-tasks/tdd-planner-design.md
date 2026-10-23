@@ -1,6 +1,6 @@
 # Design note — `tdd-planner` agent + `/to-tasks` TDD gate
 
-Decided 2026-09-25, during `/implement 143` in `ng-table`.
+Decided 2026-09-25, during `/impel 143` in `ng-table`.
 
 ## Problem
 
@@ -24,14 +24,14 @@ doc** — not test code:
 Saved as `step-N.test-plan.md`, sibling to `step-N.plan.md`.
 
 **Placement: plan-time, inside `/to-tasks`.** Produced and reviewed
-alongside the implementation step plan, before `/implement` ever runs —
+alongside the implementation step plan, before `/impel` ever runs —
 matches the existing plan-then-execute-in-a-separate-session habit
 (`~/.claude/rules/plans-execute-in-separate-session.md`). Rejected:
-execution-time inside `/implement` — would skip review for issues with no
+execution-time inside `/impel` — would skip review for issues with no
 `/to-tasks` split (e.g. #143, which went straight from issue body to
 `ready-for-agent`).
 
-## Downstream change — `/implement` execution order for a code+test pair
+## Downstream change — `/impel` execution order for a code+test pair
 
 Once a step has an approved `step-N.test-plan.md`:
 
@@ -42,7 +42,7 @@ Once a step has an approved `step-N.test-plan.md`:
 3. `/tdd`'s red-green discipline governs the loop, not "write file, run
    whole suite."
 
-This reverses `/implement`'s current default line 148 — "A `story` or
+This reverses `/impel`'s current default line 148 — "A `story` or
 `test` step always waits for the `code` step that produces its subject" —
 for any step that has a `test-plan.md`. A step with no test-plan (docs,
 chore, or code with no test seam) keeps today's ordering unchanged.
@@ -51,10 +51,10 @@ chore, or code with no test seam) keeps today's ordering unchanged.
 
 - Matt Pocock's `skills/engineering/tdd/SKILL.md`
   (github.com/mattpocock/skills) — red-before-green, one seam at a time,
-  no test written at an unconfirmed seam. This repo's `/implement` had
+  no test written at an unconfirmed seam. This repo's `/impel` had
   silently dropped that default when it became a dispatcher — this design
   restores it, scoped to the planning step rather than execution.
-- `~/.claude/skills/implement/SKILL.md` lines 80–92 (routing table), 148
+- `~/.claude/skills/impel/SKILL.md` lines 80–92 (routing table), 148
   (test-waits-for-code rule), 150–153 (`/tdd` carve-out for `code`+`node`).
 
 ## Decisions made while building (2026-09-25)
@@ -62,7 +62,7 @@ chore, or code with no test seam) keeps today's ordering unchanged.
 D1 — A test plan is absorbed into its code step.
 `step-N.test-plan.md` belongs to code step N. /to-tasks stops
 making a separate `Task type: test` step for code that has a
-test plan; /implement runs test-implementer (red) then the
+test plan; /impel runs test-implementer (red) then the
 code agent (green) inside step N. One step = one red-green
 unit, one progress.md row. Separate `test` steps remain only
 for code with no test plan. Rejected: keeping the test step
@@ -96,7 +96,7 @@ They meet at seam choice — tdd-planner picks seams with
 unit-test's policy — so one skill. The dead `/tdd` references
 in implement/SKILL.md point to test-first.md instead.
 Rejected: a separate tdd skill (second skill to keep in
-sync); inlining in /implement (rules in dispatch text, not
+sync); inlining in /impel (rules in dispatch text, not
 something agents load).
 
 D4 — tdd-planner runs as review round 2 in /to-tasks. Step 4
@@ -138,7 +138,7 @@ weak plan weakens every later phase); inherit.
 
 ### Found gaps
 
-- No `/tdd` skill exists under ~/.claude/skills — /implement
+- No `/tdd` skill exists under ~/.claude/skills — /impel
   SKILL.md line 152 and this note both reference one. Resolved
   by D3 (test-first.md under unit-test).
 - test-implementer step 2 returns `blocked` when code under

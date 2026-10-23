@@ -1,31 +1,28 @@
 ---
 name: figma-to-code
-description: Entry point for all Figma-to-code tasks. Routes to the correct specialized skill based on the scenario — product feature implementation, design system component creation, or token/styling reference.
+description: Entry point for all Figma-to-code tasks in any project. Loads the project's .claude/figma-project.json, then routes to the right skill — product feature implementation, design system component creation, Code Connect authoring, or token/styling lookup.
 ---
 
 # Figma to Code — Orchestrator
 
-When given a Figma URL or asked to implement a design, first identify which scenario applies, then invoke the matching skill.
+## 0. Load the project config (always first)
 
-## Scenario Routing
+Read `{repoRoot}/.claude/figma-project.json` per [project-config.md](references/project-config.md).
+Missing or incomplete → stop and offer to draft it; never infer it.
 
-### 1. Implementing a product feature
-**Signs:** A screen, page, flow, or UI section from the product (APA or portal). Uses existing design system components. Lives in `apps/` or a feature library.
+Also load the official plugin skill **`figma-design-to-code`** before any `get_design_context`
+call — it is mandatory and these skills sit on top of it, not instead of it.
 
-→ Use the **`figma-feature-implementation`** skill.
+## 1. Route
 
-### 2. Building a new design system component
-**Signs:** The request is to create or add a new component to the design system library (`libs/shared/ui-core`). The component will be reused across the product.
+| Signs | Skill |
+|---|---|
+| A screen, page, modal, flow or section built from existing DS components | **`figma-feature-implementation`** |
+| A new or changed reusable component for the DS (`designSystem.selectorPrefix`) | `config.designSystem.newComponent` (e.g. `figma-ds-component`, or the design-system two-MR flow) |
+| Linking a Figma component to code (`.figma.ts`) | **`code-connect-authoring`** — only when `codeConnect.available` is `true` |
+| Which token/class to use for a color, border or fill seen in Figma | `css-styling` → [ds-components.md](../css-styling/references/ds-components.md) for the mapping principle, `config.tokens` for this project's names |
 
-→ Use the **`figma-ds-component`** skill.
+## When in doubt
 
-### 3. Token/styling question only
-**Signs:** User asks which CSS variable to use for a color, border, or fill seen in Figma metadata. No component or feature to build.
-
-→ See the **Figma Token Mapping** section in the `css-styling` skill.
-
-## When in Doubt
-
-If the Figma node contains both product UI and new design system components, split the work:
-- Build the DS component first (`figma-ds-component`)
-- Then implement the feature using it (`figma-feature-implementation`)
+A node holding both product UI and a missing DS component splits in two: the DS component
+first (its own flow, often its own repo and MR), then the feature that consumes it.

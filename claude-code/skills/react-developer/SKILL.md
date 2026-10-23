@@ -11,7 +11,7 @@ metadata:
 # React Developer — v19 (Greenfield)
 
 > **Role in the pipeline:** this skill is the *knowledge* SSOT for React conventions — it does
-> not own execution. When `/implement` works a task plan, it dispatches `Task type: code` steps
+> not own execution. When `/impel` works a task plan, it dispatches `Task type: code` steps
 > to the **`react-implementer` agent**, which loads this skill and then writes the code. Read
 > this skill directly for ad-hoc React guidance; go through the agent for planned work, so each
 > step lands with its acceptance checks intact.

@@ -37,7 +37,7 @@ Every change reaches the default branch through a PR, rebase-merged (see
   completes, `Refs #N` for one it only partly delivers. Planning PRs
   (`docs/<slug>`) use `Refs #<epic>` and close nothing.
 
-`/implement`, `/ship` and `code-review` read these rules.
+`/impel`, `/ship` and `code-review` read these rules.
 
 ## When a skill says "publish to the issue tracker"
 

@@ -60,10 +60,10 @@ Frontmatter fields: `type`, `depends_on`, `files`.
 (`decisions` was listed here originally, dropped by F8; `parallel_with`
 dropped by F11.)
 
-- "Skills used" and "Scaffolding agent" dropped — `/implement` derives
+- "Skills used" and "Scaffolding agent" dropped — `/impel` derives
   them from `type` + ticket `stack`.
 - PR-scope prose dropped — every step must leave the tree green anyway.
-- Follow-up owed: `/implement` must read frontmatter.
+- Follow-up owed: `/impel` must read frontmatter.
 
 ### F3 — One "Watch out" list
 
@@ -123,7 +123,7 @@ a few lines long; no function bodies, no JSDoc.
 
 Decision IDs appear once — the body `Decisions:` line (F6), linked to
 the log. The frontmatter `decisions:` field from F2 is dropped;
-`/implement` doesn't route on it.
+`/impel` doesn't route on it.
 
 ### F9 — "Out of scope" is its own heading
 
@@ -143,7 +143,7 @@ the log. The frontmatter `decisions:` field from F2 is dropped;
 - each implementer agent — `angular-implementer` step 7,
   `react-implementer` step 6, `test-implementer` step 6,
   `story-implementer` step 5;
-- `/implement`'s affected-projects typecheck gate
+- `/impel`'s affected-projects typecheck gate
   (`implement/SKILL.md:161`, `:177-178`).
 
 Exception: a `chore` step touching tsconfig or project config lists the
@@ -162,18 +162,18 @@ Follow-up owed: amend the global rule
 `~/.claude/rules/decompose-by-dependency-graph.md` § Execution grain,
 which currently says to emit Parallel-safe per step.
 
-### F12 — /implement schedules from the plan's graph
+### F12 — /impel schedules from the plan's graph
 
 **Status:** accepted
 
-`/implement` must schedule from the approved plan's graph, not re-derive
+`/impel` must schedule from the approved plan's graph, not re-derive
 it. Today (`implement/SKILL.md:144`) it reads Depends on but decides
 parallelism itself via a Files-overlap heuristic, ignoring the plan's
 parallel declarations.
 
 Behaviour:
 
-- `/implement` schedules from `progress.md`'s graph, running the
+- `/impel` schedules from `progress.md`'s graph, running the
   unblocked frontier.
 - Before dispatching, it checks Files overlap between steps the graph
   marks parallel.
@@ -185,7 +185,7 @@ Behaviour:
   without being written back.
 - The fix is not limited to patching `depends_on` by hand. If
   correcting the graph means rewriting step files (e.g. a step's Do or
-  Watch out changes once it is sequenced after another), `/implement`
+  Watch out changes once it is sequenced after another), `/impel`
   re-invokes whatever skill or agent owns that — `/to-tasks`' writer
   for step files — before resuming. User, confirmed: "if this needs to
   invoke again some skills, so be it."
@@ -203,6 +203,49 @@ No `doc-compressor` / `concise-docs` pass: its fewer-words goal pushes
 toward the density F5 rejected.
 
 Revisit if long plans visibly drift back to dense prose.
+
+### F14 — Outcome line in progress.md
+
+**Status:** accepted (2026-10-18)
+
+`progress.md` carries one testable **Outcome** sentence above the
+graph: what is true once every step is done. It is stated first in
+§4 and copied verbatim.
+
+### F15 — Done-when checks are observable
+
+**Status:** accepted (2026-10-18). Amends F10.
+
+Every `Done when` check names a command and its result, a file and
+what it contains, or a behavior with a concrete value. Enforced via
+writer rule 5 plus a before/after example (same mechanism as F13).
+
+### F16 — §4 outline is a table
+
+**Status:** accepted (2026-10-18)
+
+The §4 outline is a table: #, Step, Type, Depends on, Files, Done
+when. Replaces the numbered list.
+
+### F17 — Decisions sit next to their step
+
+**Status:** accepted (2026-10-18)
+
+Open decisions in §4 are "Decide:" lines with a recommendation,
+under the table, each naming its step. Shown all at once under
+`rules/open-questions-one-by-one.md` § Exception.
+
+### F18 — progress.md graph is Mermaid
+
+**Status:** accepted (2026-10-18). Amends F11.
+
+The graph is a Mermaid `graph LR` block (nodes `S<N>`, one `-->` per
+`depends_on` edge) instead of ASCII. Renders in GitHub and VS Code.
+`/impel` reads both forms; `to-issues`' `issue-graph.md` stays ASCII.
+
+Source for F14–F18: HTML-planning review,
+`~/.claude/docs/discovery/html-planning-integration.md` (HTML pages
+dropped for token cost; these are the Markdown-only takeaways).
 
 ## Discovery input
 

@@ -19,7 +19,7 @@ Work from whatever the user has already described. Ask only enough to make the t
 One extra thing to pin down: the ticket's **stack** — `react`, `angular`, `node`, or `none`
 (docs/chore work with no code). Infer it from the owning project's dependencies if the ticket
 is unambiguously scoped to one; ask only if you genuinely can't tell. This is what lets
-`/implement` route each task step to the right implementer agent, so don't leave it `null`.
+`/impel` route each task step to the right implementer agent, so don't leave it `null`.
 
 ### 2. Draft the ticket
 
@@ -81,7 +81,8 @@ Explicit, testable criteria — this is the ticket's definition of done, and wha
 
 ## Other relevant data
 
-Links to designs, prior PRs, recordings, related tickets, or existing test examples.
+Links to designs (Figma frame URLs — one per row when possible), prior PRs, recordings, related
+tickets, or existing test examples.
 
 </feature-ticket-template>
 
@@ -131,12 +132,17 @@ Once the check passes, dispatch the write to a `haiku` writer per `references/fi
 — never inline; the brief carries the full JSON below, filled in. Join it before step 5's
 commit, which needs the file on disk.
 
+**Figma capture (UI tickets).** When the ticket or user supplies Figma frame URLs, run
+`references/figma-capture.md` **before** the writer finishes `state.json`: parse each frame,
+call `get_screenshot` per frame into `<workspace-root>/figma/`, and set `figma[]` on the JSON
+below. No design analysis at intake — capture only. Backend-only tickets: `figma: []`.
+
 Write `<workspace-root>/state.json` (substituting whichever root was decided above), per
 `references/state-schema.md`:
 
 ```json
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "runId": "<slug>-<utc-timestamp>",
   "slug": "<slug>",
   "ticketRef": "<the id/key/path the tracker convention returned>",
@@ -147,6 +153,8 @@ Write `<workspace-root>/state.json` (substituting whichever root was decided abo
   "isComplex": null,
   "decisionsPath": "<workspace-root>/1-decisions.md",
   "capabilityLogPath": "<the capability's decisions log, or null>",
+  "figma": [],
+  "designPath": null,
   "specPath": null,
   "architecturePath": null,
   "githubIssues": [],
@@ -166,15 +174,15 @@ the effort progresses. `githubIssues` fills in once `/to-issues` runs. `runId` i
 `<slug>-<utc-timestamp>`; `createdAt`/`updatedAt` both start at creation time and `updatedAt`
 moves forward on every later write, per `references/state-schema.md`'s validation routine.
 
-`stack` is set here and read by `/implement`, which pairs it with each step file's `Task type`
+`stack` is set here and read by `/impel`, which pairs it with each step file's `Task type`
 to pick the implementer agent. It is the only routing field that belongs to the whole ticket —
 per-step routing lives in the step files `/to-tasks` writes.
 
 ### 5. Commit
 
 Once the writer has joined, commit `state.json` on `docs/<slug>` — one commit, staged by path
-(`git add <workspace-root>/state.json`, plus the ticket file if the tracker convention is
-local files; never `-A`). Message per `atomic-commit` § Commit
+(`git add <workspace-root>/state.json`, plus `<workspace-root>/figma/` when capture ran, plus
+the ticket file if the tracker convention is local files; never `-A`). Message per `atomic-commit` § Commit
 format: `📚 docs(<scope>): open <slug> workspace`, trailer `Refs: none` (the epic issue does
 not exist until `/to-spec`). Do not push — `/ship` pushes the planning branch after
 `/to-issues`.

@@ -1,12 +1,12 @@
 ---
 name: to-tasks
-description: Generate a step-by-step implementation task plan for a single issue, from its spec and architecture doc — the last stop before /implement.
+description: Generate a step-by-step implementation task plan for a single issue, from its spec and architecture doc — the last stop before /impel.
 disable-model-invocation: true
 ---
 
 # To Tasks
 
-Turn one issue's slice of work into an ordered, step-by-step implementation plan — fine enough grain that `/implement` can follow it directly, without re-deriving the design.
+Turn one issue's slice of work into an ordered, step-by-step implementation plan — fine enough grain that `/impel` can follow it directly, without re-deriving the design.
 
 ## Process
 
@@ -23,14 +23,15 @@ in this skill writes to the default branch.
    merged — `gh pr list --state merged --head docs/<epic-slug>`. Still open → stop and point at
    it. An issue with no epic workspace skips this check.
 3. **Branch + worktree.** Run `references/start-branch.md` with
-   `<type>/<issue#>-<slice-slug>`. It prunes merged work, creates the worktree off
-   `origin/<default>` and enters it. Every later step in this skill works inside it.
+   `<type>/<issue#>-<slice-slug>` and **`useWorktree: true`** (default for issue work). It
+   prunes merged work, creates the worktree off `origin/<default>` and enters it. Every later
+   step in this skill works inside it.
 
 ### 1. Gather context
 
-Read the target issue in full (body + comments), via the issue tracker convention from `docs/agents/issue-tracker.md`. If the ticket workspace's `state.json` exists, also read `specPath` and, if set, `architecturePath` — the task plan must stay consistent with both, not just the issue's own text.
+Read the target issue in full (body + comments), via the issue tracker convention from `docs/agents/issue-tracker.md`. If the ticket workspace's `state.json` exists, also read `specPath`, `designPath` (when set), and `architecturePath` — the task plan must stay consistent with all of them, not just the issue's own text. UI issues with a **Figma frames** section follow `references/figma-steps.md`.
 
-If no `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug` and `stack`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket). `stack` must not be left `null` — `/implement` routes on it. If `state.json` already exists, validate it per `to-ticket/references/state-schema.md`.
+If no `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug` and `stack`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket). `stack` must not be left `null` — `/impel` routes on it. If `state.json` already exists, validate it per `to-ticket/references/state-schema.md`.
 
 ### 2. Explore the codebase (optional)
 
@@ -44,6 +45,8 @@ An ordered list of concrete steps — which files to create or edit, in what ord
 - Before numbering, apply `decompose-by-dependency-graph` § Execution grain: list the candidate steps, map real edges, rank core/independent/dependent.
 - Order steps so each one leaves the codebase in a working, testable state — the same discipline `/to-issues` applies to slicing, one level down. This numbering is presentation order, not proof of a dependency — two adjacent steps with no real edge are parallel-safe.
 - Call out where tests should land, using the spec's Testing Decisions.
+- When the issue lists Figma frames, bind `figma:` on UI `code` steps and add a terminal
+  `verify-ui` step per `references/figma-steps.md`.
 
 ### 4. Quiz the user
 
@@ -60,33 +63,33 @@ writes nothing.
 
 Then present each returned plan to the user, one step at a time, and iterate until approved.
 This review is the point of the stage — the user sees *why* each seam gets its test before any
-test exists. Raise the plan's **Open questions** here; don't carry them to `/implement`.
+test exists. Raise the plan's **Open questions** here; don't carry them to `/impel`.
 
 A planner that returns `Seams: none` gets no test plan. That step keeps test-after-code: if it
 still needs tests, it keeps its own `type: test` step.
 
 A step whose test plan is approved **absorbs** its test step: drop the separate `type: test`
-step for that code from the outline, and renumber. `/implement` runs red, green and types
+step for that code from the outline, and renumber. `/impel` runs red, green and types
 inside the code step.
 
 ### 5. Write the plan
 
 If the ticket workspace's `state.json` does not exist, ask the user whether to create it (with `specPath`, `architecturePath` if known) before writing the plan — unless the issue's Pipeline block says `workspace: null` (see **Tasks root** below). Always write the plan as files — never present it inline only.
 
-**Tasks root** — where this issue's plan lives. `/implement` and `/ship` resolve it the same way:
+**Tasks root** — where this issue's plan lives. `/impel`, `/implement` (Org server), and `/ship` resolve it the same way:
 
-- Issue has a workspace → `<workspaceRoot>/4-tasks/issue-<N>/` (committed, below).
-- Pipeline block says `workspace: null` (a standalone issue, no epic) →
-  `$(git rev-parse --git-dir)/pipeline/issue-<N>/`, inside the issue's worktree. That folder is
-  per-worktree and never tracked, so the plan can't dirty the tree or leak into the PR, and it is
-  deleted with the worktree after merge. No plan commit; the issue body stays the record of
-  intent.
+| Case | `<tasks-root>` |
+|------|----------------|
+| `state.json` with `workspaceRoot` | `<workspaceRoot>/tasks/` |
+| Pipeline `workspace: null` (standalone issue, no epic) | `$(git rev-parse --git-dir)/pipeline/issue-<N>/` inside the issue worktree (untracked; deleted with worktree) |
+| No ticket workspace | `.cursor/plans/<slug>/` at the repo root when `.cursor/rules/plan-format.mdc` exists (Org server default) |
 
-Write all task files under `<workspaceRoot>/4-tasks/issue-<N>/`, colocated with the domain's
-other docs (spec, architecture, decisions), inside the issue's worktree. One folder per issue:
-an epic's workspace holds many issues, and each issue's branch must touch only its own folder,
-so parallel branches never conflict on task files. The writer brief's absolute paths point
-into the worktree.
+Write all plan files under `<tasks-root>/`, colocated with the ticket's other docs when a workspace
+exists. One epic workspace may hold many issues — each issue branch should touch only its own
+`tasks/` (or pipeline folder). Do **not** use repo-root `4-tasks/` (legacy scratch).
+
+**Org server:** canonical procedure is `.claude/skills/to-tasks/SKILL.md` in that repo; hand off
+to `/implement`, not `/impel`.
 
 **Dispatch every write in this step — step files, test plans, `progress.md`, the `state.json`
 update — to one `sonnet` writer**, per `to-ticket/references/file-writes.md`. It renders step
@@ -95,143 +98,20 @@ plan, the approved test plans verbatim, the ticket's `stack`, and this section's
 Pipeline-block update below:** promoting to `ready-for-agent` claims the plan is on disk, so
 it rests on what the writer actually wrote.
 
-#### Step files
+#### Step files and `progress.md` (format)
 
-One `step-N-<slug>.plan.md` per step, in this shape:
+When the workspace contains **`.cursor/rules/plan-format.mdc`** (Org server), follow that rule
+exactly for every `step-N-<slug>.plan.md` and for `progress.md` — do not use the legacy frontmatter
+template below.
 
-````markdown
----
-step: 1
-type: code
-commit: feat
-depends_on: []
-files:
-  - libs/table/src/api/features/with-sorting/types.ts (new)
-  - libs/table/src/api/features/with-sorting/schema.ts (new)
----
-# Step 1 — The sorting schema module
+**Legacy repos (no plan-format rule):** one `step-N-<slug>.plan.md` per step with YAML frontmatter
+(`step`, `type`, `commit`, `depends_on`, `files`, optional `figma`) and sections **Do**, **Watch out**,
+**Out of scope**, **Done when** — `/impel` routes on `type` + ticket `stack`. See git history of this
+skill for the full legacy example.
 
-Adds the three sorting declarators in a new `with-sorting/schema.ts`.
-Nothing uses them yet; Step 2 wires them into `withSorting()`.
-
-Decisions: [SO21, SO22](../../decisions/sorting.md)
-
-## Do
-
-Model `schema.ts` on `with-grouping/schema.ts`. The new API:
-
-```ts
-sortNulls(path.total, { order: 'last' });
-sortFn(path.name, (a, b) => a.name.localeCompare(b.name));
-sortable(path.id, { enable: () => false });
-```
-
-## Watch out
-
-- Export nothing from `index.ts` yet. Step 3 swaps the names.
-
-## Out of scope
-
-- The `ctx` argument to the comparator (#117).
-
-## Done when
-
-- [ ] `schema.ts` calls `runRecordedSchema` and has no recorder
-      session code of its own.
-````
-
-Section rules:
-
-- **Frontmatter** holds `step`, `type`, `commit`, `depends_on`, `files`
-  — nothing else. Skills and scaffolding agent are not written:
-  `/implement` derives them from `type` + the ticket's `stack`. No
-  PR-scope prose; every step leaves the tree green anyway.
-- **`commit`** — the conventional-commit type of the one commit
-  `/implement` makes when this step is done. One of `feat`, `fix`,
-  `ref`, `perf`, `test`, `docs`, `chore`, `build`, `ci`, `style`,
-  `revert`. It is decided here because `type: code` can't tell feat
-  from fix from refactor. Emoji and message format:
-  `atomic-commit/SKILL.md`.
-- **Summary** — two plain lines under the title: what the step does,
-  and what it leaves for later steps.
-- **Decisions** — one line of decision IDs, linked to the capability's
-  decisions log. Rationale is link-only: no "why this step exists"
-  prose, no planning rulings copied in.
-- **Do** — the work. Any step that adds or changes an API or code shape
-  shows a short usage or signature snippet, even when it also points to
-  an existing pattern. A few lines; no function bodies, no JSDoc.
-- **Watch out** — implementation hints and risks, one bullet each.
-- **Out of scope** — what the step must not do. Its own heading, so the
-  step's boundary is visible at a glance.
-- **Done when** — step-specific checks only. Generic gates (typecheck)
-  are left to the implementer agents and `/implement`, which already
-  run them. Exception: a `chore` step touching tsconfig or project
-  config lists the typecheck explicitly.
-
-Each step must be independently reviewable and deployable unless the
-graph shows a hard edge, written as `depends_on: [N]`. Parallel-safety
-is not written per step; it lives once, in `progress.md`'s graph.
-
-#### Writing rules (part of the writer brief)
-
-The user reads and approves every step, so it must read easily. The
-cut targets duplication and history, not grammar.
-
-1. Short, plain, full sentences — one idea each. No telegraphic
-   shorthand.
-2. No "because", history or rejected alternatives. Rationale lives in
-   the decisions log.
-3. Don't restate conventions the agent already loads (CLAUDE.md,
-   rules, skills).
-4. Say each fact once, in one section.
-
-Before:
-
-> **Take the simplest signature that works** ([[simplest-signature-first]]).
-> Try a plain `SortingHandle<TRow>` parameter first, which is
-> `K = string, V = unknown`. Only make the helper generic in `K` if
-> `SortingHandle<Row, 'total', number>` turns out not to be assignable
-> to it. Step 5's types spec settles this.
-
-After:
-
-> - `sortingSchema` takes a plain `SortingHandle<TRow>`. Add a `K`
->   generic only if Step 5's types spec fails.
-
-Pass these rules and the example to the writer verbatim. No
-compression pass runs afterwards — its fewer-words goal pushes toward
-the density these rules reject.
-
-**`type` is required on every step file** — it is what `/implement`
-routes on. Exactly one of:
-
-| `type` | Step produces | `/implement` dispatches to |
-|---|---|---|
-| `code` | components, hooks, services, stores, utils | `react-implementer` / `angular-implementer`, by the ticket's `stack` |
-| `story` | `<Component>.stories.tsx` | `story-implementer` |
-| `test` | `*.spec.ts(x)` | `test-implementer` (or `ds-test-scaffolder` for DS-pipeline components) |
-| `docs` | markdown, ADRs, README | a fork (`adr-writer` for exactly one ADR) |
-| `chore` | config, deps, tooling | a fork |
-
-Rules that follow from this:
-
-- One type per step. A step that writes a component *and* its stories is two steps, not one —
-  otherwise it cannot be routed, and the story conventions never get loaded.
-- A `story` or `test` step must declare `depends_on: [N]` naming the `code` step that
-  produces its subject.
-- A `code` step with an approved test plan has no separate `test` step — its tests are
-  written inside it, first (§4b).
-- Don't leave the type to inference. `/implement` will guess from file extensions if it's
-  missing, but a guess means the step file was written wrong.
-
-Each step file must include navigation links at the bottom:
-
-```markdown
----
-← [Step N-1: <title>](step-N-1-<slug>.plan.md) | [Step N+1: <title>](step-N+1-<slug>.plan.md) →
-```
-
-First step omits the `←` link; last step omits the `→` link.
+**Either format:** one graph node per step file; **Depends on** / **Parallel-safe** on each step;
+parallel-safety summary once in `progress.md`. Link steps with relative paths
+(`./step-2-foo.plan.md`), not section hops inside one file.
 
 #### Test plan files
 
@@ -239,50 +119,18 @@ One `step-N-<slug>.test-plan.md` per step with an approved test plan, beside its
 `step-N-<slug>.plan.md` — written verbatim from the approved `tdd-planner` output (format in
 `~/.claude/agents/tdd-planner.md`). The writing rules above do not apply to it: its "why" and
 "order reason" lines are the content the user reviewed. No navigation links. Its presence is
-what makes `/implement` run the step test-first, so never write one that wasn't approved in
+what makes `/impel` run the step test-first, so never write one that wasn't approved in
 §4b.
 
 #### Progress file
 
-Write `<workspaceRoot>/4-tasks/issue-<N>/progress.md` to track `/implement` execution:
+Write `<tasks-root>/progress.md`. Under **plan-format.mdc**, include every required section there
+(Summary, Assumptions, Affected areas, Graph, Files rollup, Contract & i18n, Open questions, Build
+todos) plus a status table `| Step | Plan | Status | Depends / parallel |`.
 
-````markdown
-# Implementation Progress — <issue title>
-
-**Issue:** #<number>
-**Branch:** <type>/<number>-<slice-slug>
-**Worktree:** <repoRoot>/.claude/worktrees/<type>-<number>-<slice-slug>
-**Status:** 0 / N complete
-
-## Graph
-
-```
-Step 1 ──► Step 2 ──► Step 3
-             └──────► Step 5
-Step 4 (independent)
-```
-
-Parallel-safe: [4] · Dependency: 1 → 2 → 3
-
-## Steps
-
-| Step | Title | Status |
-|---|---|---|
-| 1 | <title> | ⬚ pending |
-| 2 | <title> | ⬚ pending |
-| ... | ... | ... |
-````
-
-`**Branch:**` and `**Worktree:**` are what `/implement` guards on and `/ship` pushes. There is no
-PR column: the PR is looked up from the branch (`gh pr list --head <branch>`), not written down.
-
-The graph is the one place parallel-safety is written — derived from
-the same ranking as every step's `depends_on`, so the two never
-disagree. `/implement` schedules from it.
-
-Status values: `⬚ pending`, `▶ in progress`, `✅ done`, `🧪 awaiting CI` (committed; its
-`Done when` is proven only by the PR's CI), `⏭ skipped`.
-`/implement` updates this file as it works through steps.
+Legacy layout: issue header (`**Issue:**`, `**Branch:**`, `**Worktree:**`), ASCII graph, and
+`| Step | Title | Status |` with values `⬚ pending`, `▶ in progress`, `✅ done`, `🧪 awaiting CI`,
+`⏭ skipped`. `/impel` or `/implement` updates status as steps complete.
 
 #### State update
 
@@ -292,8 +140,8 @@ conflicts. `tasks` status is tracked on the issue's `## Pipeline` block below. T
 is a `state.json` this run had to create (§1) — it is committed with the plan.
 
 **Update the source issue's `## Pipeline` block** (contract: `to-issues/references/pipeline-block.md`):
-set `tasks: done: <workspaceRoot>/4-tasks/issue-<N>/` (no workspace: `tasks: done: local, in the
-issue's worktree`) and `readiness: ready-for-agent`, and
+set `tasks: done: <tasks-root>/` (no workspace: `tasks: done: local, in the issue's worktree`) and
+`readiness: ready-for-agent`, and
 swap the `needs:tasks` label for `ready-for-agent`.
 
 This is the one promotion to `ready-for-agent` an agent may make unasked — a step plan either
@@ -303,7 +151,8 @@ exists on disk or it does not, so it is an observation, not the judgement call
 #### Plan commit
 
 After the writer's report, commit the plan on the issue branch — the first commit of the PR's
-story. Skip this when the tasks root is the untracked no-workspace folder (§5). Stage only `4-tasks/issue-<N>/` (plus a `state.json` this run created), never `-A`:
+story. Skip this when the tasks root is the untracked no-workspace folder (§5). Stage only
+`<tasks-root>/` (plus a `state.json` this run created), never `-A`:
 
 ```
 📚 [#<N> plan] docs(<scope>): plan tasks for #<N>
@@ -316,5 +165,5 @@ Refs: #<N>
 End your final message with a one-line pointer, as the very last line — nothing after it:
 
 ```
-Next: /implement <issue-#-or-slug>
+Next: /impel <issue-#-or-slug>
 ```

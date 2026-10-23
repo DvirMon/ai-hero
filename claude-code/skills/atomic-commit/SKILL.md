@@ -9,9 +9,20 @@ Turn all current uncommitted changes in the working tree — staged or not — i
 
 This only ever touches the **index** (staging area) and creates **new** commits. It never rewrites existing history, never discards or edits any file's contents, and never pushes.
 
-This skill is also the **commit-format SSOT** for the pipeline (§ Commit format). `/implement` writes its per-step commits in this format; this skill itself is the ad-hoc splitter for leftover or hand-made changes, not a step of the main flow.
+This skill is also the **commit-format SSOT** for the pipeline (§ Commit format). `/impel` writes its per-step commits in this format; this skill itself is the ad-hoc splitter for leftover or hand-made changes, not a step of the main flow.
 
 ## Commit format
+
+**Per-repo override first.** Read `~/.config/org/commit-format.json`. If its
+`repo` equals the current repo root, use its format for every commit made here:
+
+- First commit on the branch: `subject` with `{issue}` and `{ticketTitle}`
+  filled in, then the `firstCommit.body` fields (`Resolution Description`,
+  `Testing Instructions`, `Reviewed By`).
+- Later commits: `laterCommits.subject`, body optional.
+- Skip the emoji/type/`Refs:` rules below for these commits.
+
+Otherwise (another repo, or no file) use the default format:
 
 ```
 <emoji> [#<issue> <stage>] <type>(<project>[/<domain>]): <imperative subject>

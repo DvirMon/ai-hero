@@ -7,7 +7,7 @@ reference files, plus a shared cross-cutting reference nothing layer-specific sh
 
 **Structure:**
 - `unit-test` — unit/component test *selection policy* (what to test / what to skip), React +
-  Angular. Executed by the `test-implementer` agent via `/implement`. Owns its `references/`
+  Angular. Executed by the `test-implementer` agent via `/impel`. Owns its `references/`
   outright (the three unit-testing files).
 - `ds-test-scaffolder` — DS component logic tests (ds-plan/ds-scaffold pipeline only; reads
   `unit-test`'s references and the shared principles by path).

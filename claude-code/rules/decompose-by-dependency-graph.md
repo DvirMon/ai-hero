@@ -54,8 +54,9 @@ don't reuse a grilling ranking.
 4. Work the **frontier** — any step whose blockers are done —
    as the execution unit.
 5. Render the graph **once**, in the plan's progress file
-   (`progress.md` for `/to-tasks`), not per step: ASCII (nodes
-   + arrows, joined edges for multi-blocker nodes), plus a
+   (`progress.md` for `/to-tasks`), not per step: a diagram
+   (Mermaid in `progress.md`, ASCII where the caller's
+   template says so — nodes + arrows), plus a
    one-line summary (`Parallel-safe: [D,E,G] after B` /
    `Dependency: A → B → F`).
    All three views (per-step `depends_on`, diagram, summary)
