@@ -70,7 +70,8 @@ If no `state.json` exists, grill without a workspace — never create one; only 
      AC, so don't overwrite it. Log the entry as *proposed*, append `⚠ Dn` to that AC line,
      and post the question to product through `docs/agents/ticket-tracker.md`
      `## Post a comment` (a repo may implement it as e.g. `skill:jira-grill-comment`).
-     `/to-spec` stops until the marker clears.
+     `/to-spec` stops until the marker clears. On a library / DS ticket the capability PRD
+     has no AC line: put `⚠ <KEY> AC` on the proposed entry instead.
 
    **Every `1-decisions.md`, capability-log, `prd.md` and `state.json` write goes to a `haiku` writer**,
    per `to-ticket/references/file-writes.md` — you hand it the finished line, so the write is

@@ -19,6 +19,9 @@ Linear has no epic issue type; the epic is a Linear **project**. Per `intake.epi
 - **create** — first `projectCreate` with `name` and `teamIds`, then pass its id as `projectId`.
 - **none** — no project.
 
+Source: `https://github.com/linear/linear/blob/master/packages/sdk/src/schema.graphql`
+(`IssueCreateInput.projectId`, `ProjectCreateInput.name` / `.teamIds`).
+
 Return the identifier and `issue.url`.
 
 ## Post a comment

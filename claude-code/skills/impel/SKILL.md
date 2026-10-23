@@ -352,7 +352,7 @@ didn't commit its files — commit it now against that step, or report it; never
 `/ship` to sweep up.
 
 **No closing keyword in any commit.** Commits carry `Refs: #<N>` only. The PR body `/ship`
-writes owns `Closes #<N>`, and GitHub closes the issue when the PR merges. A closing keyword in a
+writes owns the closing line from `docs/agents/issue-tracker.md` `## Issue references` (GitHub/GitLab: `Closes #<N>`, closed on merge; Jira: a transition, no keyword). A closing keyword in a
 commit (`close[sd]`, `fix(e[sd])`, `resolve[sd]` before `#N`) would fire on any push that reaches
 the default branch, ahead of review and CI.
 

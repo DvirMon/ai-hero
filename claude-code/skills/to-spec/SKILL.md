@@ -24,7 +24,10 @@ The repo's `docs/agents/ticket-tracker.md` and `docs/agents/issue-tracker.md` (c
    Compare each against its `[<ticketRef> · MM-DD]` line in `prd.md`. A changed AC gets its new
    text and today's pull date; list every changed line to the user before building the
    checklist. A new remote AC is added with its tag; a removed one is listed, not deleted.
+   **`library` / `design-system`:** the capability PRD holds no ticket ACs. Read them straight
+   from the fetch as checklist input, each tagged `[<ticketRef> · MM-DD]`.
 2. **Stop on an open `⚠ Dn`.** Any line still marked `⚠` blocks the spec — product owns the AC.
+   On a library / DS ticket, check the `⚠ <KEY> AC` entries in `decisionsPath` instead.
    It clears only per `doc-contracts/prd.md` § Conflict marker: the re-fetch above shows product
    updated the ticket, or `decisionsPath` holds an override entry `Dm` naming `Dn` (then rewrite
    the line to the decision, tag `[Dm]`, drop the marker). Otherwise name the open lines and

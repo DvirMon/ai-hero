@@ -44,14 +44,22 @@ Check in order, before touching git. Any failure stops here — say which one an
      `🧪 awaiting CI` (CI on this PR proves it) or `⏭ skipped`; any `▶ in progress` or
      `⬚ pending` → stop. Do not ship unfinished steps.
    - **None** (the issue body was the step): the branch's `N` already matched in check 1. Read
-     the issue's "Acceptance criteria" boxes (`gh issue view <N> --json body`). All ticked →
+     the issue's "Acceptance criteria" boxes (read through `docs/agents/issue-tracker.md` `## Fetch`). All ticked →
      ship with `Closes #N`. Some unticked → ship only if `/impel` reported the issue as
      partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/impel` hasn't closed
      out.
 5. **Something to ship.** `git log --oneline origin/main..HEAD` is non-empty.
 6. **Code host.** `git remote get-url origin`: a GitHub host → `gh`; a GitLab host → `glab`
-   (merge requests; same steps, the `glab mr` equivalents of the `gh pr` commands below).
+   (merge requests; same steps, with the commands below swapped per this table).
    Anything else → stop and name it.
+
+   | `gh` | `glab` ([docs](https://docs.gitlab.com/cli/mr/)) |
+   |---|---|
+   | `gh pr list --head <b> --state open --json number,url` | `glab mr list --source-branch <b> --output json` (open is the default; fields are `iid`, `web_url`) |
+   | `gh pr create --base main --head <b> --title T --body-file F` | `glab mr create --target-branch main --source-branch <b> --title T --description-file F --yes` |
+   | `gh pr merge <n> --auto --rebase` | `glab mr merge <n> --auto-merge --rebase --yes` |
+
+   `glab mr create --head` names a fork repo, not a branch — use `--source-branch`.
 
 ## 2. Gate — the developer approves the story
 
@@ -172,8 +180,8 @@ as a workaround.
 - Acceptance checks are **implemented, not verified** — CI on the PR decides. Do not poll CI,
   do not merge, do not close anything.
 - **Next frontier.** From `<workspaceRoot>/issue-graph.md`'s edges and one read of open issues
-  (`gh issue list --state open --json number,title`), name the issues this PR will unblock once
-  it merges, and any already unblocked now. Blocked issues start only after GitHub merges — the
+  (through `docs/agents/issue-tracker.md` `## Fetch`), name the issues this PR will unblock once
+  it merges, and any already unblocked now. Blocked issues start only after the PR/MR merges — the
   next `/to-tasks` prunes this branch's worktree and fast-forwards `main` at that point.
 - Local cleanup is not this skill's job (see `to-tasks/references/start-branch.md`).
 

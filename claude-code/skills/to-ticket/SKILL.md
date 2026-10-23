@@ -176,7 +176,8 @@ filled in; `sonnet` if the writer must fit the PRD into an existing file. Join i
   against these. On the idea path, ACs drafted in step 2 that live only in the PRD (the
   ticket holds the summary) have no remote source and take no tag.
 - **`library` / `design-system`** — the capability PRD is `story-discovery`'s; don't write
-  it. Set `prdPath` to the resolved path when that file exists, else `null`.
+  it. Set `prdPath` to the resolved path when that file exists, else `null`. The remote ACs
+  stay on the ticket and are not copied — `/to-spec` reads them from the tracker.
 
 **Figma capture (UI tickets).** When the ticket or user supplies Figma frame URLs, run
 `references/figma-capture.md` **before** the writer finishes `state.json`: parse each frame,

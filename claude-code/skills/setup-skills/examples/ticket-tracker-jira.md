@@ -24,6 +24,9 @@ Parent epic, per `intake.epic` (unset → ask):
   it with `POST /rest/api/3/issue`, then link the item to it as above.
 - **none** — no parent.
 
+Source: `https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json`
+(`POST /rest/api/3/issue`, `GET /rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes[/{issueTypeId}]`).
+
 Return the item's key and `https://<site>/browse/<key>`.
 
 ## Post a comment
