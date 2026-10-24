@@ -16,7 +16,7 @@ Ask the user. Typical triggers:
 ## Template
 
 ```markdown
-# Architecture: {prefix}-<name>
+# Architecture: {selector}
 
 **Status:** Draft
 **PRD:** [docs/prd.md](prd.md)
@@ -40,18 +40,18 @@ Why this pattern? Reference an equivalent reference-library component if applica
 ## Component Hierarchy
 
 ```
-<Name>Container (root / trigger owner)
-├── <Name>Panel (overlay panel)
-│   ├── <Name>Option (repeated item)
+{Name}Container (root / trigger owner)
+├── {Name}Panel (overlay panel)
+│   ├── {Name}Option (repeated item)
 │   └── ...
-└── <Name>Trigger (behavior unit applied to trigger element)
+└── {Name}Trigger (behavior unit applied to trigger element)
 ```
 
 ---
 
 ## Primitive Wiring
 
-See framework file for the concrete primitive library table (e.g. CDK for Angular).
+Concrete primitives come from Phase 1's decision (ordered by `sources.primitives`); the framework file shows an example.
 
 | Concern | Purpose |
 |---|---|

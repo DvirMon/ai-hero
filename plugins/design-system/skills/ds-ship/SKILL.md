@@ -1,48 +1,51 @@
 ---
 name: ds-ship
-description: Phase 7 of DS component creation — exports the component, issues Code Connect reminder, and runs final checklist. Runs after ds-review.
+description: Phase 7 of DS component creation — checks the component's exports and registration, issues the Code Connect reminder, and runs the final checklist. Runs after ds-review.
 ---
 
 # DS Component Builder — Phase 7: Ship
 
-> `{componentPath}` = this component's own working directory. `{dsComponentsRoot}` = the design system's shared components root (resolved from `designSystem.path` + `componentPathPattern` in the project's `ds-wayfinder.config.json`).
+## Config
 
-## Config Setup
-
-Discovers `{projectPath}/.claude/ds-wayfinder.config.json` (walks up from component path):
-- Project name, framework (determines export targets)
+Resolve the config per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md` and read `{conventions}`.
+Missing either → stop and point to `/ds-setup`.
 
 ---
 
 ## On start
 
-Ask the user for the component name, then read `{componentPath}docs/session-handoff.md`.
+Ask the user for the component name, then read `{docsDir}session-handoff.md`.
 
-Previous phase must be `ds-review` (which runs after `ds-scaffold`). If not complete → tell the user to run it first.
+Previous phase must be `ds-review`. If not complete → tell the user to run it first.
 
 ## Ship steps
 
-1. Ensure the component's `public-api.ts` and `index.ts` exist under its directory (`{componentPath}`, e.g. `libs/shared/ui-core/src/lib/components/2.0/atera-{name}/` for this repo's config). There is no single root barrel — each component is self-contained. To locate the correct parent path, check neighbouring components under `{dsComponentsRoot}`.
-2. If the project's `.claude/figma-project.json` has `codeConnect.available: true`, remind the user to invoke the `code-connect-authoring` skill to publish the Code Connect mapping file
+1. **Exports** — the component's exports match `{conventions}` § Types and exports:
+   - `publicApi.perComponent: true` → `{componentPath}public-api.ts` and `index.ts` exist.
+   - `publicApi.rootBarrel` set → `{publicApiBarrel}` contains the `publicApi.rootExport` line
+     for this component.
+   - `paths.importPath` set → `{importPath}` resolves to the component (tsconfig `paths` /
+     package `exports`).
+2. **Code Connect** — if the Figma project config (`figma.project`) has
+   `codeConnect.available: true`, remind the user to run the `code-connect-authoring` skill.
 
 ## Final checklist
 
-Run through this and report status for each item:
+Report status for each item:
 
-- [ ] Discovery Summary produced — variants, states, tokens, primitive candidate, a11y role
-- [ ] Design interview complete — `docs/decisions.md` written
-- [ ] `docs/prd.md` generated and approved
-- [ ] A11y spec defined — complex components: `docs/roles-map.md`; non-complex components: `a11ySpecText` in `phase-state.json`
-- [ ] `docs/architecture.md` generated (complex components only)
-- [ ] Developer checkpoint (spec) passed
+- [ ] Discovery Summary — variants, states, tokens, primitive, a11y role
+- [ ] Design interview complete — `decisions.md` written
+- [ ] `prd.md` generated and approved
+- [ ] A11y spec — complex: `roles-map.md`; otherwise `a11ySpecText` in `phase-state.json`
+- [ ] `architecture.md` (complex components only)
+- [ ] Developer checkpoints passed (spec, plan)
 - [ ] Task plan generated with step files
-- [ ] Developer checkpoint (plan) passed
-- [ ] `{prefix}-{name}.component.ts` — OnPush, inject(), input()/output(), host bindings
-- [ ] Template uses DS atomics (`<button {prefix}-button>`, `<{prefix}-icon-2>`)
-- [ ] Icon keys confirmed — no placeholder `uii_` keys
-- [ ] `{prefix}-{name}.component.scss` — token-only, REM, logical CSS, no ::ng-deep
-- [ ] `public-api.ts` + `index.ts` created
-- [ ] Storybook scaffolded (if opted in) — `storybook/` subfolder, `StoryObj` format
+- [ ] Component file matches `{conventions}` § Component shape
+- [ ] Internal DS components used, none re-implemented (PRD table)
+- [ ] Building-block conventions met (`{conventions}` § Building blocks — e.g. real icon keys, no placeholders)
+- [ ] Styles file — tokens only, logical CSS, `{conventions}` § Styling
+- [ ] Exports per step 1
+- [ ] Storybook scaffolded (if opted in) — `{conventions}` § Storybook
 - [ ] Unit tests scaffolded (if opted in)
 - [ ] Review passed — a11y, code, styles
-- [ ] Code Connect reminder issued
+- [ ] Code Connect reminder issued (when available)

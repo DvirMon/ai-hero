@@ -14,6 +14,9 @@ Generate `docs/architecture.md` for components complex enough to need one before
 - **componentPath**: string, target component directory
 - **discoverySummary**: string, full content of `docs/discovery-summary.md` — primitive decision, Figma analysis, internal DS components
 - **designDecisions**: string, full content of `docs/decisions.md` — API surface, interaction behavior, scope triage
+- **framework**: `angular` · `react`
+- **naming**: resolved `selector`, `className` patterns
+- **conventions**: path to `{conventions}`
 
 ## Outputs
 - **`docs/architecture.md`**, written inside `componentPath`, following the architecture template: Component Pattern (with justification), Component Hierarchy, Primitive Wiring, State Management (states + transition rules), Data Flow, Open Questions
@@ -28,15 +31,16 @@ Generate `docs/architecture.md` for components complex enough to need one before
 7. Surface every open question that must be resolved by the developer before Phase 5 starts — this doc is where ambiguity gets caught, not mid-implementation
 
 ## Standards & References
-- `.claude/skills/ds-wayfinder/references/architecture.md` — the authoritative agnostic architecture template, "When to Generate" triggers, and generation rules
-- Framework-specific primitive wiring/naming file (e.g. `architecture.angular.md` if present, else use `.claude/skills/ds-discovery/references/primitives.angular.md` for concrete CDK/ng-primitives import names)
+- `${CLAUDE_PLUGIN_ROOT}/skills/ds-wayfinder/references/architecture.md` — the authoritative agnostic architecture template, "When to Generate" triggers, and generation rules
+- `${CLAUDE_PLUGIN_ROOT}/skills/ds-wayfinder/references/architecture.{framework}.md` — wiring and naming example; `${CLAUDE_PLUGIN_ROOT}/skills/ds-discovery/references/primitives.{framework}.md` for concrete import names
+- `{conventions}` § API conventions — naming of units and behavior units
 - `docs/discovery-summary.md` — source of the primitive decision; do not re-derive it here
 
 ## Process
-1. Read `discoverySummary` — extract the finalized primitive decision (CDK primitive, ng-primitives primitive, or hand-rolled) and any internal wrapper override noted by `ds-codebase-discovery`
+1. Read `discoverySummary` — extract the finalized primitive decision (library + primitive, or hand-rolled) and any internal wrapper override noted by `ds-codebase-discovery`
 2. Read `designDecisions` — extract interaction behavior, API surface, and any explicit architecture-relevant decisions from interview
 3. Decide component pattern (single / two-part / multi-component) — justify against a reference-library equivalent if one exists, referencing the adaptation table in the framework primitives file
-4. Draw the hierarchy tree naming each unit (`<Name>Container`, `<Name>Panel`, `<Name>Trigger`, repeated items) using `{prefix}-<name>` naming conventions
+4. Draw the hierarchy tree naming each unit (container, panel, trigger, repeated items) per `naming` and `{conventions}` § API conventions
 5. Fill the Primitive Wiring table with concrete primitive names/imports per concern, sourced from discovery — do not redo discovery or substitute a different primitive here
 6. Enumerate every state variable with its representation and every transition (including guard rules like "cannot open when disabled")
 7. Write Data Flow sequences for each significant user action (open, navigate, select/confirm, dismiss) from trigger to final emitted event
@@ -45,7 +49,7 @@ Generate `docs/architecture.md` for components complex enough to need one before
 
 ## Acceptance Criteria
 - [ ] Component pattern decided and justified — not left as "TBD"
-- [ ] Component hierarchy tree includes every named unit, using `{prefix}-<name>` conventions
+- [ ] Component hierarchy tree includes every named unit, named per `naming` and `{conventions}`
 - [ ] Primitive Wiring table sourced from Phase 1 discovery, not re-derived or substituted
 - [ ] State Management table is complete — every state, every transition, including error/edge states
 - [ ] Data Flow section traces at least one sequence per significant user action end-to-end

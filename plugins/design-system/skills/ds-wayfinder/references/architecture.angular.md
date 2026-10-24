@@ -1,18 +1,18 @@
 # Architecture Doc — Angular Examples
 
-> Template/decision rules live in `architecture.md` (agnostic). This file is Angular CDK wiring and naming only.
+> Template/decision rules live in `architecture.md` (agnostic). This file is Angular wiring and naming only. Class names follow `naming.className` and `{conventions}`; the CDK below is the example when `sources.primitives` lists it — wire whatever discovery chose.
 
 ## Component Hierarchy
 
 ```
-Atera<Name>Component (host directive / container)
-├── Atera<Name>PanelComponent (overlay panel)
-│   ├── Atera<Name>OptionComponent (repeated item)
+{Prefix}{Name}Component (host directive / container)
+├── {Prefix}{Name}PanelComponent (overlay panel)
+│   ├── {Prefix}{Name}OptionComponent (repeated item)
 │   └── ...
-└── Atera<Name>TriggerDirective (applied to trigger element)
+└── {Prefix}{Name}TriggerDirective (applied to trigger element)
 ```
 
-## CDK Wiring
+## Primitive Wiring (CDK example)
 
 | CDK Primitive | Purpose | Import |
 |---|---|---|
@@ -62,4 +62,4 @@ User action (Enter / click option)
 
 ## Justification Reference
 
-Reference the Angular Material equivalent if applicable — see `primitives.angular.md` for the adaptation table.
+Reference the equivalent component from `sources.references` if one exists — see `primitives.angular.md` for the adaptation table.

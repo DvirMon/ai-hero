@@ -2,7 +2,8 @@
 
 > Guideline, principle, and pattern-selection decision tree live in `component-api.md` (agnostic). This file is Angular syntax only, mapped to that file's pattern numbers.
 
-> Replace `{PREFIX}` with your component prefix (e.g., `atera`, `my`, `app`). Replace `{PascalPrefix}` with PascalCase version (e.g., `Atera`, `My`, `App`).
+> `{prefix}` · `{Prefix}` · `{PREFIX}` resolve from the design-system config. `{conventions}` § API
+> conventions wins where it differs.
 
 ## Pattern 1 — Directive-as-feature
 
@@ -35,17 +36,17 @@ Parent provides itself as a token; children inject it.
 // Parent
 @Component({
   selector: '{prefix}-card',
-  providers: [{ provide: {PREFIX_UPPER}_CARD, useExisting: {PascalPrefix}CardComponent }]
+  providers: [{ provide: {PREFIX}_CARD, useExisting: {Prefix}CardComponent }]
 })
-export class {PascalPrefix}CardComponent {
-  readonly items = signal<{PascalPrefix}CardItemComponent[]>([]);
-  register(item: {PascalPrefix}CardItemComponent): void { this.items.update(i => [...i, item]); }
+export class {Prefix}CardComponent {
+  readonly items = signal<{Prefix}CardItemComponent[]>([]);
+  register(item: {Prefix}CardItemComponent): void { this.items.update(i => [...i, item]); }
 }
 
 // Child injects parent — no direct import coupling
 @Component({ selector: '{prefix}-card-title' })
-export class {PascalPrefix}CardTitleComponent {
-  private readonly card = inject({PREFIX_UPPER}_CARD, { optional: true });
+export class {Prefix}CardTitleComponent {
+  private readonly card = inject({PREFIX}_CARD, { optional: true });
   constructor() { this.card?.register(this); }
 }
 ```
@@ -82,7 +83,7 @@ Prefer attribute selectors over element selectors.
 <!-- Consumer -->
 <{prefix}-card>
   <span {prefix}CardTitle>My Title</span>
-  <p>Rich content including <{prefix}-icon-2 key="info" /></p>
+  <p>Rich content including <{prefix}-icon key="info" /></p>
   <button {prefix}CardActions {prefix}-button>Save</button>
 </{prefix}-card>
 ```
@@ -109,21 +110,21 @@ Prefer attribute selectors over element selectors.
 ### Simple component
 
 ```typescript
-export { {PascalPrefix}BadgeComponent } from './{prefix}-badge.component';
+export { {Prefix}BadgeComponent } from './{prefix}-badge.component';
 export type { BadgeVariant, BadgeSize } from './{prefix}-badge.component';
 ```
 
 ### Multi-atomic family (Pattern 4)
 
 ```typescript
-export { {PascalPrefix}StepperComponent }        from './{prefix}-stepper.component';
-export { {PascalPrefix}StepComponent }           from './{prefix}-step.component';
-export { {PascalPrefix}StepperLabelDirective }   from './{prefix}-stepper-label.directive';
+export { {Prefix}StepperComponent }        from './{prefix}-stepper.component';
+export { {Prefix}StepComponent }           from './{prefix}-step.component';
+export { {Prefix}StepperLabelDirective }   from './{prefix}-stepper-label.directive';
 export type { StepperOrientation }      from './{prefix}-stepper.component';
 
-export const {PascalPrefix}Stepper = [
-  {PascalPrefix}StepperComponent,
-  {PascalPrefix}StepComponent,
-  {PascalPrefix}StepperLabelDirective,
+export const {Prefix}Stepper = [
+  {Prefix}StepperComponent,
+  {Prefix}StepComponent,
+  {Prefix}StepperLabelDirective,
 ] as const;
 ```

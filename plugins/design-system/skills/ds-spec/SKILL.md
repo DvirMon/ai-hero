@@ -5,26 +5,25 @@ description: Phase 3 of DS component creation — generates PRD, a11y spec, and 
 
 # DS Component Builder — Phase 3: Spec
 
-## Config Setup
+## Config
 
-Discovers `{projectPath}/.claude/ds-wayfinder.config.json` (walks up from component path):
-- Output structure (docs dir, spec file, roles-map file)
-- Framework (determines code examples in spec)
+Resolve the config per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md` and read `{conventions}`.
+Missing either → stop and point to `/ds-setup`.
 
-Read spec template: `.claude/skills/ds-spec/references/prd.md`
+Spec template: `references/prd.md`.
 
 ---
 
 ## On start
 
-Ask the user for the component name, then read `{componentPath}docs/session-handoff.md`.
+Ask the user for the component name, then read `{docsDir}session-handoff.md`.
 
 If the "Design Interview" checklist item is not marked complete → tell the user to finish `ds-interview` first.
 
-Read `{componentPath}docs/phase-state.json` — load `isComplex`, `scopeTriage`, and `discoverySummaryPath`.
-Treat `discoverySummaryPath` as a path stored **relative to `{componentPath}`** (for example, `"docs/discovery-summary.md"`), not relative to the repo root.
-Note: `componentPath` always ends with `/` (e.g. `libs/shared/ui-core/src/lib/components/2.0/atera-button/`), so `{componentPath}{discoverySummaryPath}` is always a valid joined path.
-Read `{componentPath}docs/decisions.md` — load its **full content**.
+Read `{docsDir}phase-state.json` — load `isComplex`, `scopeTriage`, and `discoverySummaryPath`.
+`discoverySummaryPath` is relative to `{componentPath}`, which always ends with `/`, so
+`{componentPath}{discoverySummaryPath}` is always a valid joined path.
+Read `{docsDir}decisions.md` — load its **full content**.
 Read the discovery summary from `{componentPath}{discoverySummaryPath}`.
 
 ## Pre-launch: Prototype check
@@ -48,9 +47,9 @@ If yes:
 
 | Agent | subagent_type | model | When | Inputs |
 |---|---|---|---|---|
-| PRD writer | `ds-prd-writer` | opus | Always | componentName, componentPath, discoverySummary (file content), designDecisions (full file content) |
-| A11y speccer | `ds-a11y-speccer` | sonnet | Always | componentName, componentPath, discoverySummary (file content, including `ds-a11y-discovery`'s "A11y Patterns" section), designDecisions (full file content, including the "Accessibility Contract" decisions), isComplex |
-| Architect | `ds-architect` | opus | `isComplex = true` only | componentName, componentPath, discoverySummary, designDecisions (full file content) |
+| PRD writer | `design-system:ds-prd-writer` | opus | Always | componentName, componentPath, selector, `{conventions}`, `tokens`, `figma.project`, discoverySummary (file content), designDecisions (full file content) |
+| A11y speccer | `design-system:ds-a11y-speccer` | sonnet | Always | componentName, componentPath, selector, `a11y.wcag`, discoverySummary (file content, including the "A11y Patterns" section), designDecisions (full file content, including the "Accessibility Contract" decisions), isComplex |
+| Architect | `design-system:ds-architect` | opus | `isComplex = true` only | componentName, componentPath, `framework`, `naming`, `{conventions}`, discoverySummary, designDecisions (full file content) |
 
 Pass `designDecisions` as the **full text content** of `decisions.md` inline in the prompt — not a file path.
 
@@ -78,14 +77,14 @@ Wait for explicit approval before continuing.
 
 ## Write handoff
 
-Merge a11y spec data into `{componentPath}docs/phase-state.json` (preserve all existing keys):
+Merge a11y spec data into `{docsDir}phase-state.json` (preserve all existing keys):
 
 - If `isComplex = false`: set `a11ySpecText` to the full inline spec, set `a11ySpecPath` to `null`
-- If `isComplex = true`: set `a11ySpecPath` to `"docs/roles-map.md"` and set `a11ySpecText` to `null`
+- If `isComplex = true`: set `a11ySpecPath` to `"<paths.docs>/roles-map.md"` and set `a11ySpecText` to `null`
 
-`docs/phase-state.json` is the source of truth for downstream phases for both `a11ySpecText` and `a11ySpecPath`.
+`phase-state.json` is the source of truth for downstream phases for both `a11ySpecText` and `a11ySpecPath`.
 
-Update `{componentPath}docs/session-handoff.md` — mark the "Spec" checklist item complete and update "What to do next", but do **not** persist the a11y spec there or instruct downstream phases to read `a11ySpecText` from the handoff.
+Update `{docsDir}session-handoff.md` — mark the "Spec" checklist item complete and update "What to do next", but do **not** persist the a11y spec there or instruct downstream phases to read `a11ySpecText` from the handoff.
 
 Print:
 

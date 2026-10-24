@@ -13,11 +13,13 @@ Discovery (not decide, not spec) which accessibility patterns apply to this comp
 - **componentName**: string, e.g. `button`, `combobox`, `stepper`
 - **componentBehavior**: string, from Phase 1 Figma discovery (what the component does, states, interactions)
 - **componentType**: string, coarse category (button, dialog, stepper, list, form-input, etc.)
+- **a11y.wcag**: target level — `2.1-AA` · `2.2-AA` · `2.2-AAA`
+- **sources.a11y**: extra a11y sources (URLs or repo paths) — the design system's own a11y guidelines; read them in addition to APG/WCAG, never instead
 
 ## Outputs
 - **A11y Patterns section**, appended to `docs/discovery-summary.md`, containing:
   - Matched ARIA APG pattern(s), or composite decomposition if no direct match
-  - WCAG SC requirements applicable to this component type (AA minimum, per traceability table)
+  - WCAG SC requirements applicable to this component type, at the `a11y.wcag` target
   - Semantic HTML recommendation
   - Keyboard nav pattern (from live-fetched APG page)
   - Focus management pattern (initial focus, trap need, restoration)
@@ -27,12 +29,13 @@ Discovery (not decide, not spec) which accessibility patterns apply to this comp
 ## Responsibilities
 1. Match componentType/componentBehavior to an ARIA APG pattern name — or flag as composite/non-APG and decompose into sub-patterns
 2. Fetch the live APG pattern page(s) for the matched name(s) — pull actual keyboard table, states/properties, structure example
-3. Determine which WCAG 2.1 A/AA success criteria are applicable to this component type (not yet disposed — that's the speccer's job once decisions exist)
+3. Determine which WCAG success criteria at the `a11y.wcag` target are applicable to this component type (not yet disposed — that's the speccer's job once decisions exist)
 4. Recommend semantic HTML element(s) per the fetched APG page
 5. Surface keyboard nav pattern options (e.g. "arrow-key roving tabindex" vs "Tab-only") when the pattern allows more than one valid approach — this is interview fodder, not a decision
 6. Surface focus management pattern needs (does this component type typically need a trap? typically need restoration?)
 7. Surface screen reader announcement pattern (what this component type typically announces, and when)
 8. Recommend touch target baseline (44x44px) and flag if this component type commonly has exceptions (e.g. inline text links)
+9. Read every `sources.a11y` entry; where the design system's own guidance is stricter than APG/WCAG, surface it as an additional requirement — where it conflicts, flag the conflict rather than picking a side
 
 ## A11y Coverage
 - ARIA APG pattern matching, grounded live (not memorized)
@@ -94,7 +97,7 @@ If componentType doesn't map to any pattern above (e.g. **stepper**, **date rang
 
 **Page-level SCs — mark N/A (page-level), not evaluated per-component:** 1.2.1–1.2.5 (media), 2.4.1 Bypass Blocks, 2.4.2 Page Titled, 2.4.4 Link Purpose (unless component is itself a link), 2.4.5 Multiple Ways, 3.1.1 Language of Page, 3.1.2 Language of Parts, 3.2.3 Consistent Navigation, 3.2.4 Consistent Identification, 3.3.4 Error Prevention (Legal/Financial), 3.3.5 Help, 2.2.3–2.2.6 (session-level).
 
-**Version note:** table above is WCAG 2.1 A/AA only. WCAG 2.2 added 2.4.11/2.4.12 Focus Not Obscured, 2.5.7 Dragging Movements, 2.5.8 Target Size (Minimum), 3.2.6 Consistent Help, 3.3.7 Redundant Entry, 3.3.8 Accessible Authentication (Minimum) — not included since baseline is 2.1 AA. Flag to PRD/architect if 2.2 should be adopted.
+**Version note:** the table above is WCAG 2.1 A/AA. When `a11y.wcag` is `2.2-*`, add the 2.2 criteria: 2.4.11 Focus Not Obscured (Minimum, AA), 2.5.7 Dragging Movements (AA), 2.5.8 Target Size (Minimum, AA), 3.2.6 Consistent Help (A), 3.3.7 Redundant Entry (A), 3.3.8 Accessible Authentication (Minimum, AA) — and the AAA criteria when the target is `2.2-AAA`. Confirm levels against the live quickref.
 
 **Staleness check (mandatory before using tables above):** both the SC list and the APG pattern-name list are hardcoded snapshots — both sources revise. Fetch the live WCAG quickref and live APG patterns index, diff against the tables in this file, and flag any delta (added/withdrawn SC, added/renamed pattern) in the output. Note the fetch date.
 
@@ -106,12 +109,13 @@ Output describes markup semantics and interaction patterns only — never framew
 2. Match componentType/componentBehavior to an APG pattern name from the list. If no direct match, decompose into sub-patterns per the composite rule — don't force-fit or invent a name
 3. Fetch the live APG pattern page(s) for the matched name(s) — pull the actual keyboard table, states/properties table, structure example. Don't rely on memorized pattern details
 4. Recommend semantic HTML element (native > custom+role) per the fetched page
-5. From the WCAG SC table, list which SCs are typically applicable to this component type (discovery-level applicability, not a per-component disposition — that's Phase 3's job once real decisions exist)
+5. From the WCAG SC table (plus the 2.2 additions when `a11y.wcag` is `2.2-*`), list which SCs are typically applicable to this component type (discovery-level applicability, not a per-component disposition — that's Phase 3's job once real decisions exist)
 6. Surface keyboard nav pattern options from the fetched APG page — if the pattern supports more than one valid keyboard model, present the options rather than picking one
 7. Surface focus management pattern needs (trap needed for this component type? restoration? initial focus candidates?)
 8. Surface screen reader announcement pattern (what typically gets announced, when, for this component type)
 9. Recommend touch target baseline and flag likely exception candidates for this component type
-10. Append "A11y Patterns" section to `docs/discovery-summary.md`, including fetch dates and source URLs for every claim
+10. Read `sources.a11y`; surface stricter DS requirements and flag conflicts
+11. Append "A11y Patterns" section to `docs/discovery-summary.md`, including fetch dates and source URLs for every claim
 
 ## Acceptance Criteria
 - [ ] APG pattern matched and cited with live-fetched source URL, or explicitly flagged composite/non-APG with sub-pattern decomposition

@@ -1,16 +1,18 @@
-# Primitives — React (React Aria + Radix Primitives)
+# Primitives — React catalog
 
-> Discovery order and rationale live in `primitives.md` (agnostic). This file is the React-specific selection tables and libraries.
+> Discovery order lives in `primitives.md`. This file is a **catalog** of well-known React
+> libraries. Which ones apply, and in what order, is `sources.primitives` /
+> `sources.references` in the design-system config — consult only those.
 
-Before writing any interaction logic from scratch, check if React Aria or Radix Primitives already solves it. They handle keyboard management, focus trapping, and ARIA wiring correctly and accessibly.
+| Catalog id | Kind | Notes |
+|---|---|---|
+| `react-aria` | primitives | hook-based, headless, most granular keyboard/focus control |
+| `@radix-ui` | primitives | component-based, headless, one package per primitive |
+| `ark-ui` | primitives | Zag.js-based headless set |
+| `mui` · `radix-themes` · `chakra-ui` | reference | inspiration only |
 
-## Library Priority
-
-1. **React Aria (`react-aria` / `react-aria-components`)** — hook-based, headless, most granular control. Prefer for anything with complex keyboard/focus contracts.
-2. **Radix Primitives (`@radix-ui/react-*`)** — component-based, headless, one package per primitive. Prefer when a compound-component shape fits better than hooks.
-3. **Ark UI** — alternative headless set (Zag.js-based) if the codebase already standardizes on it — check codebase discovery output before introducing a third option.
-
-Don't mix multiple primitive libraries for the same interaction pattern within one component — pick one per component and stay consistent with codebase precedent.
+Don't mix primitive libraries for the same interaction pattern within one component — pick one
+and stay consistent with codebase precedent.
 
 ## Selection Table
 
@@ -45,9 +47,9 @@ React Aria/Radix provide behaviour only — the DS owns the visual styling (Radi
 
 MUI, Chakra UI, and Ark UI-based libraries are built on similar accessibility patterns. Use them to understand *what* to build and *which primitive/hook to use* — **never copy their code directly**.
 
-These libraries often carry legacy patterns of their own version. Always adapt:
+These libraries often carry legacy patterns of their own version. Adapt to the idioms in `{conventions}`; the defaults:
 
-| Reference pattern | Atera equivalent |
+| Reference pattern | Current idiom |
 |---|---|
 | Class component + lifecycle methods | Function component + hooks |
 | Prop-drilled callback refs | `forwardRef` + `useImperativeHandle` only when truly needed |
@@ -57,7 +59,7 @@ These libraries often carry legacy patterns of their own version. Always adapt:
 
 ## Truly No Primitive Available?
 
-If neither React Aria nor Radix fits:
+If no library in `sources.primitives` fits:
 1. Check the [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) for the interaction pattern
 2. Implement keyboard handling via a custom hook (`use{Prefix}KeyboardNav`), never inline `onKeyDown` sprawl across the component
 3. Document in a comment why no primitive was used

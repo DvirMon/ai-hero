@@ -4,14 +4,14 @@
 
 ## Phase 2 — Component class (Angular checklist)
 
-- [ ] Scaffold `@Component` decorator with selector, `OnPush`, `host` base class
-- [ ] Add theme class and selector class to `host`
+- [ ] Scaffold `@Component` decorator per `{conventions}` § Component shape (selector, change detection, `host`)
+- [ ] Add the selector class and `{themeClass}` (when set) to `host`
 - [ ] Declare all inputs with types and defaults (from PRD API Summary)
 - [ ] Declare all outputs
 - [ ] Wire variant/state classes in `host` bindings
 - [ ] Wire ARIA attributes in `host` bindings (from roles-map / accessibility planning)
 - [ ] [if architecture.md exists] Implement state signals and transitions
-- [ ] [if CDK] Inject CDK services, wire overlay/focus management
+- [ ] [if primitive-backed] Inject/compose the primitive chosen in discovery, wire overlay/focus management
 
 ## Phase 3 — Template (Angular checklist)
 
@@ -24,6 +24,6 @@
 
 - [ ] Declare CSS custom property override API on `:host` (from design-tokens.md or styles planning)
 - [ ] Style `:host` base layout (display, align, border-radius, etc.)
-- [ ] Style each variant class using role tokens (from Figma token mapping)
+- [ ] Style each variant class using DS tokens (from the Figma token mapping)
 - [ ] Style each state (`:host:hover`, `:host:focus-visible`, `:host.disabled`)
 - [ ] [if motion.md] Add transition declarations + `prefers-reduced-motion` override

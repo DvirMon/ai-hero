@@ -1,48 +1,45 @@
 # DS styles rules
 
-Passed by `ds-review` to the plugin's `styles-reviewer` as a
-`references` file. Moved here from the retired `ds-styles-reviewer`
-agent.
+Passed by `ds-review` to the `code-review` plugin's `styles-reviewer` as
+a `references` file, together with `{conventions}` and the resolved
+`tokens` config.
+
+These are the **universal** rules — true for every design system.
+Framework- and DS-specific styling rules (encapsulation, escape hatches,
+units) are `{conventions}` § Styling and § Review rules; check both.
 
 Each rule is a **conformance** finding when broken — cite this file and
 the rule number. Impact severity needs the review contract's evidence:
-e.g. `::ng-deep` is P2 impact only when it can restyle consumer markup;
-otherwise it is a RULE finding. (The old agent graded raw hex and
-`::ng-deep` as CRIT unconditionally — that is exactly what the contract
-replaces.)
+e.g. an escape hatch is P2 impact only when it can restyle consumer
+markup; otherwise it is a RULE finding.
 
 A `docs/decisions.md` / `docs/narrative.md` entry that explicitly
 addresses a rule wins — cite the decision instead of flagging.
 
-`{dsStyleTokensPath}` = config `references.styleTokensPath` in
-`.claude/ds-wayfinder.config.json`; unset → search the DS for the
-role-token convention.
-
-Sources: `.claude/skills/ds-scaffold/references/styles.md`
-+ `styles.angular.md`, `motion.md`; `{planDir}/step-*-styles.plan.md`;
+Sources: `css-styling` skill ("DS Components" section),
+`ds-scaffold/references/motion.md`; `{planDir}/step-*-styles.plan.md`;
 `docs/prd.md`; `docs/discovery-summary.md`.
 
 ## Rules
 
-1. **Role tokens only** — color/shadow/radius via `var(--fill-*)`,
-   `--content-*`, `--border-*`, `--shadow-*`, `--border-radius-*`. No raw
-   hex/RGB, no palette tokens (`apa-palette.scss`). Token source:
-   `{dsStyleTokensPath}/{prefix}-roles.scss`.
-2. **`:host` is the styling root** — no wrapper element styled only for
-   layout the host should own.
-3. **No `::ng-deep`** — expose a custom property instead.
-4. **`ViewEncapsulation.None` needs justification** — only for genuinely
-   arbitrary projected content; fixed part-sets use directive-per-part.
-   When justified, every selector scoped under a host class.
-5. **Figma → token fidelity** — tokens match `docs/discovery-summary.md`
-   paths (`/` → `-`). Spot-check.
-6. **Override API bounded** — matches the styles step's token table;
-   5–7 tokens max; no locked token exposed; no documented token missing.
-7. **Parent ownership** — no styling the styles step marks as owned by a
+1. **Tokens only** — color, shadow, radius, spacing and motion come from
+   tokens matching `tokens.allowed`, defined in `tokens.sources`. No raw
+   hex/RGB/px-colour values in rule bodies; nothing matching
+   `tokens.forbidden`. With `tokens.sources: []`, values come from the
+   component's own custom properties, declared once on its root.
+2. **Single styling root** — the component's root is the styling anchor;
+   no wrapper element styled only for layout the root should own.
+3. **Figma → token fidelity** — tokens match `docs/discovery-summary.md`
+   (converted per `tokens.figmaToCss`). Spot-check.
+4. **Override API bounded** — matches the styles step's token table and
+   `{conventions}` § Styling's size limit; no locked token exposed; no
+   documented token missing.
+5. **Parent ownership** — no styling the styles step marks as owned by a
    parent component.
-8. **Variant/state coverage** — every row of the PRD's Variants & States
+6. **Variant/state coverage** — every row of the PRD's Variants & States
    table has a style block.
-9. **Motion** — durations/easing from `--motion-*` tokens; a
+7. **Motion** — durations/easing from `tokens.motion` (or component
+   custom properties with the fallback values); a
    `prefers-reduced-motion` override; ≤ 300ms unless justified.
-10. **Logical CSS** — logical properties over physical
-    (`margin-inline-start`, not `margin-left`).
+8. **Logical CSS** — logical properties over physical
+   (`margin-inline-start`, not `margin-left`).

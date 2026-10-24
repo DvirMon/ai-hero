@@ -1,110 +1,102 @@
 ---
 name: ds-scaffold
-description: Phase 5 of DS component creation — scaffolds Angular component, styles, Storybook, and tests in parallel. Run after ds-plan, after the phase-end /compact.
+description: Phase 5 of DS component creation — scaffolds the component, styles, Storybook, and tests in parallel, for the framework in the design-system config. Run after ds-plan, after the phase-end /compact.
 ---
 
 # DS Component Builder — Phase 5: Scaffold
 
-## Config Setup
+## Config
 
-Discovers `{projectPath}/.claude/ds-wayfinder.config.json` (walks up from component path):
-- Framework-specific scaffold template path
-- Output structure (docs dir)
+Resolve the config per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md` and read `{conventions}`.
+Missing either → stop and point to `/ds-setup`.
 
-Read styling guide agnostic: `.claude/skills/css-styling/SKILL.md` (see its "DS Components" section for the stricter rules)
-Read styling guide framework: `.claude/skills/css-styling/references/styles.{framework}.md` (see each file's DS-scoped subsections)
-Read test guide agnostic: `.claude/skills/ds-scaffold/references/unit-testing.md`
-Read test guide framework: `.claude/skills/ds-scaffold/references/unit-testing.{framework}.md`
-Read file structure agnostic: `.claude/skills/ds-scaffold/references/file-structure.md`
-Read file structure framework: `.claude/skills/ds-scaffold/references/file-structure.{framework}.md`
+Agents load their own guides; this skill only gathers inputs. The guides they use:
+
+- `css-styling` skill — its "DS Components" section and `references/styles.{framework}.md`
+- `unit-test` skill — `references/unit-testing.md` + `unit-testing.{framework}.md`
+- `references/motion.md`
+- `{conventions}` — component shape, file layout, styling, Storybook, tests
 
 ---
 
 ## On start
 
-Ask the user for the component name and which version to scaffold (e.g. "V1 Core"), then read `{componentPath}docs/session-handoff.md`.
+Ask the user for the component name and which version to scaffold (e.g. "V1 Core"), then read `{docsDir}session-handoff.md`.
 
 If the "Task Plan" checklist item is not marked complete → tell the user to finish `ds-plan` first.
 
-From `{componentPath}docs/phase-state.json`, load:
-- `planDir` — path to the version subfolder (e.g. `.claude/plans/NNN-atera-{name}/v1-core/`)
+From `{docsDir}phase-state.json`, load:
+- `planDir` — the version subfolder under `{plansDir}`
 - `includeStorybook`, `includeTests` — from Task Plan decisions (user may override now)
-- `discoverySummaryPath` — relative path to the discovery summary used to source `figmaTokens` (e.g. `"docs/discovery-summary.md"`)
+- `discoverySummaryPath` — source of `figmaTokens`
 
-Ask if they want to confirm or change the storybook/tests choices before launching.
+Ask if they want to confirm or change the Storybook/tests choices before launching.
 
 ## Pre-scaffold: classify responsibilities
 
-Before launching any agents, classify the component responsibilities from the PRD (`prdPath`) (directive / service / utils / component) and pass the classification as `srpClassification` input to the Angular scaffolder.
+Classify the component's responsibilities from the PRD (`prdPath`) — behavior unit (directive/hook) / service / utils / component — and pass the result as `srpClassification` to the component scaffolder.
 
 ## Launch agents
 
-### Phase A — Angular + Styles (parallel, run first)
+Every agent also receives: `framework`, the resolved `naming` patterns, `{componentPath}`,
+`{conventions}`, and `planDir`.
 
-| Agent | subagent_type | model | When | Inputs |
+### Phase A — Component + Styles (parallel, run first)
+
+| Agent | subagent_type | model | When | Extra inputs |
 |---|---|---|---|---|
-| Angular scaffolder | `ds-angular-scaffolder` | sonnet | Always | componentName, componentPath, prdPath, a11ySpec, apiSpec, planDir, srpClassification |
-| Styles scaffolder | `ds-styles-scaffolder` | sonnet | Always | componentName, componentPath, prdPath, figmaTokens (from handoff), planDir |
+| Component scaffolder | `design-system:ds-component-scaffolder` | sonnet | Always | componentName, prdPath, a11ySpec, apiSpec, srpClassification, `publicApi`, `{importPath}` |
+| Styles scaffolder | `design-system:ds-styles-scaffolder` | sonnet | Always | componentName, prdPath, figmaTokens, `tokens`, `styles.language` |
 
-Wait for both Phase A agents to complete before proceeding.
+Wait for both before Phase B.
 
-### Phase B — Tests + Storybook (parallel, run after Phase A)
+### Phase B — Tests + Storybook (parallel, after Phase A)
 
-Run only after the Angular scaffolder has returned and `componentFilePath` (the generated `.component.ts`) is known.
+Run only after the component scaffolder returned `componentFilePath`.
 
-| Agent | subagent_type | model | When | Inputs |
+| Agent | subagent_type | model | When | Extra inputs |
 |---|---|---|---|---|
-| Storybook scaffolder | `ds-storybook-scaffolder` | sonnet | `includeStorybook` | componentName, componentPath, prdPath, componentApiSummary, planDir |
-| Test scaffolder | `ds-test-scaffolder` | sonnet | `includeTests` | componentName, componentPath, componentFilePath, prdPath, planDir |
+| Storybook scaffolder | `design-system:ds-storybook-scaffolder` | sonnet | `includeStorybook` | componentName, prdPath, componentApiSummary, `storybook.dir`, `sources.storybook` |
+| Test scaffolder | `design-system:ds-test-scaffolder` | sonnet | `includeTests` | componentName, componentFilePath, prdPath |
 
-`figmaTokens` = design tokens from `{componentPath}{discoverySummaryPath}` — resolve `discoverySummaryPath` from `phase-state.json` (e.g. `"docs/discovery-summary.md"`) and join it to `componentPath`.
+### Inputs
 
-`a11ySpec` = inline accessibility text, sourced from `{componentPath}docs/phase-state.json`:
-- If `a11ySpecText` is set (non-complex): use its value as the inline text.
-- If `a11ySpecPath` is set (complex): read `{componentPath}{a11ySpecPath}` and pass its full content as inline text.
-Do **not** pass a file path — `ds-angular-scaffolder` expects inline text for `a11ySpec`.
-
-`prdPath` = path to `{componentPath}docs/prd.md` — passed as a file path to all scaffolders.
-
-`apiSpec` = **inline API text** (not a file path) — read the public API section of `prd.md` and extract inputs, outputs, and content slots as inline text before invoking `ds-angular-scaffolder`.
-
-`componentApiSummary` = a concise summary derived from `{componentPath}docs/prd.md` — specifically the public API section listing all inputs, outputs, and content slots. Read that section of the PRD and extract or summarize it before invoking `ds-storybook-scaffolder`.
+- `figmaTokens` — the Tokens section of `{componentPath}{discoverySummaryPath}`.
+- `a11ySpec` — **inline text**: `a11ySpecText` when set (non-complex), else the content of
+  `{componentPath}{a11ySpecPath}` (complex). Never a path.
+- `prdPath` — `{docsDir}prd.md`, passed as a path.
+- `apiSpec` — **inline text**: the PRD's API Summary (inputs, outputs, content slots).
+- `componentApiSummary` — the same API Summary, condensed, for the Storybook scaffolder.
 
 ## After agents return
 
 ### Update progress tracking
 
-For each scaffolder that returned successfully, update the corresponding step plan files — change `Status: pending` → `Status: completed`:
-- `ds-angular-scaffolder` → step files it owns (Glob for files with agent name)
-- `ds-styles-scaffolder` → its step file
-- `ds-test-scaffolder` → its step file
-- `ds-storybook-scaffolder` → its step file
+For each scaffolder that returned successfully, flip its step files in `planDir` from
+`Status: pending` → `Status: completed` (Glob for step files naming the agent). Update
+`progress.md` — ✅ `completed` per finished step, ❌ `failed` per failed one.
 
-Update `progress.md` — mark each completed step row with ✅ `completed`. Mark failed steps with ❌ `failed`.
-
-Report all generated files to the user as clickable links.
+Report all generated files as clickable links.
 
 ## Write handoff
 
-Merge `componentFilePath` and `scssFilePath` into `{componentPath}docs/phase-state.json` (preserve existing keys):
+Merge into `{docsDir}phase-state.json` (preserve existing keys):
 
 ```json
 {
-  "componentFilePath": "<absolute path to the generated .ts component file>",
-  "scssFilePath": "<absolute path to the generated .scss styles file>"
+  "componentFilePath": "<absolute path to the generated component file>",
+  "stylesFilePath": "<absolute path to the generated styles file>"
 }
 ```
 
-Update `{componentPath}docs/session-handoff.md` — mark the "Scaffold" checklist item complete, update "What to do next". List all generated files to the user as clickable links.
+Update `{docsDir}session-handoff.md` — mark "Scaffold" complete, update "What to do next".
 
 ## Continuation
-
-Print:
 
 ```
 Scaffold complete.
 
-/compact Keep: componentPath, phase-state.json values (componentFilePath, scssFilePath, planDir), prdPath. Drop: raw scaffolder-agent code-generation transcripts and progress.md narration — the generated code and progress state live on disk already.
+/compact Keep: componentPath, phase-state.json values (componentFilePath, stylesFilePath, planDir), prdPath. Drop: raw scaffolder transcripts and progress.md narration — the code and progress state live on disk already.
 
 Then run `ds-review <name>` next.
 ```

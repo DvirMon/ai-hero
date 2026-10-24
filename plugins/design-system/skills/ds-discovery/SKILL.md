@@ -5,191 +5,148 @@ description: Phase 1 of DS component creation — runs Figma, primitive, codebas
 
 # DS Component Builder — Phase 1: Discovery
 
-> `{dsComponentsRoot}` = the design system's shared components root (resolved from `designSystem.path` + `componentPathPattern` in the project's `ds-wayfinder.config.json`). `{componentPath}` = this component's own working directory within it.
+## Config
 
-## Config Setup
+Resolve the config per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md` and read `{conventions}`.
+Missing either → run `/ds-setup` first. Placeholders are defined in `ds-config.md`
+§ Placeholders; phase state in `${CLAUDE_PLUGIN_ROOT}/contracts/phase-state.md`.
 
-Discovers `{projectPath}/.claude/ds-wayfinder.config.json` by walking up from component path:
-- Starts at component directory
-- Walks up until finding `.claude/ds-wayfinder.config.json`
-- Reads framework, component paths, reference doc locations, output structure
-
-**If config missing:** Prompt user to run `/ds-wayfinder` in project root.
-
-Pass config to agents: `Agent("ds-figma-discovery", { config })`
+Pass every agent the resolved config values it needs and the path to `{conventions}` — agents
+never resolve the config themselves.
 
 ---
 
 ## On start
 
-Check if `{componentPath}docs/session-handoff.md` exists (you won't know the path until setup — check after collecting the component name):
-- **Exists and Phase 1 already complete** → tell the user and suggest running `ds-interview` next.
-- **Exists and Phase 1 incomplete** → resume from where it left off
-- **Does not exist** → proceed with setup
+Check `{docsDir}session-handoff.md` once the component name is known:
+- **Exists, Phase 1 complete** → say so and suggest `ds-interview`.
+- **Exists, Phase 1 incomplete** → resume where it left off.
+- **Missing** → Setup.
 
 ## Setup
 
-Ask for what's needed to begin:
-
-1. **Component name** (e.g. `stepper`, `autocomplete`) — if not provided as an argument
+1. **Component name** (e.g. `stepper`, `autocomplete`) — if not given as an argument
 2. **Figma URL** (frame or component — optional but preferred)
-3. **Work type** (`new` | `variant` | `modify` | `tokens`) — via the `AskUserQuestion` tool
-4. **Sibling component** (optional): "Do you know of a similar existing component in `{dsComponentsRoot}` to reference? (e.g. `{prefix}-banner`, `{prefix}-dialog`) — skip if unsure."
-5. **CDK/primitive hint** (optional): "Do you know which primitive layer this component uses? (e.g. `ng-primitives`, `CdkOverlay`, `@angular/cdk/a11y`) — skip if unsure."
-6. **Codebase discovery** (optional): "Should I scan existing DS components for patterns and conventions? Recommended for new components; skip if you already know them. (yes/no)"
+3. **Work type** (`new` · `variant` · `modify` · `tokens`) — via `AskUserQuestion`
+4. **Sibling component** (optional): "Is there a similar component in `{componentsRoot}` to
+   reference? Skip if unsure." Offer `sources.siblings` as the options when set.
+5. **Primitive hint** (optional): "Do you know which primitive layer this uses? Skip if unsure."
+   Offer `sources.primitives` as the options.
+6. **Codebase discovery** (optional): "Scan existing DS components for patterns? Recommended for
+   new components."
 
-Derive: `componentPath` = resolved from config (`designSystem.path` + `componentPathPattern` + `{prefix}-{name}/`) — e.g. `libs/shared/ui-core/src/lib/components/2.0/atera-{name}/` for this repo's config.
+Derive `{componentPath}` from the config.
 
 ### `workType: tokens` fast path
 
-If Setup step 3 returns `tokens`, this is a design-token-only change to an existing component — no new API surface, no primitive/behavior question. Skip steps 4–6, Pre-flight, and the full agent fan-out below entirely. Instead:
+A design-token-only change to an existing component — no API, no primitive question. Skip steps
+4–6, the pre-flight and the agent fan-out:
 
-1. Ask: "Which design tokens are changing, and to what values? (e.g. `--color-surface-brand`: `#1a1a1a` → `#0f0f0f`)"
-2. Confirm the target component exists at `{componentPath}` (it must — `tokens` edits an existing component, it doesn't create one).
-3. Write `{componentPath}docs/discovery-summary.md` containing only the token diff — skip the Figma/primitive/codebase/a11y sections.
-4. Skip **Verdict confirmation** below — there's no build-new/extend/reuse question for a token edit. Set `verdictChoice: "extend"` directly in `phase-state.json`.
-5. Skip to **Write session handoff**.
+1. Ask which tokens change and to what values.
+2. Confirm the component exists at `{componentPath}`.
+3. Write `{docsDir}discovery-summary.md` with only the token diff.
+4. Skip Verdict confirmation; set `verdictChoice: "extend"`.
+5. Go to **Write session handoff**.
 
-## Pre-flight — ng-primitives check
+## Pre-flight — tool availability
 
-Verify the Angular Primitives MCP server is available:
-
-```
-ToolSearch(query: "list_primitives", max_results: 3)
-```
-
-**If tools returned** → proceed.
-
-**If no tools returned** → add to `~/.claude/settings.json` under `mcpServers`:
-```json
-"ng-primitives": {
-  "type": "stdio",
-  "command": "{absolute-path-to-project}/node_modules/.bin/ngp-mcp"
-}
-```
-Tell the user to restart Claude Code. Do not proceed until restarted (unless they say "continue anyway" — then note WebFetch fallback and proceed).
+For each library in `sources.primitives` and each Figma tool in `figma.tools`, check whether an
+MCP server serves it (`ToolSearch(query: "<library or tool>")`). A missing one is not a blocker:
+tell the user which agents will fall back to `WebFetch` / the Figma REST flow, and how to add the
+server if they want it. Continue unless they say to stop.
 
 ## Launch agents (parallel)
 
-Use the `Agent` tool with `subagent_type` matching the agent's filename:
+| Agent | subagent_type | When | Inputs |
+|---|---|---|---|
+| Figma discovery | `design-system:ds-figma-discovery` | Always | componentName, figmaUrl, `figma.tools`, `tokens`, `{componentsRoot}`, `{conventions}` |
+| Primitive discovery | `design-system:ds-discovery` | Always | componentName, componentBehaviour (infer from name), primitiveHint, `framework`, `sources.primitives`, `sources.references` |
+| Codebase discovery | `design-system:ds-codebase-discovery` | User opted in | componentName, componentBehaviour, siblingComponentPath, `{componentsRoot}`, `naming`, `{conventions}` |
+| A11y discovery | `design-system:ds-a11y-discovery` | Always | componentName, componentBehavior, componentType (coarse category), `a11y.wcag`, `sources.a11y` |
 
-| Agent | subagent_type | model | When | Inputs |
-|---|---|---|---|---|
-| Figma discovery | `ds-figma-discovery` | sonnet | Always | componentName, figmaUrl |
-| Primitive discovery | `ds-discovery` | sonnet | Always | componentName, componentBehaviour (infer from name), cdkHint (if provided) |
-| Codebase discovery | `ds-codebase-discovery` | sonnet | User opted in | componentName, componentBehaviour, siblingComponentPath (if provided) |
-| A11y discovery | `ds-a11y-discovery` | sonnet | Always | componentName, componentBehavior (infer from name), componentType (coarse category inferred from name, e.g. button/dialog/stepper/list/form-input) |
-
-Pass all inputs in the `prompt` parameter. Call `Agent` multiple times in the same response to run in parallel.
+Pass all inputs in the `prompt`. Call `Agent` several times in one response to run them in
+parallel.
 
 ## After agents return
 
-### Deduplication gate (only if codebase discovery ran)
+### Deduplication gate (codebase discovery ran)
 
-Check its "Duplicate Check" field:
-- **DUPLICATE** → stop and ask: "A component named `{prefix}-{name}` already exists at `{path}`. Extend it, or create new?"
-- **CLEAR** → proceed
+- **DUPLICATE** → stop and ask: "`{selector}` already exists at `{path}`. Extend it, or create
+  new?"
+- **CLEAR** → proceed.
 
 ### Internal wrapper consolidation
 
-If both discovery agents ran: an internal wrapper finding **overrides** any raw CDK recommendation.
-If only `ds-discovery` ran: use its wrapper findings directly.
-
-Note the final primitive decision in the Discovery Summary.
+An internal wrapper found by codebase discovery **overrides** a raw library recommendation from
+primitive discovery. Note the final primitive decision in the Discovery Summary.
 
 ### Internal DS components inventory
 
-Before writing the Discovery Summary, scan the Figma output and the codebase to identify **existing DS v2 components that appear inside the new component** (e.g. a filter bar contains `atera-button`; a form field contains `atera-input`).
+Before writing the summary, list the **existing DS components that appear inside the new one**
+(e.g. a filter bar contains the DS button; a form field contains the DS input). Start from
+`{conventions}` § Building blocks, then the Figma output.
 
-For each found component:
-1. Confirm the component exists under `{dsComponentsRoot}`
-2. Extract the selector from the component/directive source (`@Component`/`@Directive({ selector: ... })`) and the import path from the relevant `public-api.ts` or exports
+For each:
+1. Confirm it exists under `{componentsRoot}`.
+2. Read its selector/name from source and its import path from its export (or `{importPath}`).
 
-Record the result as `internalDsComponents` in the Discovery Summary — even if the list is empty (write `none`). This list is mandatory input for the PRD in the Spec phase (`ds-spec`).
-
-**Rule:** If the Figma design contains a UI element that matches an existing DS component, that component MUST be listed here. The scaffolder will not reimplement it — it will import and use it.
+Record `internalDsComponents` in the summary — `none` when empty. It is mandatory input for the
+PRD. **Rule:** a Figma element that matches an existing DS component MUST be listed; the
+scaffolder imports it, never re-implements it.
 
 ### Discovery Summary
 
-Synthesize all outputs into a **Discovery Summary** and write it to `{componentPath}docs/discovery-summary.md`. Present it to the user as a clickable link.
+Synthesize every output into `{docsDir}discovery-summary.md` (shape:
+`references/discovery.md` § Output) and link it to the user.
 
-**Mandatory section: "A11y Patterns"** — append `ds-a11y-discovery`'s full output verbatim (matched APG pattern(s) + source URLs, applicable WCAG SCs, semantic HTML recommendation, keyboard/focus/SR/touch-target pattern options, fetch dates). Never omitted, never summarized away — `ds-interview` (Phase 2) and `ds-a11y-speccer` (Phase 3) both depend on it being present in full.
+**Mandatory section "A11y Patterns"** — `ds-a11y-discovery`'s output verbatim (APG pattern(s) +
+URLs, WCAG SCs, semantic HTML, keyboard/focus/SR/touch-target options, fetch dates). Never
+summarized away — Phases 2 and 3 depend on it.
 
 ## Verdict confirmation
 
-Before writing any handoff files, determine the verdict (`build-new` | `extend` | `reuse`) from the Discovery Summary, then surface it to the user as an interactive 3-way choice.
-
-### Reason about the three paths
-
-From the Discovery Summary, synthesize a 2–3 sentence description for each option — be specific: name real components, tokens, and trade-offs found during discovery. Each description answers "what would this mean for `{prefix}-{name}` specifically?".
+Determine the verdict (`build-new` · `extend` · `reuse`) from the summary and offer it as a
+3-way choice.
 
 | Option | Label template | Recommended when |
 |---|---|---|
-| **Build new** | `Build a new {prefix}-{name}` | No existing component covers this behaviour. Always available. |
-| **Extend existing** | `Extend {prefix}-{sibling} to add this behaviour` | A sibling component exists that could absorb this behaviour; describe the cost/risk of muddying its contract. If no sibling was found, label it `Extend a related component` and explain why the candidate pool is thin. |
-| **Not needed** | `Skip — reuse {prefix}-{sibling} as-is` | An existing component already satisfies the full spec with zero gaps. If no such component exists, label it `Skip — an existing component already covers this` and explain the gap. |
+| Build new | `Build a new {selector}` | No existing component covers this. Always available. |
+| Extend existing | `Extend <sibling> to add this behaviour` | A sibling could absorb it; describe the contract risk. No sibling found → `Extend a related component`, and why the pool is thin. |
+| Not needed | `Skip — reuse <sibling> as-is` | An existing component covers the full spec with zero gaps; otherwise explain the gap. |
 
-Mark `(Recommended)` on whichever option matches the verdict you determined above.
-
-### Call AskUserQuestion
+Each description is 2–3 sentences specific to this component — real component names, tokens and
+trade-offs from discovery. Never placeholder copy. Mark `(Recommended)` on the verdict.
 
 ```
 AskUserQuestion({
   questions: [{
-    question: "How should we approach the {prefix}-{name} component?",
+    question: "How should we approach {selector}?",
     header: "Approach",
     multiSelect: false,
-    options: [
-      {
-        label: "<Build a new {prefix}-{name}> OR append \" (Recommended)\" if verdict.action === 'build-new'",
-        description: "<specific rationale: what tokens/patterns it reuses, why this is the cleanest path for this component>"
-      },
-      {
-        label: "<Extend {prefix}-{sibling}> OR append \" (Recommended)\" if verdict.action === 'extend'",
-        description: "<trade-offs: what bolting this onto the sibling means, blast-radius, contract risks>"
-      },
-      {
-        label: "<Skip — reuse {prefix}-{sibling} as-is> OR append \" (Recommended)\" if verdict.action === 'reuse'",
-        description: "<why this is or isn't viable: specific gaps in the existing component, or confirmation of zero-gap>"
-      }
-    ]
+    options: [ <build-new>, <extend>, <reuse> ]
   }]
 })
 ```
 
-> **Never use placeholder text.** Every label and description must be populated from the actual discovery output — component names, token names, behaviours. Generic copy like "this option is recommended" is not acceptable.
-
-### Record the user's choice
-
-Store the answer in `{componentPath}docs/phase-state.json` as `verdictChoice` before writing any other handoff files. Map the user's selected option to:
-- Option 0 selected → `"build-new"`
-- Option 1 selected → `"extend"`
-- Option 2 selected → `"reuse"`
+Store the answer as `verdictChoice` in `{docsDir}phase-state.json` before any other handoff
+file.
 
 ## Write session handoff
 
-Using the already-written Discovery Summary as input (CDK decision, similar components, tokens, codebase patterns), create the handoff files below.
+Merge into `{docsDir}phase-state.json`: `componentName`, `figmaUrl`, `workType`,
+`discoverySummaryPath` (`"<paths.docs>/discovery-summary.md"`, relative to `{componentPath}`),
+`verdictChoice`.
 
-**Update** `{componentPath}docs/phase-state.json` — preserve `workType` and `figmaUrl` collected in Setup; add `discoverySummaryPath` and `verdictChoice`:
-```json
-{
-  "figmaUrl": "...",
-  "workType": "new|variant|modify|tokens",
-  "discoverySummaryPath": "docs/discovery-summary.md",
-  "verdictChoice": "build-new|extend|reuse"
-}
-```
-
-Write `{componentPath}docs/session-handoff.md` using the template at `.claude/skills/ds-wayfinder/references/session-handoff-template.md`. Fill in: Phase 1 checked off, Figma URL, component path, "What to do next".
+Write `{docsDir}session-handoff.md` from
+`${CLAUDE_PLUGIN_ROOT}/skills/ds-wayfinder/references/session-handoff-template.md`: Phase 1
+checked, Figma URL, component path, next step.
 
 ## Continuation
-
-Print:
 
 ```
 Discovery complete.
 
-/compact Keep: componentPath, config values, workType, verdictChoice, path to discovery-summary.md and session-handoff.md. Drop: Figma/primitive/codebase/a11y agent raw tool outputs and transcripts — fully synthesized into discovery-summary.md already.
+/compact Keep: componentPath, config values, workType, verdictChoice, paths to discovery-summary.md and session-handoff.md. Drop: Figma/primitive/codebase/a11y agent raw outputs — synthesized into discovery-summary.md already.
 
 Then run `ds-interview <name>` next.
 ```

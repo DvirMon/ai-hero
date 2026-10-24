@@ -2,7 +2,9 @@
 
 > Framework-specific syntax lives in the sibling file for your target framework (e.g. `component-api.angular.md`). This file covers the design decisions that hold regardless of framework — read it first, then the framework file for the concrete syntax.
 
-> **Note:** Replace `{prefix}` with your component prefix (e.g., `atera`, `my`, `app`).
+> Placeholders (`{prefix}`, `{Prefix}`, `{selector}`) resolve from the design-system config. Where
+> `{conventions}` § API conventions differs from an example here (slot style, behavior-unit naming),
+> the conventions doc wins.
 
 ## Core Principle: Composability
 

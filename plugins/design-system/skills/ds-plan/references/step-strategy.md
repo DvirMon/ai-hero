@@ -3,7 +3,7 @@
 Rules for how implementation plan steps must be structured, ordered, and scoped.
 Extracted from the user-level workflow skill for repo-level portability.
 
-> `{dsComponentsRoot}` = the design system's shared components root (resolved from `designSystem.path` + `componentPathPattern` in the project's `ds-wayfinder.config.json`).
+> Placeholders (`{componentsRoot}`, `{conventions}`, …) resolve per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md`.
 
 ---
 
@@ -33,7 +33,7 @@ Default to this presentation order. Adjust only when a hard compilation dependen
 5. Accessibility verification (review gate — not a scaffold step)
 6. Tests
 7. Storybook
-8. Code Connect
+8. Code Connect (only when the Figma project config has `codeConnect.available: true`)
 
 ---
 
@@ -63,7 +63,7 @@ Every `step-N-*.plan.md` must contain all of these:
 
 - **Title** — concise name
 - **PR scope** — `Standalone`, `Depends on Step N`, or `Parallel-safe with Step N` (from the dependency graph, not the presentation order)
-- **Skills used** — list the skill names that guide implementation (e.g. `angular-dev-v21`, `css-styling`)
+- **Skills used** — list the skill names that guide implementation (e.g. `angular-developer` / `react-developer`, `css-styling`)
 - **Scaffolding agent** — the `ds-*` agent that executes this step
 - **Files** — exact file paths to create or modify
 - **Why This Step Exists** — why it is needed now and what it unlocks
@@ -82,26 +82,29 @@ The styles step (`step-4-styles.plan.md`) must include:
 - **Design token table** — Level 1 internal tokens → Level 2 consumer-overridable tokens
 - **Override API** — which CSS custom properties consumers can set, with recommended bounded values
 - **Locked tokens** — what is intentionally NOT exposed (DS-controlled only)
-- **Prior art analysis** — how existing sibling components handle similar overrides (search `{dsComponentsRoot}`)
+- **Token source** — every value from `tokens.allowed` in `tokens.sources`; when `tokens.sources` is empty, the component's own custom properties, declared on its root
+- **Prior art analysis** — how existing sibling components handle similar overrides (search `{componentsRoot}`)
 - **Parent ownership check** — does a parent component already own this concern (e.g. form-field owns input sizing)? Don't duplicate.
-- **No component-state props for visual styling** — all consumer overrides via SCSS/CSS-Module token API only
-- **Reference-library comparison** — what the framework's primitive/reference library exposes for the same component vs what Atera needs to expose (Angular: Angular Material/CDK; React: Radix/React Aria/MUI)
+- **No component-state props for visual styling** — all consumer overrides via the custom-property API only
+- **Reference-library comparison** — what each `sources.references` library exposes for the same component vs what this DS needs to expose
 
 ---
 
 ## Behavior-Unit Naming — Verify Against Codebase
 
-Before writing any behavior-unit (directive/hook/composable) selector or name in a plan step, grep the existing DS 2.0 codebase to confirm the current convention:
+Before writing any behavior-unit (directive/hook) selector or name in a plan step, check
+`{conventions}` § API conventions, then confirm against the live code:
 
 ```
 # Angular
-grep -r "selector:" {dsComponentsRoot} --include="*.directive.ts"
+grep -r "selector:" {componentsRoot} --include="*.directive.ts"
 
 # React
-grep -r "^export function use" {dsComponentsRoot} --include="*.ts"
+grep -r "^export function use" {componentsRoot} --include="*.ts"
 ```
 
-Use whatever convention the codebase shows. Do NOT hardcode an assumed format — derive it from the live code so the plan stays in sync with the project.
+When the two disagree, the code wins and the conventions doc gets flagged as stale. Never
+hardcode an assumed format.
 
 ---
 

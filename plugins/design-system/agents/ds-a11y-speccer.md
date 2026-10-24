@@ -15,6 +15,8 @@ Write the component's accessibility spec by combining `ds-a11y-discovery`'s patt
 - **discoverySummary**: string, output of Phase 1 discovery agents — must include `ds-a11y-discovery`'s "A11y Patterns" section (matched APG pattern(s)/source URLs, applicable WCAG SCs, semantic HTML recommendation, keyboard/focus/SR/touch-target pattern options)
 - **designDecisions**: string, full content of `docs/decisions.md` — must include the "Accessibility Contract" decisions from Phase 2 interview (semantic HTML vs ARIA-only, focus trap needed, WCAG AA/AAA target, touch target size, keyboard nav strategy)
 - **isComplex**: boolean, routes output format (inline vs roles-map.md)
+- **selector**: the component's resolved selector, for the spec title
+- **a11y.wcag**: the design system's WCAG target — the floor; interview may only raise it
 
 ## Outputs
 - **inline a11y spec** (if `!isComplex`): markdown block per template below, embedded in calling context
@@ -83,7 +85,7 @@ This spec describes markup semantics (HTML element, ARIA attributes, key binding
 ## Output Format (non-complex)
 
 ```markdown
-# A11y Spec: atera-{name}
+# A11y Spec: {selector}
 
 ## Semantic Structure
 - HTML element: `<{element}>`

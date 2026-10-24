@@ -1,58 +1,58 @@
 ---
 name: ds-discovery
-description: Discovers which behavior/primitive library (CDK, ng-primitives, reference-library equivalent) covers a DS component's interaction pattern. Phase 1 discovery agent — feeds interview, architecture, and scaffold phases.
+description: Discovers which behavior/primitive library from the design system's configured sources covers a DS component's interaction pattern, plus reference-library inspiration. Phase 1 discovery agent — feeds interview, architecture, and scaffold phases.
 model: haiku
 ---
 
 # DS Discovery (Primitives)
 
 ## Purpose
-Determine which framework-native behavior library and/or unstyled primitive collection already solves this component's interaction pattern, before any interaction logic gets written from scratch. Runs in parallel with `ds-figma-discovery`, `ds-codebase-discovery`, and `ds-a11y-discovery` during `ds-discovery`. Output feeds the "Primitives" section of the Discovery Summary, which downstream phases (interview, architecture, scaffold) treat as the primitive decision unless `ds-codebase-discovery` finds an internal wrapper that overrides it.
+Determine which behavior library from the design system's `sources.primitives` already solves this component's interaction pattern, before any interaction logic is written from scratch. Runs in parallel with `ds-figma-discovery`, `ds-codebase-discovery` and `ds-a11y-discovery` during `ds-discovery`. Output feeds the "Primitives" section of the Discovery Summary, which downstream phases treat as the primitive decision unless `ds-codebase-discovery` finds an internal wrapper that overrides it.
 
 ## Inputs
 - **componentName**: string, e.g. `combobox`, `stepper`
-- **componentBehaviour**: string, inferred from name if not explicitly provided — what the component does, its interaction pattern (dropdown, overlay, multi-step flow, etc.)
-- **cdkHint**: string, optional — a primitive layer hint if the user already knows one (e.g. `ng-primitives`, `CdkOverlay`, `@angular/cdk/a11y`)
+- **componentBehaviour**: string — what the component does, its interaction pattern (dropdown, overlay, multi-step flow, …)
+- **primitiveHint**: string, optional — a library or primitive the user already has in mind
+- **framework**: `angular` · `react`
+- **sources.primitives**: ordered list of behavior libraries — the discovery order
+- **sources.references**: list of reference libraries — inspiration only
 
 ## Outputs
-- **Primitives section**, contributed to `docs/discovery-summary.md`, containing:
-  - CDK primitive selection (or "none")
-  - ng-primitives selection, only if CDK doesn't cover the pattern
-  - Angular Material equivalent component (inspiration only), or "none"
-  - Legacy-pattern adaptation notes (what Material patterns must be translated to current idioms)
-  - ARIA APG fallback pattern, only if neither CDK nor ng-primitives fit
+- **Primitives section**, contributed to `docs/discovery-summary.md`:
+  - Selected library + primitive + import path (or "none")
+  - Libraries checked and why each was or wasn't a fit
+  - Reference-library equivalent per `sources.references` (inspiration only), or "none"
+  - Legacy-pattern adaptation notes
+  - ARIA APG fallback pattern, only if no library fits
 
 ## Responsibilities
-1. Follow the fixed discovery order: framework-native behavior library → unstyled primitive collection → reference-library inspiration → ARIA APG fallback
-2. Check the CDK Selection Table against `componentBehaviour`; if a match exists, record it and stop there unless the interaction needs are broader
-3. If CDK doesn't cover it, check the ng-primitives selection table (via `ngp-mcp` if available, else `WebFetch` fallback to angularprimitives.com)
-4. If neither fits, fetch the equivalent ARIA APG pattern and note that keyboard handling must be implemented manually via the `host` property (never `@HostListener`)
-5. Discovery the Angular Material equivalent component (if one exists) as inspiration only — never as code to copy
-6. Fetch Material source files (`.ts`, `.html`, `.scss`, harness) for the matched component via the GitHub raw URL table
-7. Translate every legacy Material pattern found to current Atera idioms using the adaptation table (`@Input()` → `input()`, `NgModule` → standalone, `ngOnInit` → `effect()`/`computed()`, etc.)
-8. If `cdkHint` was provided, verify it against the actual selection tables rather than accepting it uncritically — flag if the hint doesn't match the behavior
+1. Follow the order in `primitives.md`: libraries in `sources.primitives`, in order → reference-library inspiration → ARIA APG fallback
+2. For each library, look it up in the catalog (`primitives.{framework}.md`); a library the catalog doesn't list is researched from its own docs (MCP if available, else `WebFetch`)
+3. The first library that covers the pattern wins; record its import path and stop the primitive search unless the interaction needs are broader
+4. If none fits, fetch the matching ARIA APG pattern and note that keyboard handling is hand-rolled, with a comment explaining why
+5. For each `sources.references` library with an equivalent component, study it as inspiration only — fetch its source per the catalog's source table when one exists
+6. Translate every legacy pattern found to current idioms (catalog adaptation table) — never carry it into the recommendation
+7. If `primitiveHint` was given, verify it against the libraries rather than accepting it — flag a mismatch
 
 ## Standards & References
-- `.claude/skills/ds-discovery/references/primitives.md` — framework-agnostic discovery order and rationale
-- `.claude/skills/ds-discovery/references/primitives.angular.md` — CDK selection table, ng-primitives selection table, Material adaptation table, Material GitHub source table, `ngp-mcp` / `WebFetch` query methods
-- ARIA APG patterns index: https://www.w3.org/WAI/ARIA/apg/patterns/ (fallback only, when no primitive fits)
+- `${CLAUDE_PLUGIN_ROOT}/skills/ds-discovery/references/primitives.md` — discovery order and rationale
+- `${CLAUDE_PLUGIN_ROOT}/skills/ds-discovery/references/primitives.{framework}.md` — library catalog: selection tables, source URLs, MCP/WebFetch query methods, adaptation table
+- ARIA APG patterns index: https://www.w3.org/WAI/ARIA/apg/patterns/ (fallback only)
 
 ## Process
-1. Verify the `ngp-mcp` MCP server is available via `ToolSearch(query: "ng-primitives")` if ng-primitives discovery will be needed — note if unavailable and fall back to `WebFetch`
-2. Match `componentBehaviour` against the CDK Selection Table (dropdown/select/combobox, menu, dialog, tooltip/popover, accordion, drag-drop, tree, table, virtual scroll, focus management, focus trap, live announcer)
-3. If a CDK primitive matches, record `import` path(s) and stop the primitive search there
-4. If no CDK primitive fits, check the ng-primitives selection table for a matching primitive; record its import path
-5. If neither fits, note "no primitive available" and fetch the relevant ARIA APG pattern page; document that keyboard handling must be hand-rolled via `host`, with a comment explaining why no primitive was used
-6. Identify the Angular Material equivalent component (if any) from the known component paths table; fetch its `.ts`, `.html`, `.scss`, and harness files via `WebFetch` in parallel, skipping any that 404
-7. For each legacy pattern found in the Material source, note the Atera-idiom translation using the adaptation table — do not carry the legacy pattern into the recommendation
-8. If `cdkHint` was supplied, cross-check it against the selection tables; note agreement or flag the discrepancy
-9. Write the "Primitives" section for the Discovery Summary — final primitive decision, supporting evidence, and translation notes
+1. For each library in `sources.primitives`, check for an MCP server (`ToolSearch(query: "<library>")`); note when falling back to `WebFetch`
+2. Match `componentBehaviour` against each library in order; record the first match with its import path
+3. If none matches, note "no primitive available" and fetch the relevant ARIA APG pattern page
+4. For each library in `sources.references`, identify the equivalent component; fetch its key source files in parallel, skipping 404s
+5. Pair each legacy pattern found with its current-idiom translation
+6. Cross-check `primitiveHint`, if supplied; note agreement or flag the discrepancy
+7. Write the "Primitives" section — final decision, evidence, translation notes
 
 ## Acceptance Criteria
-- [ ] Discovery order followed: CDK → ng-primitives → Material inspiration → ARIA APG fallback, in that sequence
-- [ ] Final primitive decision stated explicitly (CDK primitive, ng-primitives primitive, or "none — ARIA APG hand-rolled")
+- [ ] Libraries checked in `sources.primitives` order, then references, then ARIA APG
+- [ ] Final primitive decision stated explicitly (library + primitive, or "none — ARIA APG hand-rolled")
 - [ ] Import path(s) recorded for any selected primitive
-- [ ] Material discovery (if applicable) explicitly labeled "inspiration only" — no code copied verbatim
-- [ ] Every legacy Material pattern found is paired with its Atera-idiom translation
-- [ ] `cdkHint`, if provided, is verified rather than blindly accepted — agreement or conflict noted
-- [ ] Output is a "Primitives" section ready to append to `docs/discovery-summary.md`, framework-accurate for the project's configured framework
+- [ ] Reference-library findings labeled "inspiration only" — no code copied
+- [ ] Every legacy pattern found is paired with its current-idiom translation
+- [ ] `primitiveHint`, if provided, verified rather than accepted — agreement or conflict noted
+- [ ] Output is a "Primitives" section ready to append to `docs/discovery-summary.md`, accurate for `framework`

@@ -2,13 +2,14 @@
 
 > Framework-specific checklist items live in the sibling file for your target framework (e.g. `tasks.angular.md`). This file covers the phase structure and rules that hold regardless of framework.
 
-> **Note:** Replace `{PREFIX}` with your component prefix (e.g., `atera`, `my`, `app`). Replace `<Name>` with the component name (e.g., `Card`, `Stepper`).
+> Placeholders resolve per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md`. Concrete file names
+> and the root-element shape come from `{conventions}`.
 
-Generate `tasks/steps.md` inside the component folder after all planning docs are produced. This is the implementation checklist — it translates the PRD and architecture into concrete, ordered, checkable steps.
+This is the per-phase content of the implementation plan — it translates the PRD and architecture into concrete, ordered, checkable steps. `ds-task-planner` splits it into step files per `step-strategy.md`.
 
 ## When to Generate
 
-Always, as the final planning artifact at the end of Phase 2 — after `docs/prd.md` and any other planning docs are complete, before Phase 3 scaffolding begins, so it can reference the full planning set.
+Phase 4, after `prd.md` and any other spec docs are complete, before scaffolding.
 
 ## How to Generate
 
@@ -27,7 +28,7 @@ Steps must be:
 ## Template
 
 ```markdown
-# Implementation Steps: {PREFIX}-<Name>
+# Implementation Steps: {selector}
 
 **PRD:** [docs/prd.md](../docs/prd.md)
 **Status:** 0 / N complete
@@ -36,14 +37,14 @@ Steps must be:
 
 ## Phase 1 — Types & Public API skeleton
 
-- [ ] Define `<Name>Variant`, `<Name>Size`, `<Name>Color` types
+- [ ] Define `{Name}Variant`, `{Name}Size`, `{Name}Color` types
 - [ ] Create public entry point with component + type exports (component stub)
-- [ ] Register in component library's main entry point
+- [ ] [if `publicApi.rootBarrel`] Register in `{publicApiBarrel}`
 
 ## Phase 2 — Component class
 
-- [ ] Scaffold component definition with efficient re-render mode, base class
-- [ ] Add theme class and selector class to the root
+- [ ] Scaffold component definition per `{conventions}` § Component shape
+- [ ] Add the selector class and `{themeClass}` (when set) to the root
 - [ ] Declare all inputs/props with types and defaults (from PRD API Summary)
 - [ ] Declare all outputs/events
 - [ ] Wire variant/state classes at the root
@@ -62,7 +63,7 @@ Steps must be:
 
 - [ ] Declare CSS custom property override API at the root (from design-tokens.md or styles planning)
 - [ ] Style root base layout (display, align, border-radius, etc.)
-- [ ] Style each variant class using role tokens (from Figma token mapping)
+- [ ] Style each variant class using DS tokens (from the Figma token mapping)
 - [ ] Style each state (hover, focus-visible, disabled)
 - [ ] [if motion.md] Add transition declarations + `prefers-reduced-motion` override
 
@@ -81,9 +82,9 @@ Steps must be:
 - [ ] Write tests for [specific logical units from PRD/architecture]
 - [ ] Verify no structural/CSS tests are included
 
-## Phase 7 — Code Connect
+## Phase 7 — Code Connect *(only when the Figma project config has `codeConnect.available: true`)*
 
-- [ ] Create `{PREFIX}-<name>.figma.ts`
+- [ ] Create `{fileBase}.figma.ts` via the `code-connect-authoring` skill
 - [ ] Map all Figma variant props to framework props/inputs
 - [ ] Publish via code-connect tooling
 

@@ -5,14 +5,13 @@ description: Interview phase — grills the component's design/API/accessibility
 
 # DS Component Builder — Phase 2: Design Interview
 
-## Config Setup
+## Config
 
-Discovers `{projectPath}/.claude/ds-wayfinder.config.json` (walks up from component path):
-- Framework (determines which component API reference to use)
+Resolve the config per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md` and read `{conventions}`
+§ API conventions. Missing either → stop and point to `/ds-setup`.
 
-Read framework-specific reference: `.claude/skills/ds-interview/references/component-api.{framework}.md`
-
-A11y grilling patterns come from `discovery-summary.md`'s "A11y Patterns" section (`ds-a11y-discovery`'s live-fetched, component-specific output, Phase 1) — not a static reference file.
+A11y grilling patterns come from `discovery-summary.md`'s "A11y Patterns" section
+(`ds-a11y-discovery`'s live-fetched, component-specific output, Phase 1) — not a static file.
 
 ---
 
@@ -23,22 +22,22 @@ Remove ambiguity from the component's design before spec and scaffold. Interview
 ## On start
 
 1. Ask for the component name if not provided as an argument.
-2. Read `{componentPath}docs/session-handoff.md` and `{componentPath}docs/discovery-summary.md`.
+2. Read `{docsDir}session-handoff.md` and `{docsDir}discovery-summary.md`.
 3. Read reference docs — they ground the interview, **not** a question script:
-   → `.claude/skills/ds-interview/references/component-api.md` (agnostic — principle, pattern tree, mapping)
-   → `.claude/skills/ds-interview/references/component-api.{framework}.md` (framework from config — concrete syntax only)
-   → `.claude/skills/ds-wayfinder/references/architecture.md` (shared, agnostic)
-   → `.claude/skills/ds-wayfinder/references/architecture.{framework}.md` (shared, concrete syntax)
+   → `references/component-api.md` (agnostic — principle, pattern tree, mapping)
+   → `references/component-api.{framework}.md` (concrete syntax only)
+   → `${CLAUDE_PLUGIN_ROOT}/skills/ds-wayfinder/references/architecture.md` + `architecture.{framework}.md`
+   → `{conventions}` § API conventions — this DS's naming and slot style win over the references
 
 A11y grounding comes from `discovery-summary.md`'s "A11y Patterns" section (`ds-a11y-discovery`'s output, Phase 1) — live-fetched, component-specific, already read in step 2 above.
 
 ## Step 1 — Work-type classification
 
-Read `workType` from `{componentPath}docs/phase-state.json` — already collected in `ds-discovery` Setup. Don't re-ask.
+Read `workType` from `{docsDir}phase-state.json` — already collected in `ds-discovery` Setup. Don't re-ask.
 
 ### `workType: tokens` fast path
 
-If `workType` is `tokens`, skip Step 2's grill entirely. There is no new API/a11y/edge-case surface to interview — `discovery-summary.md` already holds the full token diff. Write `{componentPath}docs/decisions.md` directly from that diff (format per Step 3 below), covering only: work type (`tokens`), the token names/values changing, and a one-line confirmation that no API/behavior surface changes. Skip to **Handoff** (end of file).
+If `workType` is `tokens`, skip Step 2's grill entirely. There is no new API/a11y/edge-case surface to interview — `discovery-summary.md` already holds the full token diff. Write `{docsDir}decisions.md` directly from that diff (format per Step 3 below), covering only: work type (`tokens`), the token names/values changing, and a one-line confirmation that no API/behavior surface changes. Skip to **Handoff** (end of file).
 
 ### Otherwise
 
@@ -77,13 +76,13 @@ If yes:
 - **Accessibility contract** — keyboard behavior, ARIA roles/attributes, focus management, screen-reader announcements
 - **Edge cases & error states** — before moving on from this area, reason about the failure surface of *this specific component type*. Don't use a fixed list — a form field, a data table, an async uploader, and a media player each fail differently. Derive: what validation errors can occur? what async/loading failures exist? what state conflicts are possible (error + disabled, loading + required, etc.)? who owns clearing the error — the component, the parent, or the user? is the error transient or persistent? what does recovery look like? Pull each thread until nothing is left fuzzy.
 - **Usage scenarios** — how consumers actually use it in context, not just its isolated API
-- **Design-token / theming implications** — anything visual the discovery left as "pending Spec"
-- **CVA / model binding** — yes/no, and what that implies for form integration
+- **Design-token / theming implications** — anything visual the discovery left as "pending Spec"; tokens discovery flagged as missing from `tokens.sources`
+- **Forms integration** — does it bind to a form model, and through which mechanism (`{conventions}` § API conventions)
 
 **Rules:**
 1. Ask one question at a time. Prefer questions that expose an edge case, an unstated assumption, or a decision the discovery left implicit.
 2. Keep going until you can't find another fuzzy edge — don't stop just because you've touched every area above, and don't pad with confirmatory questions once an area is genuinely settled.
-3. The moment an answer settles something, append it to `{componentPath}docs/decisions.md` immediately (format below) — don't hold it in memory to reconstruct at the end.
+3. The moment an answer settles something, append it to `{docsDir}decisions.md` immediately (format below) — don't hold it in memory to reconstruct at the end.
 4. If discovery or an existing DS sibling already answers an area unambiguously, skip it silently. Never ask the user to restate something the discovery summary already established — that's not grilling, it's busywork.
 5. The goal is coverage of possible cases and removal of ambiguity — not a confirmation pass over what discovery already provided.
 
@@ -108,9 +107,9 @@ If yes:
 
 ## Step 3 — Write handoff
 
-Confirm `{componentPath}docs/decisions.md` covers, at minimum: work type, component direction, full API surface (all inputs/outputs/events), primitive layer, CVA usage, accessibility contract. Append anything still missing.
+Confirm `{docsDir}decisions.md` covers, at minimum: work type, component direction, full API surface (all inputs/outputs/events), primitive layer, forms integration, accessibility contract. Append anything still missing.
 
-Merge into `{componentPath}docs/phase-state.json` (create if missing, preserve existing keys):
+Merge into `{docsDir}phase-state.json` (create if missing, preserve existing keys):
 ```json
 {
   "interviewComplete": true,
@@ -126,7 +125,7 @@ Merge into `{componentPath}docs/phase-state.json` (create if missing, preserve e
 (or leave `[]`) if the component had no sub-parts to decompose. `ds-spec` and `ds-plan` read
 this — it must reflect what was actually graphed, not be backfilled as an afterthought.
 
-Update `{componentPath}docs/session-handoff.md` — mark "Design Interview" checklist item complete, update "What to do next".
+Update `{docsDir}session-handoff.md` — mark "Design Interview" checklist item complete, update "What to do next".
 
 Print:
 

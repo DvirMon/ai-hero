@@ -2,7 +2,7 @@
 
 Generate `docs/prd.md` inside the component folder after Phase 2 planning is complete. This is the primary context document — it captures what the component is, why it exists, and what it must do. All subsequent implementation phases reference it.
 
-> `{componentPath}` = this component's own working directory, resolved from the project's `ds-wayfinder.config.json`.
+> Placeholders resolve from the design-system config (`${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md`).
 
 ## When to Generate
 
@@ -11,7 +11,7 @@ Always. Every DS component gets a `docs/prd.md`, regardless of complexity.
 ## Template
 
 ```markdown
-# PRD: {prefix}-<name>
+# PRD: {selector}
 
 **Status:** Draft  
 **Figma:** [link]  
@@ -56,9 +56,9 @@ Why does this component need to exist in the DS? What gap does it fill? What pro
 
 | Property | Value |
 |---|---|
-| Selector | `{prefix}-<name>` |
+| Selector | `{selector}` |
 | Location | `{componentPath}` |
-| CDK primitive | [name, or "none"] |
+| Primitive | [library + primitive, or "none"] |
 | Complexity | Simple / Moderate / Complex |
 
 ---
@@ -69,11 +69,9 @@ Why does this component need to exist in the DS? What gap does it fill? What pro
 
 | DS Component | Selector | Import path | Used for |
 |---|---|---|---|
-| {prefix}-button | `button[{prefix}-button]` | `@{NAMESPACE}/ui-core/2.0/{prefix}-button` | Trigger / action buttons |
-| {prefix}-icon-2 | `{prefix}-icon-2` | `@{NAMESPACE}/ui-core/2.0/{prefix}-icon-2` | Icons |
-| [add rows from Discovery Summary] | | | |
+| [one row per Discovery Summary entry] | [selector from source] | [import path from its export] | [purpose] |
 
-**Scaffolding rule:** The angular scaffolder MUST import and use every component listed here using the exact `Import path` value in this table. Do NOT reimplement their markup or behaviour from scratch, and do not guess import paths from component names.
+**Scaffolding rule:** the component scaffolder MUST import and use every component listed here using the exact `Import path` value in this table. Do NOT reimplement their markup or behaviour from scratch, and do not guess import paths from component names.
 
 ---
 
@@ -126,11 +124,11 @@ Why does this component need to exist in the DS? What gap does it fill? What pro
 - [ ] All states visually correct (hover, focus, disabled, error)
 - [ ] Fully keyboard operable
 - [ ] ARIA attributes correct and dynamic
-- [ ] Role tokens only — no hardcoded hex
-- [ ] `{prefix}-theme-element` on `:host`
+- [ ] Tokens only — every color/shadow/radius/spacing value from `tokens.allowed` (or the component's own custom properties when the DS has no tokens); nothing from `tokens.forbidden`
+- [ ] Root element matches `{conventions}` § Component shape (incl. `{themeClass}` when set)
 - [ ] All internal DS components from the table above are imported and used — none reimplemented
-- [ ] Public API exported
-- [ ] Code Connect published
+- [ ] Public API exported per `{conventions}` § Types and exports
+- [ ] Code Connect published *(only when the Figma project config has `codeConnect.available: true`)*
 ```
 
 ## Rules for Generating

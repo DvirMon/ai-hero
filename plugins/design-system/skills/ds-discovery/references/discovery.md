@@ -1,108 +1,103 @@
 # Discovery Phase — Reading the Figma Design
 
-This is always Phase 1. Fetch the Figma design once. All subsequent planning steps consume this output.
+Always Phase 1. Fetch the Figma design once; every later phase consumes this output.
 
 ## Fetching the Design
 
 ### Primary: Figma MCP
 
-Call `mcp__{prefix}-ui-mcp__getFigmaData` or `mcp__{prefix}-ui-mcp__getFigmaFileNodes` with the node ID and file key from the Figma URL.
+Call the first available tool in `figma.tools` (none configured → `ToolSearch("figma")` and
+use what is connected) with the file key and node ID from the Figma URL. Prefer a tool that
+returns design context with variables over a raw node dump.
 
-### Fallback 1: Figma REST API (when MCP is unavailable)
+### Fallback 1: Figma REST API (MCP unavailable)
 
-If the MCP tool fails or is unavailable, fall back to the Figma REST API directly.
+Ask the user to run the call locally and paste the response:
 
-**Instruct the user to run the API call locally and paste the response:**
-
-> "The Figma MCP is not available. To fetch the design via the Figma REST API, run the following command in your terminal (replace `<token>` with a Figma personal access token — generate one at figma.com → Account Settings → Personal access tokens → read-only scope):
+> "The Figma MCP is not available. Run this with a Figma personal access token (read-only
+> scope — figma.com → Account Settings → Personal access tokens):
 >
 > ```sh
 > curl -s -H "X-Figma-Token: <token>" \
 >   "https://api.figma.com/v1/files/:fileKey/nodes?ids=:nodeId"
 > ```
 >
-> Paste the JSON response here — do not paste the token itself."
+> Paste the JSON response — not the token."
 
-Extract the same information from the JSON response as you would from the MCP output.
+Extract the same information as from the MCP output.
 
-### Fallback 2: No Figma available (designer in MVP / pre-design phase)
+### Fallback 2: No Figma (pre-design)
 
-If no Figma URL exists and the designer has not yet created a component frame, do not block. Instead:
+Don't block:
 
-1. Search the existing codebase for the **most similar DS component** already built (e.g. if building a "stat card", look for `{prefix}-card`, `{prefix}-content-block`, or any existing card-like component).
-2. Read its SCSS, template, and public API to understand the established pattern.
-3. Use that component as the structural and token reference instead of a Figma frame.
-4. Clearly note in the discovery summary: "No Figma available — pattern derived from `<existing-component>`."
-
-This ensures the new component is consistent with existing DS patterns even without a design spec.
+1. Find the **most similar existing DS component** in `{componentsRoot}` (start with
+   `sources.siblings`).
+2. Read its styles, template and public API.
+3. Use it as the structural and token reference.
+4. State in the summary: "No Figma available — pattern derived from `<component>`."
 
 Read the full output before doing anything else.
 
 ## What to Extract
 
 ### From the screenshot
-- All **visual states**: default, hover, focus, active, disabled, error, loading, empty
-- All **variants**: how many exist, what dimension they control (appearance, size, color/intent)
-- **Layout regions**: which areas are distinct (header, body, footer, actions, icon slot)
-- Whether icons are **decorative** (purely visual) or **interactive** (clickable)
+- Every **visual state**: default, hover, focus, active, disabled, error, loading, empty
+- Every **variant** dimension (appearance, size, color/intent) and its values
+- **Layout regions** (header, body, footer, actions, icon slot)
+- **Decorative** vs **interactive** icons
 
 ### From variant names → candidate inputs
 
 | Figma variant property | Maps to |
 |---|---|
-| `Type=Primary,Secondary,Danger` | `appearance = input<Appearance>('primary')` |
-| `Size=SM,MD,LG` | `size = input<Size>('md')` |
-| `Color=Brand,Danger,Success` | `color = input<Color>('brand')` |
-| `Show Icon=True/False` | `showIcon = input(false)` |
-| `Disabled=True/False` | `disabled = input(false)` |
-| `State=Default,Hover,Error` | **Not an input** — CSS pseudo-class or state class |
-| `Loading=True/False` | `loading = input(false)` if it changes structure |
+| `Type=Primary,Secondary,Danger` | enum input `appearance`, default `primary` |
+| `Size=SM,MD,LG` | enum input `size`, default `md` |
+| `Color=Brand,Danger,Success` | enum input `color`, default `brand` |
+| `Show Icon=True/False` | boolean input `showIcon`, default `false` |
+| `Disabled=True/False` | boolean input `disabled`, default `false` |
+| `State=Default,Hover,Error` | **not an input** — CSS pseudo-class or state class |
+| `Loading=True/False` | boolean input only if it changes structure |
 
-**Rule:** Hover and focus are always CSS pseudo-classes, never inputs. Error and loading may be inputs only if they change the DOM structure (e.g. show a spinner), not just the color.
+Hover and focus are always CSS pseudo-classes. Error and loading become inputs only when they
+change the DOM (e.g. a spinner), not just the color. Framework syntax: `component-api.{framework}.md`.
 
-### From CSS variable references
-Note every token referenced in the Figma layer. They map directly to SCSS variables.
-
-Format: Figma `fill/brand/bold` → CSS `var(--fill-brand-bold)` (replace `/` with `-`)
+### From variable references
+Record every token a layer references, converted with `tokens.figmaToCss`: split the Figma path
+on `/`, join with `separator`, add `prefix` — with the defaults, `fill/brand/bold` →
+`var(--fill-brand-bold)`. Check each converted name exists in `tokens.sources`; flag misses and
+anything matching `tokens.forbidden`. With `tokens.sources: []`, record the raw values — the
+component will declare its own custom properties for them.
 
 ### From component descriptions
-Designers often leave usage notes in the Figma component description. Extract:
-- Intended use cases
-- What NOT to use it for
-- Links to documentation or specs
+Designer notes: intended use, what NOT to use it for, linked specs.
 
-## Angular Material Discovery (optional but recommended)
+## Reference library discovery
 
-For any component with **interactive behaviour** (dropdowns, dialogs, overlays, keyboard navigation, focus management), discovery the equivalent Angular Material component **before** Phase 2 planning.
+For components with **interactive behaviour** (overlays, keyboard navigation, focus
+management), study the equivalent in each `sources.references` library before Phase 2 —
+**inspiration only**, never copied. Use it to learn which primitive it uses, which ARIA pattern
+it follows and how it shapes its public API. Catalog URLs and adaptation tables:
+`primitives.md` + `primitives.{framework}.md`.
 
-Angular Material is **inspiration only** — never copy its code directly. It uses outdated Angular patterns (`@Input`, `NgModule`, `ngOnInit`). Use it to understand:
-- Which CDK primitives it uses
-- What ARIA pattern it follows
-- How it structures its public API
-
-→ See [primitives.md](primitives.md) (agnostic) and [primitives.angular.md](primitives.angular.md) for the full Material reference URLs and the adaptation rules.
-
-**Skip this step** for purely presentational components (cards, badges, banners, dividers) with no interactive behaviour.
+Skip for purely presentational components (cards, badges, dividers).
 
 ## Output: Discovery Summary
 
-Before moving to Phase 2, produce this structured summary. It feeds all three parallel planning steps.
-
 ```
-Component: <name>
-Variants: [list all variant dimensions and their values]
-States: [list: default, hover, focus, disabled, error, etc.]
-Candidate inputs: [name: type = default, ...]
-Tokens: [list of CSS vars referenced in Figma]
-Content regions: [named regions that may become ng-content slots]
-CDK candidate: [initial guess based on interaction pattern]
-A11y role: [initial guess: button, dialog, listbox, etc.]
-Motion: [any animations observed in the design: open/close, hover transitions, etc.]
-Material equivalent: [Angular Material component name, or "none"]
+Component: {name}
+Variants: [dimensions and values]
+States: [default, hover, focus, disabled, error, …]
+Candidate inputs: [name: type = default, …]
+Tokens: [converted CSS custom properties; flagged misses]
+Content regions: [named regions that may become slots]
+Primitive candidate: [library + primitive, or "none"]
+A11y role: [initial guess]
+Motion: [observed animations, or "none"]
+Reference equivalent: [library: component, or "none"]
 internalDsComponents:
-  - component: {prefix}-button
-    selector: button[{prefix}-button]
-    importPath: "@{NAMESPACE}/ui-core/2.0/{prefix}-button"
-    usedFor: action buttons
-  # write "none" if no existing DS components are used inside this component
+  - component: <DS component>
+    selector: <selector from source>
+    importPath: <import path from its export>
+    usedFor: <purpose>
+  # "none" when the component uses no existing DS components
 ```

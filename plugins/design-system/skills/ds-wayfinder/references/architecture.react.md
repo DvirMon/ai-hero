@@ -1,15 +1,15 @@
 # Architecture Doc — React Examples
 
-> Template/decision rules live in `architecture.md` (agnostic). This file is React primitive wiring and naming only.
+> Template/decision rules live in `architecture.md` (agnostic). This file is React primitive wiring and naming only. Names follow `naming.className` and `{conventions}`; the libraries below are examples when `sources.primitives` lists them — wire whatever discovery chose.
 
 ## Component Hierarchy
 
 ```
-{Prefix}<Name> (root / trigger owner)
-├── {Prefix}<Name>Panel (overlay panel)
-│   ├── {Prefix}<Name>Option (repeated item)
+{Prefix}{Name} (root / trigger owner)
+├── {Prefix}{Name}Panel (overlay panel)
+│   ├── {Prefix}{Name}Option (repeated item)
 │   └── ...
-└── use{Prefix}<Name>Trigger (behavior hook applied to trigger element)
+└── use{Prefix}{Name}Trigger (behavior hook applied to trigger element)
 ```
 
 ## Primitive Wiring
@@ -62,4 +62,4 @@ User action (Enter / click option)
 
 ## Justification Reference
 
-Reference an equivalent Radix/React Aria/MUI component if applicable — see `primitives.react.md` for the adaptation table.
+Reference the equivalent component from `sources.references` if one exists — see `primitives.react.md` for the adaptation table.

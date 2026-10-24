@@ -1,8 +1,14 @@
-# Primitives — Angular (CDK + ng-primitives)
+# Primitives — Angular catalog
 
-> Discovery order and rationale live in `primitives.md` (agnostic). This file is the Angular-specific selection tables and libraries.
+> Discovery order lives in `primitives.md`. This file is a **catalog** of well-known Angular
+> libraries. Which ones apply, and in what order, is `sources.primitives` /
+> `sources.references` in the design-system config — consult only those.
 
-Before writing any interaction logic from scratch, check if the Angular CDK already solves it. CDK handles keyboard management, focus trapping, and ARIA wiring correctly and accessibly.
+| Catalog id | Kind | Section |
+|---|---|---|
+| `@angular/cdk` | primitives | CDK Selection Table |
+| `ng-primitives` | primitives | Angular Primitives |
+| `angular-material` | reference | Angular Material as Inspiration |
 
 ## CDK Selection Table
 
@@ -33,17 +39,17 @@ CDK provides behaviour only — you own the visual styling.
 
 Angular Material is built on the same CDK and follows the same ARIA patterns. Use it to understand *what* to build and *which CDK to use* — **never copy its code directly**.
 
-Material uses outdated Angular patterns. Always adapt:
+Material uses outdated Angular patterns. Adapt to the idioms in `{conventions}`; the defaults:
 
-| Material pattern | Atera equivalent |
+| Material pattern | Current idiom |
 |---|---|
 | `@Input() foo` | `foo = input()` |
 | `@Output() fooChange` | `fooChange = output()` |
 | `NgModule` imports | standalone `imports: []` |
 | `ngOnInit` / `ngOnChanges` | `effect()` / `computed()` |
 | `@ViewChild` + imperative DOM | signals + template refs |
-| `ViewEncapsulation.None` | `Emulated` (default — never override) |
-| MDC/Material design tokens | Atera role tokens (`var(--fill-*)`, `var(--content-*)`) |
+| `ViewEncapsulation.None` | `Emulated` unless `{conventions}` § Styling allows it |
+| MDC/Material design tokens | the DS's tokens (`tokens.sources`, `tokens.allowed`) |
 | `::ng-deep` | CSS custom property override API |
 
 ## Angular Material GitHub Reference
@@ -89,9 +95,9 @@ If a file 404s, skip and continue.
 Full list and supplementary sources (Storybook, CHANGELOG, tokens):
 `https://material.angular.io/components/<component>/api`
 
-## No CDK Available? Try Angular Primitives First
+## Angular Primitives
 
-If no CDK primitive fits, check **Angular Primitives (`ng-primitives`)** before going native. It is a collection of unstyled, accessible Angular directives designed specifically for building design systems.
+**Angular Primitives (`ng-primitives`)** is a collection of unstyled, accessible Angular directives designed for building design systems.
 
 - Package: `ng-primitives` — one entrypoint per primitive
 - All Angular directives — composable, no built-in styles, you own the markup
@@ -145,7 +151,7 @@ If no CDK primitive fits, check **Angular Primitives (`ng-primitives`)** before 
 
 ### How to query Angular Primitives
 
-**Via ngp-mcp (preferred):** The `ngp-mcp` MCP server is configured in `~/.claude/settings.json` (user-level, not committed to the repo) as a local stdio server pointing to the project's `node_modules`. Use `ToolSearch(query: "ng-primitives")` to discover available tools, then call them to get primitive details.
+**Via MCP (preferred):** the package ships an `ngp-mcp` server. When `ToolSearch(query: "ng-primitives")` finds it, use it. To add it: `mcpServers` entry `"ng-primitives": { "type": "stdio", "command": "<project>/node_modules/.bin/ngp-mcp" }` in the user's settings.
 
 **Via WebFetch (fallback):**
 ```
@@ -156,7 +162,7 @@ Full overview: `https://angularprimitives.com/assets/llms/llms.txt`
 
 ### Truly no primitive available?
 
-If neither CDK nor Angular Primitives fit:
+If no library in `sources.primitives` fits:
 1. Check the [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/patterns/) for the interaction pattern
 2. Implement keyboard handling via the `host` property (never `@HostListener`)
 3. Document in a comment why no primitive was used

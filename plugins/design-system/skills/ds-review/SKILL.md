@@ -5,34 +5,32 @@ description: Phase 6 of DS component creation — runs a11y, code, and styles re
 
 # DS Component Builder — Phase 6: Review
 
-## Config Setup
+## Config
 
-Discovers `{projectPath}/.claude/ds-wayfinder.config.json` (walks up from component path):
-- Framework (determines review checklist)
-
-Read review handoff: `.claude/skills/ds-review/references/skill-review-handoff.md`
+Resolve the config per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md` and read `{conventions}`.
+Missing either → stop and point to `/ds-setup`.
 
 ---
 
 ## On start
 
-Ask the user for the component name, then read `{componentPath}docs/session-handoff.md`.
+Ask the user for the component name, then read `{docsDir}session-handoff.md`.
 
 If Phase 5 is not marked complete → tell the user to finish `ds-scaffold` first.
 
-Read `{componentPath}docs/phase-state.json` and load: `componentFilePath`, `scssFilePath`, `isComplex`, `planDir`, `a11ySpecText`, and `a11ySpecPath`.
+Read `{docsDir}phase-state.json` and load: `componentFilePath`, `stylesFilePath`, `isComplex`, `planDir`, `a11ySpecText`, and `a11ySpecPath`.
 
 Derive inline `a11ySpec` from the `phase-state.json` keys `a11ySpecText` / `a11ySpecPath` as follows:
 - If `isComplex = false` → use the `a11ySpecText` value as inline `a11ySpec`
 - If `isComplex = true` → read the file whose relative path is stored in `a11ySpecPath`, resolving that path relative to `{componentPath}` (for example, `a11ySpecPath = "docs/..."` means `{componentPath}docs/...`), and pass its content as inline `a11ySpec`
 
 **Resolve `planDir`** — the versioned plan subfolder for the active version:
-1. Read `planDir` from `{componentPath}docs/phase-state.json` (primary source)
-2. If `planDir` is not present, fall back to folder discovery: locate the component's plan folder under `.claude/plans/`, then inspect its version subfolders (for example `v1-ngp/`, `v2/`)
+1. Read `planDir` from `{docsDir}phase-state.json` (primary source)
+2. If `planDir` is not present, fall back to folder discovery: locate the component's plan folder (`{plansDir}`, any `{nnn}`), then inspect its version subfolders (for example `v1-core/`, `v2-enhancement/`)
 3. If exactly one version subfolder exists, use it
 4. If multiple version subfolders exist, choose the most recently modified version subfolder as the fallback, and tell the user which one you selected; if the user says a different version was scaffolded, use the user-specified version instead
 5. If no matching component plan folder or no version subfolders exist, stop and ask the user which scaffolded plan/version folder to use
-6. `planDir` = repo-relative path to the selected versioned subfolder (for example `.claude/plans/001-atera-snackbar/v1-ngp/`)
+6. `planDir` = repo-relative path to the selected versioned subfolder
 
 ## Launch agents (parallel)
 
@@ -50,27 +48,30 @@ mode** over the component. This skill owns only the pipeline state; the
 plugin owns how to review and what severity means.
 
 "Code" is four plugin agents: `template-reviewer`,
-`public-api-reviewer` (the component is exported from the DS barrel),
+`public-api-reviewer` (the component is part of the DS's public surface),
 `standards-reviewer` and `spec-reviewer`. `correctness-reviewer` always
 runs with Code.
 
+`public-surface` = the component's own `public-api.ts`, plus `{publicApiBarrel}`
+when `publicApi.rootBarrel` is set.
+
 | Surface | subagent_type | extra inputs |
 |---|---|---|
-| A11y | `code-review:a11y-reviewer` | every file in `design-system` mode; a11y contract = `a11ySpec` (inline text or `a11ySpecPath`) |
-| Code | `code-review:correctness-reviewer`, `code-review:template-reviewer`, `code-review:public-api-reviewer`, `code-review:standards-reviewer` | `public-surface: [{dsPublicApiBarrel}]`; `references: [references/ds-code-rules.md]` (template, standards) |
-| Code — spec | `code-review:spec-reviewer` | spec sources: `{componentPath}docs/prd.md` and the step files in `{planDir}` (their Acceptance Checks are acceptance criteria) |
-| Styles | `code-review:styles-reviewer` | `references: [references/ds-styles-rules.md]` |
+| A11y | `code-review:a11y-reviewer` | every file in `design-system` mode; a11y contract = `a11ySpec` (inline text or `a11ySpecPath`); target = `a11y.wcag` |
+| Code | `code-review:correctness-reviewer`, `code-review:template-reviewer`, `code-review:public-api-reviewer`, `code-review:standards-reviewer` | `public-surface` (above); `references: [references/ds-code-rules.md, {conventions}]` (template, standards) |
+| Code — spec | `code-review:spec-reviewer` | spec sources: `{docsDir}prd.md` and the step files in `{planDir}` (their Acceptance Checks are acceptance criteria) |
+| Styles | `code-review:styles-reviewer` | `references: [references/ds-styles-rules.md, {conventions}]`; the resolved `tokens` config |
 
 Every dispatch prompt carries the plugin's common inputs — build them
 from `docs/agents/code-review.md` exactly as the plugin's SKILL.md §5
 does:
 
 ```
-scope: files: [componentFilePath, its template, scssFilePath, public-api.ts]
-contract: <plugin root>/skills/code-review/references/review-contract.md
+scope: files: [componentFilePath, its template (if separate), stylesFilePath, public-api.ts]
+contract: <code-review plugin root>/skills/review/references/review-contract.md
 files: <path — type — library — design-system>, one per line
 standards: <config knowledge.standards, resolved>
-decisions: [{componentPath}docs/decisions.md, {componentPath}docs/narrative.md]
+decisions: [{docsDir}decisions.md, {docsDir}narrative.md]
 skills: <config skills for the design-system context>
 ```
 
@@ -85,7 +86,7 @@ If ever unsure which reviewers apply, default to running all of them — a misse
 **Write `{planDir}/review-issues.md`** before fixing anything. Use this format:
 
 ```markdown
-# Review Issues — atera-{name} {version}
+# Review Issues — {selector} {version}
 <!-- {date} | a11y, code, styles -->
 
 ## A11y
@@ -160,16 +161,16 @@ Step file → reviewer mapping:
 - `step-*-template*` → `code-review:template-reviewer`
 - `step-*-styles*` → `code-review:styles-reviewer`
 - `step-*-a11y*` → `code-review:a11y-reviewer` (manual-checks stay `- [ ]`)
-- `step-*-tests*` → confirmed by `nx test` passing
-- `step-*-storybook*` → confirmed by `npm run sb` passing
+- `step-*-tests*` → confirmed when the user reports `commands.test` passing — never run it yourself
+- `step-*-storybook*` → confirmed when the user reports `commands.storybook` rendering the stories — never run it yourself
 
-Update `docs/prd.md` acceptance criteria: tick `- [ ]` → `- [x]` for each confirmed criterion, or `- [!]` if flagged.
+Update `{docsDir}prd.md` acceptance criteria: tick `- [ ]` → `- [x]` for each confirmed criterion, or `- [!]` if flagged.
 
 Update `progress.md` — mark ✅ `completed` or ⚠️ `needs-fix` for each step row.
 
 ## Write handoff
 
-Update `{componentPath}docs/session-handoff.md` — mark Phase 6 complete, note any issues fixed.
+Update `{docsDir}session-handoff.md` — mark Phase 6 complete, note any issues fixed.
 
 Print:
 

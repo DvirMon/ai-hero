@@ -2,29 +2,33 @@
 
 ## When to Add Motion
 
-Add animation only when the design explicitly specifies it or when the interaction pattern benefits from spatial continuity (e.g. a panel that appears from a trigger, a list item that expands).
+Add animation only when the design specifies it or the interaction benefits from spatial
+continuity (a panel appearing from its trigger, an item expanding).
 
-**Do not animate** for the sake of it — static components (badges, dividers, banners without dismiss) should have no animation.
+**Do not animate** for its own sake — static components (badges, dividers, banners without
+dismiss) have no animation.
 
-## DS Motion Principles
+## Principles
 
-- **Purposeful**: animation should reinforce the interaction — where did this element come from, where is it going?
-- **Brief**: DS animations are 150–250ms. Never exceed 300ms.
-- **Reduced motion**: always respect `prefers-reduced-motion` — skip or reduce all transitions.
+- **Purposeful** — reinforce where an element came from and where it goes.
+- **Brief** — 150–250ms; never above 300ms without a documented reason.
+- **Reduced motion** — always honour `prefers-reduced-motion`.
 
 ## Token-Based Durations
 
-Use DS motion tokens when available. Do not hardcode duration values.
+Durations and easings come from tokens matching `tokens.motion`, defined in `tokens.sources`.
+Never hardcode them in a rule body.
 
-```scss
-// ✅ GOOD: use motion tokens
+```css
+/* ✅ motion tokens */
 transition: opacity var(--motion-duration-fast) var(--motion-easing-standard);
 
-// ❌ BAD: hardcoded duration
+/* ❌ hardcoded */
 transition: opacity 200ms ease-in-out;
 ```
 
-Check `{prefix}-roles.scss` for available `--motion-*` tokens. If none exist for your use case, use these standard values as fallback:
+When the DS has no motion tokens (`tokens.motion: []`), declare component-level custom
+properties on the root with these fallback values, and use those:
 
 | Use | Duration | Easing |
 |---|---|---|
@@ -35,15 +39,18 @@ Check `{prefix}-roles.scss` for available `--motion-*` tokens. If none exist for
 
 ## Common Patterns
 
+`--{selector}-motion-duration` below is a component-level custom property declared on the root,
+defaulting to a motion token (or a fallback value above).
+
 ### Panel open/close
 
-```scss
+```css
 .panel {
   opacity: 0;
   transform: translateY(-4px);
   transition:
-    opacity 150ms ease-out,
-    transform 150ms ease-out;
+    opacity var(--{selector}-motion-duration) ease-out,
+    transform var(--{selector}-motion-duration) ease-out;
 
   &.open {
     opacity: 1;
@@ -52,23 +59,11 @@ Check `{prefix}-roles.scss` for available `--motion-*` tokens. If none exist for
 }
 ```
 
-### Chevron rotation (accordion, select)
-
-```scss
-.chevron {
-  transition: transform 150ms ease-in-out;
-
-  :host.open & {
-    transform: rotate(180deg);
-  }
-}
-```
-
 ### Reduced motion override
 
-Always include this alongside any animation:
+Always alongside any animation:
 
-```scss
+```css
 @media (prefers-reduced-motion: reduce) {
   .panel,
   .chevron {
@@ -77,21 +72,9 @@ Always include this alongside any animation:
 }
 ```
 
-Or as a global mixin if one exists in the DS:
+Use the DS's reduced-motion mixin instead when `{conventions}` § Styling names one.
 
-```scss
-:host {
-  @include reduced-motion {
-    transition: none;
-  }
-}
-```
+## What to Note in the Discovery Summary
 
-## What to Note in Discovery Summary
-
-During Phase 1, look for motion in the Figma prototype or design notes:
-- Does the panel/overlay animate in? What direction?
-- Does any element rotate or scale on state change?
-- Is there a dismiss or fade transition?
-
-Add observed motion to the Discovery Summary under `Motion:` so Phase 4 (styles) can implement it correctly.
+During Phase 1, record under `Motion:` whether the panel/overlay animates in (and from where),
+whether anything rotates or scales on state change, and whether there is a dismiss or fade.

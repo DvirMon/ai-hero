@@ -1,18 +1,29 @@
 # Primitives (Framework-Agnostic)
 
-> Framework-specific selection tables and library names live in the sibling file for your target framework (e.g. `primitives.angular.md`). This file covers the discovery order — read it first, then the framework file for concrete libraries/imports.
+> The libraries to consult, in order, are `sources.primitives` then `sources.references` from
+> the design-system config. The framework file (`primitives.{framework}.md`) is a **catalog**:
+> selection tables and source URLs for well-known libraries. A configured library the catalog
+> doesn't list is researched from its own docs.
 
-Before writing any interaction logic from scratch, check whether the platform's primitive/behavior library already solves it. These libraries handle keyboard management, focus trapping, and ARIA wiring correctly and accessibly — reinventing them risks silent a11y regressions.
+Before writing interaction logic from scratch, check whether a behavior library already solves
+it. These libraries handle keyboard management, focus trapping and ARIA wiring — reinventing
+them risks silent a11y regressions.
 
 ## Discovery Order
 
-1. **Framework-native behavior library** (e.g. Angular CDK, React Aria, Radix, Headless UI, Vue's `@vueuse/core`) — check its selection table (framework file) first.
-2. **Unstyled accessible primitive collection** for the framework (e.g. `ng-primitives` for Angular, Radix Primitives / Ark UI for React) if the native library doesn't cover the pattern.
-3. **Reference implementation as inspiration only** — a mature component library built on the same primitives (e.g. Angular Material, MUI, Radix-based libraries). Use it to understand *what* to build and *which primitive to use* — **never copy its code directly**. These libraries often carry legacy patterns of their own framework version; always adapt to current idioms.
-4. **ARIA Authoring Practices Guide** — if no primitive fits, check the [ARIA APG](https://www.w3.org/WAI/ARIA/apg/patterns/) for the interaction pattern, implement keyboard handling manually, and document in a comment why no primitive was used.
+1. **Internal wrappers** — overlay/portal/focus helpers the DS already has
+   (`{conventions}` § Building blocks, codebase discovery). They override any library below.
+2. **`sources.primitives`, in order** — the first library that covers the pattern wins.
+3. **`sources.references`, inspiration only** — a mature component library built on similar
+   primitives. Learn *what* to build and *which primitive* to use; **never copy its code**.
+4. **ARIA Authoring Practices Guide** — no primitive fits: implement the
+   [APG pattern](https://www.w3.org/WAI/ARIA/apg/patterns/) by hand and document in a comment
+   why no primitive was used.
 
-Primitives/behavior libraries provide behavior only — the DS owns the visual styling.
+Primitives provide behavior only — the DS owns the visual styling.
 
 ## Legacy-Pattern Adaptation
 
-When drawing inspiration from a reference component library, always translate its patterns to current framework idioms rather than copying verbatim — reference libraries frequently lag behind current framework conventions (e.g. imperative lifecycle hooks instead of reactive primitives, global override escape hatches instead of a scoped custom-property API). See the framework file's adaptation table for concrete before/after mappings.
+Reference libraries often lag current framework idioms. Translate what you learn into the idioms
+in `{conventions}` (and the framework file's adaptation table) — never carry a legacy pattern into
+the recommendation.

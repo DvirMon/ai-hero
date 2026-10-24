@@ -2,7 +2,9 @@
 
 > Guideline, principle, and pattern-selection decision tree live in `component-api.md` (agnostic). This file is React syntax only, mapped to that file's pattern numbers.
 
-> Replace `{prefix}` with component prefix (e.g., `atera`, `my`, `app`). Components named PascalCase (`{Prefix}Card`), hooks camelCase (`use{Prefix}Autosize`).
+> `{prefix}` · `{Prefix}` resolve from the design-system config. Components PascalCase
+> (`{Prefix}Card`), hooks camelCase (`use{Prefix}Autosize`) unless `{conventions}` § API
+> conventions says otherwise.
 
 ## Pattern 1 — Hook-as-feature
 
