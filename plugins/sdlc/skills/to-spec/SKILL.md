@@ -10,7 +10,7 @@ This skill takes the current conversation context and codebase understanding —
 (the `slug` in `state.json`), in its worktree. On the default branch or an issue branch, stop
 and point the user to `/to-ticket`, which starts it via `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks/references/start-branch.md`.
 
-If a ticket workspace's `state.json` exists, validate it per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md` before reading it. A version-3 file is read through that schema's § Reading version 3 mapping; every write is version 4.
+If a ticket workspace's `state.json` exists, validate it per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md` before reading it.
 
 If it carries a non-null `capabilityLogPath`, **read that log too.** It holds what earlier efforts on the same capability already settled, superseded or left open — which this workspace's own decisions file does not, and which a spec is worse than useless for contradicting. Any decision the spec makes that binds the capability beyond this ticket gets a row in that log, per `~/.claude/conventions/doc-contracts/decisions-log.md`.
 
@@ -33,7 +33,7 @@ The repo's `docs/agents/ticket-tracker.md` and `docs/agents/issue-tracker.md` (c
    the line to the decision, tag `[Dm]`, drop the marker). Otherwise name the open lines and
    stop.
 
-`prdPath` null (a v3 workspace, or no PRD): ask the user for the path or confirm there is none,
+`prdPath` null (no PRD): ask the user for the path or confirm there is none,
 then skip the gate.
 
 ## Process

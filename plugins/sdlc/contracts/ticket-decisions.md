@@ -66,7 +66,7 @@ A decision that needs a paragraph to justify it gets a research or discovery fil
 links to it.
 
 **Phases:** `grill` · `spec` · `tasks` · `implement` · `review`. A `review` decision binds
-exactly like a `grill` one. (`implement` is the phase name; the skill is `/impel`.)
+exactly like a `grill` one. (`implement` is the phase name; the skill is `/implementation`.)
 
 **Optional sections**, both written by `grill-with-docs`:
 - `## Aspects` — when the grill splits the ticket by hand-off aspect (its step 0b). Status is

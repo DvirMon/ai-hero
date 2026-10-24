@@ -3,7 +3,7 @@
 The ticket-to-PR pipeline, as a plugin in the `ai-hero` marketplace.
 
 ```
-/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /impel → /review → /ship
+/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /implementation → /review → /ship
 ```
 
 Each stage is its own skill. You start each one yourself; the plugin only packages
@@ -24,11 +24,14 @@ In a repo's `.claude/settings.json`:
 ```
 
 Installing `sdlc` also installs and enables `code-review` from the same marketplace — it is
-a declared dependency (`.claude-plugin/plugin.json`), which `/impel` and `/ship` call as
+a declared dependency (`.claude-plugin/plugin.json`), which `/implementation` and `/ship` call as
 `code-review:review`.
 
 Then run `/setup-skills` once (or `/to-ticket`, which runs it when the repo has no
-`.claude/workflow.json`).
+`.claude/workflow.json`). It writes one entry per project in the repo — an app, a server, a
+library — with the skills each step type loads there
+([`contracts/workflow-config.md`](contracts/workflow-config.md) § Projects). Stages name no
+framework; the project config does.
 
 ## Local development
 
@@ -43,8 +46,8 @@ The files load in place; `/reload-plugins` picks up edits.
 
 These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 
-- **Skills:** domain-modeling, unit-test, story-create,
-  angular-developer, react-developer, figma-to-code
+- **Skills:** domain-modeling, and whatever the repo's `projects` name — e.g. unit-test,
+  story-create, angular-developer, react-developer, nodejs-developer, figma skills
 - **Contracts** (`~/.claude/conventions/doc-contracts/`): decisions-log, adr, jsdoc,
   story-doc
 - **Agents:** doc-compressor, adr-writer
@@ -58,6 +61,6 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 ```
 .claude-plugin/plugin.json
 skills/      the stages, plus setup-skills
-contracts/   ticket-decisions, prd, workflow-config, tracker, review-stage
-agents/      tdd-planner, test-implementer, angular/react/story-implementer
+contracts/   ticket-decisions, prd, workflow-config, tracker, review-stage, branch-guard
+agents/      implementer, test-implementer, tdd-planner
 ```

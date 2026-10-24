@@ -1,10 +1,10 @@
 <!-- Shared contract. Cited by to-issues, grill-with-docs, to-spec, to-tasks,
-     impel and ship. Edit here, never restate in a skill body. -->
+     implementation and ship. Edit here, never restate in a skill body. -->
 
 # The Pipeline block
 
 Every issue body ends with a `## Pipeline` section: which upstream stages actually ran, and
-whether the issue is ready to implement. `/impel` reads it and refuses to start work the
+whether the issue is ready to implement. `/implementation` reads it and refuses to start work the
 pipeline has not prepared.
 
 It exists because `state.json` only tracks issues that came from a workspace. An issue opened
@@ -14,9 +14,9 @@ mid-work — noticed while building something else, written down so a future ses
 ## Where the rung lives
 
 The repo's `docs/agents/issue-tracker.md` `## Readiness` (per `${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`) says
-which form applies. `/impel` reads the rung from that place and nowhere else.
+which form applies. `/implementation` reads the rung from that place and nowhere else.
 
-| Form | Trackers | Rung + `assessed:` live in | `/impel` reads |
+| Form | Trackers | Rung + `assessed:` live in | `/implementation` reads |
 |---|---|---|---|
 | **Body block** | GitHub, GitLab, local | the item's `## Pipeline` block (below) | the block |
 | **State form** | any tracker whose description must not be edited — e.g. Jira | `state.json` `units[].readiness` / `units[].assessed` | `units[]` |
@@ -76,8 +76,7 @@ this a sub; there is no `kind:` line, because presence already says it.
 
 `tasks` lives on the issue, not in `state.json`. `/to-tasks` plans **one issue**, and a single
 workspace-level boolean could never answer "is *this* issue planned" on a multi-issue epic —
-see `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`'s "Removed in this version" for why that boolean no
-longer exists on `state.json` at all. Grain decides the home:
+which is why `state.json` carries no per-issue stage status. Grain decides the home:
 `state.json` tracks per-workspace facts (paths, complexity, the ticket pointer); every
 per-issue pipeline stage — `grill`, `spec`, `tasks` — lives entirely in the issue's own
 `## Pipeline` block.
@@ -111,7 +110,7 @@ rather than each child.
 **An epic's rung describes the epic's own pipeline — grill, spec, slicing — never its children's
 readiness.** Once those three are done and children exist, the epic is `in-progress`
 regardless of what the children still need. Anything else double-counts a child's blocker as the
-parent's. Never `ready-for-agent` on an epic with children: that rung invites `/impel`, and
+parent's. Never `ready-for-agent` on an epic with children: that rung invites `/implementation`, and
 an epic with children is never implemented directly. `in-progress` is off the ladder — it
 means the epic's own pipeline is finished, and the next action is the frontier child's rung.
 
@@ -160,6 +159,29 @@ assessed: 2026-09-15 — body's Scope opens with "Decide Q1-Q3"; the column
   fold's read of grouping() has undecided ordering semantics.
 ```
 
+## The implementation gate
+
+What `/implementation` does with an issue that has no task plan. No plan means either the pipeline
+decided it needs none, or nobody has looked at it yet — the rung tells them apart.
+
+**An epic with children is never implemented directly.** Check the tracker's sub-issue relation
+first; if it has children, refuse and point at the frontier child.
+
+| `readiness` | `/implementation` |
+|---|---|
+| `ready-for-agent` | Implement. The issue body is the step; its acceptance criteria are the checks. |
+| `needs:<stage>` | **Refuse.** `Next: /<stage skill> <#>` (`needs:grill` → `/grill-with-docs`, `needs:spec` → `/to-spec`, `needs:issues` → `/to-issues`, `needs:tasks` → `/to-tasks`) |
+| `needs:triage`, or no rung at all | Assess per § Assessing readiness, record the rung, **ask**. Never proceed on your own verdict. |
+
+- **Refuse means refuse.** Name the rung and what tripped it, give the pointer, stop — no partial
+  start, no offer to run the missing stage inline. Stages exist to run in a fresh context.
+- **Never promote to `ready-for-agent` yourself** while implementing — you benefit from the
+  answer. Ambiguity resolves upward.
+- **On a sub**, refuse `needs:grill` by pointing at the child, not the epic. Several siblings at
+  `needs:grill` at once → say so: the epic's grill failed, and the regrill belongs there.
+- The user may say to implement a refused issue anyway. Proceed, and report which stage was
+  bypassed.
+
 ## Labels
 
 Three orthogonal axes. An issue carries one label from each of the last two, and optionally a
@@ -187,7 +209,7 @@ spec cover the child, which for a late-filed enhancement is false. Rationale and
 it: `docs/agents/discovery/issue-feature-taxonomy.md`.
 
 **The body block (or `units[]`, in the state form) is authoritative; the labels are a
-projection.** `/impel` reads the block,
+projection.** `/implementation` reads the block,
 never a label — a label is one edit away from being stale and carries no reason. Every skill that
 writes the block re-syncs both labels in the same turn. On conflict the body wins and the label
 gets corrected.

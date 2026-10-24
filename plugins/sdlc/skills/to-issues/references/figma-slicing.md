@@ -7,7 +7,7 @@ When `state.json` → `designPath` is set (or `figma[]` is non-empty but spec pr
 
 - Epic has a UI surface and `/to-spec` wrote `design.md` (or grill locked a frame table in
   `decisionsPath` while `designPath` is still null — use that table until spec runs).
-- Skip for backend-only slices and `stack: none` work.
+- Skip for backend-only slices and docs/chore work.
 
 ## Per FE slice (issue body)
 

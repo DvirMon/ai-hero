@@ -1,4 +1,4 @@
-# Figma UI — `/impel`
+# Figma UI — `/implementation`
 
 Consumes `state.json` → `designPath`, `figma[]`, and step frontmatter → `figma` (node IDs).
 **No new token or component decisions** — an unmapped row in `design.md` is a **stop**; send
@@ -11,15 +11,15 @@ When `designPath` is non-null, read it before the first UI step. When a step lis
 
 Load repo `.claude/figma-project.json` when the workspace is under a repo that has one.
 
-## UI `code` steps (`stack`: `angular` | `react`)
+## UI `code` steps
 
 Applies when the step has non-empty `figma:` **or** (no `figma` key but `designPath` is set and
 the step's `files` include UI templates/styles under the frontend app).
 
 ### Before dispatching the implementer
 
-1. Skills (load, do not skip): plugin **`figma-design-to-code`**, **`figma-feature-implementation`**
-   (or `figma-to-code` router), **`css-styling`**, and the stack developer skill.
+1. Skills: the project's `skills.code` plus `skills.ui` (e.g. `figma-design-to-code`,
+   `figma-feature-implementation`, `css-styling`), passed to the implementer.
 2. Area rules from `figma-project.json` → `rules[]` (e.g. `frontend/AGENTS.md`).
 3. Brief the implementer with:
    - `designPath` — mappings are authoritative
@@ -27,7 +27,7 @@ the step's `files` include UI templates/styles under the frontend app).
    - Instruction: run `figma-feature-implementation` Steps 0–5; **Step 6** runs after the step
      lands unless a `verify-ui` step follows (then Step 6 belongs to verify)
 
-### Implementer dispatch (unchanged agents)
+### Implementer dispatch
 
 Pass the usual `stepFilePath`, `workspaceRoot`, `specPath`, `architecturePath`, plus the brief
 above. Do not batch Figma fetch for multiple steps.
@@ -41,19 +41,19 @@ diff review).
 
 ## `verify-ui` steps
 
-Handled **inline by the dispatcher** (not `angular-implementer` / `react-implementer`).
+Handled **inline by the dispatcher**, not an implementer.
 
 1. Node list = step `figma:` or union of all `figma:` on UI code steps this step `depends_on`.
-2. **`get_screenshot`** per node (`fileKey` from `figma[]`) after loading `figma-design-to-code`.
+2. **`get_screenshot`** per node (`fileKey` from `figma[]`) after loading the project's `skills.ui`.
 3. **Browser** — screenshot the route/states named in the step's **Do** / issue acceptance
-   criteria on the developer's **already running** dev server (Org: `http://localhost:4200`
-   unless the step says otherwise). Use browser MCP / Playwright MCP / built-in browser tools
+   criteria on the developer's **already running** dev server — the URL the step names, else the
+   project's `devUrl`. Use browser MCP / Playwright MCP / built-in browser tools
    available in the session.
 4. **Compare** Figma vs app in four groups: **layout**, **token/color**, **typography**, **copy**.
 5. **Fix** in-scope mismatches in a new commit (`fix` or `style` per change); **list** pre-existing
-   out-of-scope mismatches without fixing (per `figma-design-to-code` § Verification).
+   out-of-scope mismatches without fixing.
 6. **Never** start, stop, or restart the dev server. If nothing is listening on the expected port,
-   stop the step: write a **checklist** of routes/states and frames still to compare manually.
+   (or neither URL is set), stop the step: write a **checklist** of routes/states and frames still to compare manually.
 
 Optional: append a short comparison note to the step report; do not commit node IDs into product
 source.

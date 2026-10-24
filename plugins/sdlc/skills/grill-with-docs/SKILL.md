@@ -22,7 +22,7 @@ never on the default branch.
 
 ## Starting material
 
-If a ticket workspace's `state.json` exists in context (created by `/to-ticket`; its root is `<domain-path>/docs/work/<slug>/` — see `/to-ticket`), validate it per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md` (a version-3 file is read through its § Reading version 3; every write is version 4), then fetch the ticket it points at (`ticketRef`, via `docs/agents/ticket-tracker.md` `## Fetch`) and use it, with the PRD at `prdPath` (`${CLAUDE_PLUGIN_ROOT}/contracts/prd.md`), as the interview's starting material — this is what you're sharpening.
+If a ticket workspace's `state.json` exists in context (created by `/to-ticket`; its root is `<domain-path>/docs/work/<slug>/` — see `/to-ticket`), validate it per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`, then fetch the ticket it points at (`ticketRef`, via `docs/agents/ticket-tracker.md` `## Fetch`) and use it, with the PRD at `prdPath` (`${CLAUDE_PLUGIN_ROOT}/contracts/prd.md`), as the interview's starting material — this is what you're sharpening.
 
 If no `state.json` exists, grill without a workspace — never create one; only `/to-ticket` does. Ask the user where to keep the decisions log (e.g. `~/.claude/work/<slug>/1-decisions.md`) and append entries there per the ticket-decisions format. Steps that need the workspace — `state.json` updates, `prd.md`, tracker comments, readiness — are skipped.
 

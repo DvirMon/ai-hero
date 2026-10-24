@@ -1,6 +1,6 @@
 ---
 name: to-ticket
-description: Pipeline entry — take an intake ticket ref (or a freeform ask, captured first via /to-intake), fetch it, write the PRD for app work, and initialize the ticket workspace and branch the rest of the pipeline reads from.
+description: Pipeline entry — take an intake ticket ref (or a freeform ask, captured first via /to-intake), fetch it, write the PRD when its project says so, and initialize the ticket workspace and branch the rest of the pipeline reads from.
 disable-model-invocation: true
 ---
 
@@ -11,7 +11,7 @@ The pipeline entry. Takes a **ticket** — a rough, product-level description of
 - **Ref** (`/to-ticket PROJ-123`) — the item already exists; fetch it.
 - **Idea** (no ref) — draft the ticket, capture it with `/to-intake`, then continue with the ref it returns.
 
-Both end with a v4 `state.json` and a branch.
+Both end with a v5 `state.json` and a branch.
 
 ## Process
 
@@ -26,14 +26,9 @@ below goes through the repo's `docs/agents/ticket-tracker.md` (contract
 ### 1. Gather context
 
 **Ref path:** skip to step 3 — the ticket already says what's wanted. Still settle the
-stack (below) and the domain (step 4).
+domain (step 4).
 
 **Idea path:** work from whatever the user has already described. Ask only enough to make the ticket useful — a title and a paragraph of intent, not a full requirements gathering (that's `/grill-with-docs`'s job, next). Do not interview.
-
-One extra thing to pin down: the ticket's **stack** — `react`, `angular`, `node`, or `none`
-(docs/chore work with no code). Infer it from the owning project's dependencies if the ticket
-is unambiguously scoped to one; ask only if you genuinely can't tell. This is what lets
-`/impel` route each task step to the right implementer agent, so don't leave it `null`.
 
 ### 2. Draft the ticket (idea path only)
 
@@ -102,13 +97,13 @@ tickets, or existing test examples.
 
 Omit a section entirely rather than leaving it filled with a placeholder — a missing "How to reach it in the UI" is a signal this is backend work, not a gap to fill with N/A.
 
-**`projectKind: app`** — the full draft becomes the feature-variant `prd.md` (step 4), and the
-ticket body is a short summary: the `## Summary` section plus a link to the PRD path. The
+**`docs.prdWriter: to-ticket`** (the ticket's project, per `workflow-config.md` § Projects) —
+the full draft becomes the feature-variant `prd.md` (step 4), and the ticket body is a short summary: the `## Summary` section plus a link to the PRD path. The
 tracker holds the pointer; the PRD holds the requirements.
 
 ### 3. Get the ticket
 
-**Idea path:** run `/to-intake` with the drafted title and body (the summary body, for `app`).
+**Idea path:** run `/to-intake` with the drafted title and body (the summary body, when this skill writes the PRD).
 It creates the item — and its epic, per `intake.epic` — and returns the ref. Continue with
 that ref; don't create the item yourself.
 
@@ -124,6 +119,8 @@ Every effort in this pipeline has a workspace directory, where `<slug>` is a sho
 
 1. If the user already named the domain path (in this conversation, or as an argument), use it.
 2. Otherwise, try to derive it from the ticket's subject: does the ask map cleanly to one workspace project (`apps/<name>/`, `packages/<name>/`, `libs/<name>/`)? If `ticketRef` itself resolves to a path under one of those (e.g. a backlog row like `apps/<name>/BACKLOG.md#T-03`), that's a strong signal.
+   The domain path must fall inside a project from the workflow config — that project's
+   `docs.*` and `stages` apply to the ticket. No project matches → stop, name the path.
 3. If a derivation was made in step 2, **confirm it with the user** before writing anything — state the derived path and ask them to confirm or correct it. Do not proceed on an unconfirmed guess.
 4. If neither 1 nor 2 resolves cleanly, ask the user directly for the domain path.
 
@@ -156,26 +153,24 @@ do not write the workspace or `state.json`. Tell the user the directory already 
 whether to resume the existing workspace (read its `state.json` and continue the pipeline from
 there) or pick a different slug for a new workspace. Never silently overwrite an existing
 `state.json` — a re-run of `/to-ticket` on the same slug must not clobber another session's
-`decisionsPath`/`specPath`/`architecturePath`/`units` progress. An existing v3 `state.json` is
-read through `references/state-schema.md` § Reading version 3 and upgraded to v4 on the next
-write — never written back as v3.
+`decisionsPath`/`specPath`/`architecturePath`/`units` progress.
 
 Once the check passes, dispatch the writes to a writer per `references/file-writes.md` —
 never inline. `haiku` when the brief holds the full JSON below and the full `prd.md` text,
 filled in; `sonnet` if the writer must fit the PRD into an existing file. Join it before step
 5's commit, which needs the files on disk.
 
-**PRD.** Resolve `prdPath` from `docs.prd` (default by `projectKind`, per
-`workflow-config.md`; `{domainDir}` = `<domain-path>`).
+**PRD.** Resolve `prdPath` from the ticket's project `docs.prd` (`{domainDir}` =
+`<domain-path>`), per `workflow-config.md` § Projects.
 
-- **`projectKind: app`** — write the feature variant of `${CLAUDE_PLUGIN_ROOT}/contracts/prd.md` at `prdPath`:
+- **`docs.prdWriter: to-ticket`** — write the feature variant of `${CLAUDE_PLUGIN_ROOT}/contracts/prd.md` at `prdPath`:
   shared core (Problem / Who / User stories / Out of scope) plus Current flow / Target flow /
   Success signal, from the step-2 draft or the fetched ticket.
 - **Acceptance criteria** — copy each remote AC from the fetch into `prd.md`, tagged
   `[<ticketRef> · MM-DD]` (today's pull date). `/to-spec` re-fetches and flags changes
   against these. On the idea path, ACs drafted in step 2 that live only in the PRD (the
   ticket holds the summary) have no remote source and take no tag.
-- **`library` / `design-system`** — the capability PRD is `prd-discovery`'s; don't write
+- **`docs.prdWriter: <skill>`** — that skill owns the PRD (e.g. `prd-discovery`); don't write
   it. Set `prdPath` to the resolved path when that file exists, else `null`. The remote ACs
   stay on the ticket and are not copied — `/to-spec` reads them from the tracker.
 
@@ -189,14 +184,13 @@ Write `<workspace-root>/state.json` (substituting whichever root was decided abo
 
 ```json
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "runId": "<slug>-<utc-timestamp>",
   "slug": "<slug>",
   "ticketRef": "<the id/key/path the tracker convention returned>",
   "ticketUrl": "<url, if the tracker has one>",
   "domainPath": "<domain-path>",
   "workspaceRoot": "<workspace-root>",
-  "stack": "react | angular | node | none",
   "isComplex": null,
   "decisionsPath": "<workspace-root>/1-decisions.md",
   "prdPath": "<resolved docs.prd path, or null>",
@@ -222,10 +216,6 @@ the effort progresses. `units` holds the ticket's one unit when `prUnit` is `tic
 the branch table above); with `sub-issue` it starts `[]` and fills in once `/to-issues` runs. `runId` is
 `<slug>-<utc-timestamp>`; `createdAt`/`updatedAt` both start at creation time and `updatedAt`
 moves forward on every later write, per `references/state-schema.md`'s validation routine.
-
-`stack` is set here and read by `/impel`, which pairs it with each step file's `Task type`
-to pick the implementer agent. It is the only routing field that belongs to the whole ticket —
-per-step routing lives in the step files `/to-tasks` writes.
 
 ### 5. Commit
 

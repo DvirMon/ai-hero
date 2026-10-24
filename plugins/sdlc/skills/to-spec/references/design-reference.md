@@ -1,7 +1,7 @@
 # `design.md` — design reference artifact
 
 Locked CSS/UI context for the epic. **`/to-spec` writes it**; `/to-issues`, `/to-tasks`, and
-`/impel` read it via `state.json` → `designPath`. **`2-spec.md` links here** — do not duplicate
+`/implementation` read it via `state.json` → `designPath`. **`2-spec.md` links here** — do not duplicate
 these tables in the spec body.
 
 Path: `<workspaceRoot>/design.md` (recorded in `designPath`).
@@ -60,7 +60,7 @@ Apply `figma-project.json` → `tokens.figmaNameRule`. Holes follow `tokens.miss
 |---|---|---|
 
 Keys use `figma-project.json` → `i18n.keyCase`. Final keys may shift slightly in implementation;
-impel must not invent English literals.
+implementation must not invent English literals.
 
 ## States not shown in Figma
 
@@ -71,12 +71,12 @@ From grill FE behavior / design-check (cross-link `decisionsPath` section):
 
 ## Motion
 
-`none` or one paragraph from design fragments — implementation detail deferred to `/impel` when
+`none` or one paragraph from design fragments — implementation detail deferred to `/implementation` when
 flagged in Figma.
 
 ## Open items
 
-Numbered list of anything still blocking `/impel` UI steps (unmapped token, missing frame). Empty
+Numbered list of anything still blocking `/implementation` UI steps (unmapped token, missing frame). Empty
 when clean.
 ```
 

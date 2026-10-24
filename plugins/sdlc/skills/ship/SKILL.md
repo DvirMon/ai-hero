@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Ship
 
-One issue = one branch = one PR. `/impel` leaves a feature branch with one commit per step;
+One issue = one branch = one PR. `/implementation` leaves a feature branch with one commit per step;
 `/review` adds its fix commits and `review.md`.
 This skill turns that branch into a PR that GitHub merges on its own once required checks pass.
 
@@ -23,34 +23,24 @@ before that has happened is asserting a result it has no evidence for.
 
 Check in order, before touching git. Any failure stops here — say which one and why.
 
-1. **On a feature branch.** `git branch --show-current` is not the default branch
-   (`git symbolic-ref refs/remotes/origin/HEAD`). Classify it:
-   - **Issue branch** `<type>/<N>-<slug>` → issue `#N`.
-   - **Planning branch** `docs/<epic-slug>` → the epic's planning PR (step 5b).
-   - **No-issue branch** `chore/<slug>` (e.g. `chore/setup-skills`) → only when every commit in
-     `origin/main..HEAD` carries `Refs: none`; a commit naming an issue → stop, it belongs on
-     that issue's branch. Skips checks 3–4; body per step 5d.
-   - Anything else → stop; renaming a branch is the developer's call.
+1. **On a feature branch.** Run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`. A planning
+   branch ships per step 5b; a no-issue branch skips checks 3–4 and ships per step 5d.
 2. **Clean tree.** `git status --porcelain` is empty. Leftover changes → stop and suggest
    committing them first (`capabilities.commit.skill` when set).
 3. **`state.json` resolves** in the workspace (`<domain-path>/docs/work/<slug>/state.json`, per
-   `/to-ticket`'s workspace-root rule). Read `specPath`, `ticketRef`, `units[]`, `workspaceRoot`;
-   a version-3 file is read through `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md` § Reading version 3
-   (never rewritten as v3). **This unit** is the `units[]` entry whose `branch` equals the
+   `/to-ticket`'s workspace-root rule). Read `specPath`, `ticketRef`, `units[]`, `workspaceRoot`. **This unit** is the `units[]` entry whose `branch` equals the
    current branch, else whose `remoteRef` is `#N`.
    **No workspace** — issue `#N`'s Pipeline block says `workspace: null`: skip this check; there
    is no spec and no `units[]`, only issue `#N`.
 4. **Issue branch only — work is finished.** Find `progress.md` in the tasks root
-   (`/to-tasks` §5: `<workspaceRoot>/tasks/issue-<N>/` — a version-3 workspace's older step
-   folder per the schema's § Reading version 3 — or
-   `$(git rev-parse --git-dir)/pipeline/issue-<N>/` with no workspace).
-   - **Found:** its `**Branch:**` header must equal the current branch. Every row is `✅ done`,
+   (`/to-tasks` § 5).
+   - **Found:** every row is `✅ done`,
      `🧪 awaiting CI` (CI on this PR proves it) or `⏭ skipped`; any `▶ in progress` or
      `⬚ pending` → stop. Do not ship unfinished steps.
    - **None** (the issue body was the step): the branch's `N` already matched in check 1. Read
      the issue's "Acceptance criteria" boxes (read through `docs/agents/issue-tracker.md` `## Fetch`). All ticked →
-     ship with `Closes #N`. Some unticked → ship only if `/impel` reported the issue as
-     partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/impel` hasn't closed
+     ship with `Closes #N`. Some unticked → ship only if `/implementation` reported the issue as
+     partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/implementation` hasn't closed
      out.
 5. **Something to ship.** `git log --oneline origin/main..HEAD` is non-empty.
 6. **Code host.** `git remote get-url origin`: a GitHub host → `gh`; a GitLab host → `glab`
@@ -67,7 +57,7 @@ Check in order, before touching git. Any failure stops here — say which one an
 
 ## 2. Gate — the developer approves the story
 
-This is the pipeline's human gate (`/impel` commits per step without asking). Show:
+This is the pipeline's human gate (`/implementation` commits per step without asking). Show:
 
 - `git log --reverse --format='%h %s' origin/main..HEAD` — the commit story, oldest first.
 - The review record, `review.md` in the tasks root (`/review` § 4): its reviewer, verdict and
@@ -150,7 +140,7 @@ Closes #<N>
 
 The closing line follows the repo's `issue-tracker.md` `## Issue references`. Jira: the ticket
 key and its URL, no keyword — closing is a Jira transition, not this skill's job. GitHub/GitLab:
-exactly one `Closes #<N>` — this issue only. Exception: if `/impel` reported acceptance
+exactly one `Closes #<N>` — this issue only. Exception: if `/implementation` reported acceptance
 criteria left unchecked on the issue (partially satisfied), write `Refs #<N>` instead and say so
 in the Summary — the issue stays open. `Closes` is what closes the issue on merge; a bare
 `#N` only links. Commits carry `Refs: #N`, never a closing keyword.
@@ -164,8 +154,7 @@ closing keyword, and list the created slice issues under **Evidence**.
 
 ### 5c. Record the PR
 
-Write the PR/MR number to this unit's `units[].pr` in `state.json` — v4 only; a version-3 file is
-upgraded on this write. Already set to the same number → no-op. No workspace, a no-issue branch, or a planning
+Write the PR/MR number to this unit's `units[].pr` in `state.json`. Already set to the same number → no-op. No workspace, a no-issue branch, or a planning
 branch with no matching unit → skip.
 
 ### 5d. No-issue branch body

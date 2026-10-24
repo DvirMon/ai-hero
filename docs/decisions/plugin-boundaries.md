@@ -29,7 +29,7 @@ D1–D7, D9 and D10 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.m
 | D4 | Review is its own sdlc stage, swappable via `stages.review.skill` | 10-24 | revised by D9 | G1 |
 | D5 | Delete legacy loose `code-review` skill; callers name `code-review:review` explicitly | 10-24 | accepted | G1 |
 | D6 | A shared file's source lives in the plugin that owns its contract; `scripts/shared-files.json` maps copies | 10-24 | accepted | G1 |
-| D7 | Hard-coded refs split three ways: swappable ops → slots; reference files → vendored; stack conventions → `stacks.<stack>.skill` | 10-24 | accepted | G1 |
+| D7 | Hard-coded refs split three ways: swappable ops → slots; reference files → vendored; conventions → `projects.<name>.skills.<type>` | 10-24 | accepted, amended 10-24 | G1 |
 | D8 | Each plugin owns its own config file; no shared config that every plugin reads | 10-24 | accepted | G1 |
 | D9 | sdlc has a real `/review` stage skill; the reviewer is a separate `stages.review.reviewer` slot | 10-24 | accepted | G1 |
 | D10 | A capability slot may have no default; unset means the stage's built-in behavior | 10-24 | accepted | G2 |
@@ -75,7 +75,7 @@ Pack it into a plugin (then D1 applies) or vendor it (then D2 applies).
 
 ### D4 — review is its own sdlc stage
 
-`… → impel → review → ship`. Swappable through `.claude/workflow.json`
+`… → implementation → review → ship`. Swappable through `.claude/workflow.json`
 (`plugins/sdlc/contracts/workflow-config.md`):
 
 ```json
@@ -90,11 +90,11 @@ sdlc owns a **review stage contract**, and any reviewer must conform to it:
 - **Input:** a fixed point or a file set, plus spec sources.
 - **Output:** findings ranked P0–P3 in one format, written to `state.json`.
 
-- **Why:** `/impel`, `/ship`, the feedback loop (handoff 03) and the PR-thread handler
-  (handoff 05) read one shape regardless of which reviewer ran; review → impel / review → grill
-  become explicit stage transitions instead of logic hidden inside `/impel`.
-- **Rejected:** keeping review as a step inside `/impel` (org reviewer only configurable inside
-  impel; loop stays implicit).
+- **Why:** `/implementation`, `/ship`, the feedback loop (handoff 03) and the PR-thread handler
+  (handoff 05) read one shape regardless of which reviewer ran; review → implementation / review → grill
+  become explicit stage transitions instead of logic hidden inside `/implementation`.
+- **Rejected:** keeping review as a step inside `/implementation` (org reviewer only configurable inside
+  implementation; loop stays implicit).
 - The stage contract is a D2 shared file; the future `ds` plugin gets the same
   `stages.review` slot and a synced copy.
 
@@ -104,7 +104,7 @@ Delete `claude-code/skills/code-review/` (loaded every session through the `~/.c
 symlink). sdlc and `ds-review` call `code-review:review` explicitly, never bare `/code-review`.
 The `cursor/skills/code-review/` mirror stays — Cursor has no plugins.
 
-- **Why:** `/impel` (`SKILL.md:316`) and `/ship` call bare `/code-review`, which resolves to the
+- **Why:** `/implementation` (`SKILL.md:316`) and `/ship` call bare `/code-review`, which resolves to the
   legacy loose skill, not the plugin's `code-review:review` — the pipeline has not been running
   the maintained plugin. Resolves O1.
 
@@ -124,17 +124,19 @@ Hard-coded references in plugins split into three kinds:
 
 | Kind | Examples | Handling |
 |---|---|---|
-| (a) Swappable operations an org would replace | `atomic-commit`, review, tracker ops, possibly `doc-compressor`/`adr-writer` | config slot with a contract: `capabilities.<name>` in `workflow.json` for an operation used inside a stage (e.g. commit per impel step), alongside existing `stages.<stage>` for whole-stage swaps |
+| (a) Swappable operations an org would replace | `atomic-commit`, review, tracker ops, possibly `doc-compressor`/`adr-writer` | config slot with a contract: `capabilities.<name>` in `workflow.json` for an operation used inside a stage (e.g. commit per implementation step), alongside existing `stages.<stage>` for whole-stage swaps |
 | (b) Reference files the plugin's own steps read | doc-contracts `jsdoc`/`decisions-log`/`story-doc`, `unit-test/references/test-first`, `testing/testing-principles` | vendored into the plugin via the D2/D6 sync — not slots |
-| (c) Per-stack conventions | `angular-developer`, `react-developer` | `stacks.<stack>.skill` |
+| (c) Per-project conventions | `angular-developer`, `react-developer`, `nodejs-developer` | `projects.<name>.skills.<type>`, matched per step by path |
 
-Plugin-internal agents (`tdd-planner`, the implementers) stay fixed.
+Executor agents are generic (`implementer`, `test-implementer`) and load the skills the step's project names; `tdd-planner` stays fixed.
+
+- **Amended 10-24:** `stacks.<stack>` and per-stack implementer agents replaced by `projects` — one ticket can span a server, a frontend and a library in one monorepo, and `projectKind` was repo-wide.
 
 - **Rule:** slot only what an org would actually replace. Every slot default must ship in an
   installable plugin (D3) — or the slot has no default at all (D10).
 - **Why:** slotting contract files lets a repo break pipeline correctness and bloats config.
 - **Rejected:** everything overridable.
-- **Note:** `plugins/sdlc` still references stale `~/.claude/skills/impel/` — impel now lives
+- **Note:** `plugins/sdlc` still references stale `~/.claude/skills/impel/` — implementation now lives
   in the plugin.
 
 ### D8 — one config file per plugin

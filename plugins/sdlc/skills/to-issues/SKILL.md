@@ -27,8 +27,7 @@ user to `/to-ticket`, which starts it via `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks
 
 **Requires a ticket workspace.** With no `state.json`, or a `state.json` whose `ticketRef` is
 `null`, stop and point the user to `/to-ticket` — do not create either here. Validate
-`state.json` per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`; a version-3 file is read through its
-§ Reading version 3, and every write is version 4.
+`state.json` per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`.
 
 Default to its `specPath` (and `architecturePath`, if set) as the source — read both fully. When `designPath` is set, read `design.md` for frame and DS routing (do not restate it in slice prose). Also use what is already in the conversation context.
 
@@ -264,7 +263,7 @@ it on green. **No issue branch starts until that PR has merged** — `/to-tasks`
 Then work the frontier: **one issue = one branch = one PR.** Each issue branch starts from
 fresh `origin/main`; a blocked issue starts only after every blocker's PR has merged — no
 stacked branches. Per issue, `/to-tasks` plans it (and starts its branch + worktree), then
-`/impel`, then `/ship` — clearing context between issues. End your final message with a
+`/implementation`, then `/ship` — clearing context between issues. End your final message with a
 one-line pointer, as the very last line — nothing after it:
 
 ```
@@ -276,7 +275,7 @@ Next: /ship (planning PR) — once merged: /to-tasks <first-frontier-issue-#-or-
 ## The Pipeline block
 
 Every issue body ends with a `## Pipeline` section recording which upstream stages ran and
-whether the issue is ready to implement. `/impel` reads it and refuses work the pipeline
+whether the issue is ready to implement. `/implementation` reads it and refuses work the pipeline
 has not prepared.
 
 **The full contract lives in [`references/pipeline-block.md`](references/pipeline-block.md)** —
@@ -288,7 +287,7 @@ Two rules that govern this skill's own steps, repeated here because steps 5-7 de
 
 - **You set the rung from your own difficulty reasoning — `ready-for-agent` included.** Write
   the rung and its evidence into `assessed:`; never cite the user's approval of the breakdown
-  as the reason. The closing `Next:` line follows the frontier issue's rung — `/impel` for
+  as the reason. The closing `Next:` line follows the frontier issue's rung — `/implementation` for
   `ready-for-agent` (it starts the issue branch itself), `/to-tasks` for `needs:tasks`.
 - **The record is authoritative; labels are a projection.** Where the record lives is
   `issue-tracker.md` `## Readiness` (body block, or `units[]` in the state form). Re-sync

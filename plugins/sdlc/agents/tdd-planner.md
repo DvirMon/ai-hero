@@ -24,16 +24,17 @@ job — every seam carries its "why", every skipped item its reason.
   The step file does not exist on disk yet.
 - **stepNumber** / **stepSlug** (required): for the header and
   the link to `step-N-<slug>.plan.md`.
-- **stack** (required): `react` | `angular` | `node`.
+- **testSkills** (required): the project's `skills.test`.
 - **specPath** (optional): read its Testing Decisions section.
 - **architecturePath** (optional): read for signatures and file
   layout if the outline is thin on them.
 
 ## Process
 
-1. **Load the selection policy.** Invoke the `unit-test` skill.
-   Read `unit-testing.md`, the framework file for `stack`, and
-   `references/test-first.md` — the three phases your plan feeds.
+1. **Load the selection policy.** Invoke each `testSkills`
+   skill. Read its policy, the framework file for the code
+   under test, and `unit-test`'s `references/test-first.md` —
+   the three phases your plan feeds.
 2. Read the code at the seams the step touches: the files it
    edits, the types it consumes, the neighbouring specs. The plan
    must fit what is really there — existing fixtures, the

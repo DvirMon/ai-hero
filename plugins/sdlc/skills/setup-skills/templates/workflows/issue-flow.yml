@@ -97,13 +97,12 @@ jobs:
         id: move
         run: |
           # Workspace = the active/<slug>/state.json that names the epic:
-          # v4 ticketRef / units[].remoteRef ("#N"), or v3 githubIssues (N).
+          # ticketRef / units[].remoteRef ("#N").
           state=$(git ls-files '*/active/*/state.json' | while read -r f; do
             jq -e --argjson n "$EPIC" '
               ("#\($n)") as $ref
               | (.ticketRef | tostring) == $ref
                 or ((.units // []) | map(.remoteRef) | index($ref) != null)
-                or ((.githubIssues // []) | index($n) != null)
             ' "$f" >/dev/null 2>&1 && echo "$f"
           done | head -n1)
           if [ -z "$state" ]; then

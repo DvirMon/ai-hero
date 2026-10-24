@@ -19,7 +19,7 @@ Conventions below. Nothing else publishes; the spec stays local (D18).
 ## Readiness
 
 The readiness rung and its dated `assessed:` reason live in `state.json`
-`units[].readiness` / `units[].assessed` — the source `/impel` reads. Jira labels **mirror**
+`units[].readiness` / `units[].assessed` — the source `/implementation` reads. Jira labels **mirror**
 the rung so it is visible without the repo: on every rung change, add the new rung label and
 remove the old one in one labels update (below). Rung names are the ones in
 `to-issues/references/pipeline-block.md`. If label and `units[]` disagree, `units[]` wins and
