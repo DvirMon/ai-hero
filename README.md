@@ -69,7 +69,15 @@ Pushing is manual; pulling is automatic at session start. No background job, no 
 gh auth login   # the repo is private; skip if already authenticated
 gh repo clone DvirMon/ai-hero ~/git/ai-hero
 bash ~/git/ai-hero/scripts/link.sh
+claude plugin marketplace add ~/git/ai-hero
+claude plugin install sdlc@ai-hero
+claude plugin install design-system@ai-hero
+claude plugin install figma@ai-hero
 ```
+
+The symlinks don't cover `plugins/`. Adding the marketplace from the clone's local path loads
+the plugins in place, so the session-start pull updates them too — no auto-update or version
+bump needed. `sdlc` and `design-system` pull in `code-review` and `story` as dependencies.
 
 Any clone path works: scripts locate the repo from their own location.
 Set `GUIDELINES_REPO` only to point them somewhere else.
@@ -132,12 +140,19 @@ one-time snapshot, not a live-updating install — for that, use
 
 Unlike everything above, `plugins/` is authored in this repo — it is the source, not a mirror,
 and `sync.sh` skips this repo's own marketplace so it is never copied back into
-`claude-code/plugins/`. Install:
+`claude-code/plugins/`.
+
+On your own machines, add the marketplace from the clone (see
+[Set up a new machine](#set-up-a-new-machine)). Anyone else installs without a clone:
 
 ```bash
-claude plugin marketplace add DvirMon/ai-hero   # or a local clone's path
+claude plugin marketplace add DvirMon/ai-hero
 claude plugin install code-review@ai-hero
 ```
+
+Then `/plugin` → **Marketplaces** → `ai-hero` → **Enable auto-update** (off by default for
+non-official marketplaces). Plugins pin no `version`, so each push is a new version (the commit
+SHA) and reaches them on the next auto-update.
 
 Never touches `settings.json`, `mcp.json`, or credentials — not in this repo, not copied by the
 installer.
