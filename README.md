@@ -34,8 +34,24 @@ scripts/
 ├── link.sh             — symlink ~/.claude paths into claude-code/, wire pull.sh
 ├── pull.sh             — fast-forward pull; runs from the SessionStart hook
 ├── push.sh             — commit claude-code/ edits and push
-└── install.sh          — copy-based install (no symlinks), any harness
+├── install.sh          — copy-based install (no symlinks), any harness
+├── sync-shared.sh      — copy shared plugin files from source to copies
+└── shared-files.json   — the shared-file map: source → copies
 ```
+
+### Shared plugin files
+
+A plugin can't read outside its own folder. A file two plugins need
+lives in the plugin that owns its contract; the others get a copy.
+Edit the source, list the copy in `scripts/shared-files.json`, then:
+
+```
+bash scripts/sync-shared.sh
+```
+
+The `shared-files` CI job runs it with `--check` and fails when a copy
+differs from its source. Decisions: D2, D6 in
+`docs/decisions/plugin-boundaries.md`.
 
 Not mirrored: `~/.cursor/skills-cursor/` — Cursor's own built-in skill bundle, ships with every
 Cursor install automatically, not authored by you.
