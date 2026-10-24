@@ -29,7 +29,10 @@ whatever `ticket-tracker.md` creates).
 
 ### 3. Pick the epic
 
-Follow `intake.epic` when it is set. Otherwise ask, one question:
+**`prUnit: sub-issue` (GitHub): skip this step.** The item is itself the epic — `/to-issues`
+puts its sub-issues under it — so there is no level above it.
+
+Otherwise follow `intake.epic` when it is set, or ask, one question:
 
 - **Link** an existing epic — ask for its ref;
 - **Create** a new epic — ask for its title; it is created first, through the same section;

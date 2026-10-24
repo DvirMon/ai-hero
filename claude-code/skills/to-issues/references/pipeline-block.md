@@ -38,7 +38,7 @@ stage of its own: tasks.
 ## Epic form
 
 ````markdown
-# Pipeline
+## Pipeline
 
 ```yaml
 workspace: <path to the folder holding state.json, or null>
@@ -60,7 +60,7 @@ child that ships.
 ## Sub form
 
 ````markdown
-# Pipeline
+## Pipeline
 
 ```yaml
 epic: "#82"
