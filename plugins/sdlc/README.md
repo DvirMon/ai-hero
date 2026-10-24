@@ -23,13 +23,18 @@ In a repo's `.claude/settings.json`:
 }
 ```
 
+Installing `sdlc` also installs and enables `code-review` from the same marketplace — it is
+a declared dependency (`.claude-plugin/plugin.json`), which `/impel` and `/ship` call as
+`code-review:review`.
+
 Then run `/setup-skills` once (or `/to-ticket`, which runs it when the repo has no
 `.claude/workflow.json`).
 
 ## Local development
 
 ```bash
-claude --plugin-dir ~/git/ai-hero/plugins/sdlc
+claude --plugin-dir ~/git/ai-hero/plugins/code-review \
+  --plugin-dir ~/git/ai-hero/plugins/sdlc
 ```
 
 The files load in place; `/reload-plugins` picks up edits.
@@ -43,7 +48,6 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 - **Contracts** (`~/.claude/conventions/doc-contracts/`): decisions-log, adr, jsdoc,
   story-doc
 - **Agents:** doc-compressor, adr-writer
-- **Plugins:** `code-review` (same marketplace; `/impel` runs it, `/ship` reports it)
 - **Optional:** a skill that implements a tracker operation, e.g. `jira-grill-comment`
   for `## Post a comment` on Jira
 

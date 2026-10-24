@@ -1,6 +1,7 @@
 {
   "name": "sdlc",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Ticket-to-PR pipeline: /to-intake, /to-ticket, /grill-with-docs, /to-spec, /to-issues, /to-tasks, /impel, /ship, configured per repo by /setup-skills.",
-  "author": { "name": "DvirMon" }
+  "author": { "name": "DvirMon" },
+  "dependencies": [{ "name": "code-review", "version": "^0.1" }]
 }
