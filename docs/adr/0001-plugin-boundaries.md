@@ -10,7 +10,11 @@ inside a stage, `stages.<stage>` for a whole stage, `projects.<name>.skills.<typ
 per-project conventions), each defaulting to a skill in an installable plugin or, for a
 capability, to no skill at all — unset, the stage does the operation itself; reference files
 the plugin's own steps read are vendored. sdlc's executor agents are generic and load the
-skills a project names (D7, amended 10-24).
+skills a project names (D7, amended 10-24). Story work is its own `story` plugin with
+generic stages (setup, discovery, plan, create, implementer, docs), its own
+`.claude/story.json`, and in-plugin stack skills; sdlc reaches it only through a
+config-named executor slot (`projects.<p>.executors.<type>`), and design-system depends on
+it for Storybook (D11–D13).
 
 **Alternatives considered**
 
@@ -32,3 +36,5 @@ skills a project names (D7, amended 10-24).
 - sdlc's loose-skill prerequisites violate the no-loose-skill rule; follow-up required.
 - `capabilities.commit` has no default: unset, stages write a plain conventional commit; set (e.g. `atomic-commit`), every committing stage hands its commits to that skill.
 - `workflow.json` gains `capabilities.<name>` (e.g. commit per implementation step via `atomic-commit`) and `projects.<name>` (path glob + skills per step type); doc-contracts and test references are vendored into sdlc via the sync; sdlc's stale `~/.claude/skills/impel/` references must be repointed to the plugin.
+- Loose `story-create`, `story-plan`, `prd-discovery` and `ds-storybook-scaffolder` are deleted; `story-doc.md` becomes story-owned (synced into sdlc), `prd.md` stays sdlc-owned (synced into story).
+- story.json `sources.packages` (peers discovery compares against) and design-system.json `sources.primitives` (libraries a DS builds on) are different facts; story never reads `design-system.json`.

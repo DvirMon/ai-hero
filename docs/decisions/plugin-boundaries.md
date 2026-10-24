@@ -10,7 +10,7 @@ capability: plugin-boundaries
 
 How the marketplace's plugins (`code-review`, `sdlc`, a future `ds`) share work without
 coupling. No separate grill transcript exists, so each decision carries its short why inline.
-D1–D7, D9 and D10 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.md).
+D1–D7 and D9–D13 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.md).
 
 ## Source keys
 
@@ -18,6 +18,7 @@ D1–D7, D9 and D10 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.m
 |---|---|
 | **G1** | design discussion 2026-10-24 (handoff 02: code-review placement) |
 | **G2** | grill 2026-10-24 (handoff 04: per-repo commit format) |
+| **G3** | story plugin plan + grill 2026-10-24 |
 
 ## Decisions
 
@@ -33,6 +34,9 @@ D1–D7, D9 and D10 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.m
 | D8 | Each plugin owns its own config file; no shared config that every plugin reads | 10-24 | accepted | G1 |
 | D9 | sdlc has a real `/review` stage skill; the reviewer is a separate `stages.review.reviewer` slot | 10-24 | accepted | G1 |
 | D10 | A capability slot may have no default; unset means the stage's built-in behavior | 10-24 | accepted | G2 |
+| D11 | Story skills/agents become the `story` plugin: generic stages, own `.claude/story.json`, stack skills shipped in-plugin | 10-24 | accepted | G3 |
+| D12 | sdlc routes a step type to an executor named by `projects.<p>.executors.<type>`, default `sdlc:implementer` | 10-24 | accepted | G3 |
+| D13 | design-system depends on `story` for Storybook; `ds-storybook-scaffolder` is deleted | 10-24 | accepted | G3 |
 
 ### D1 — code-review standalone, consumed by namespaced entry points
 
@@ -72,6 +76,7 @@ Pack it into a plugin (then D1 applies) or vendor it (then D2 applies).
 - **Current violation:** `plugins/sdlc/README.md` § Prerequisites — `domain-modeling`,
   `atomic-commit`, `unit-test`, `story-create`, `angular-developer`, `react-developer`,
   `figma-to-code`, plus `doc-compressor`/`adr-writer` agents and doc-contracts.
+  `story-create` is resolved by D11 (packed into the `story` plugin).
 
 ### D4 — review is its own sdlc stage
 
@@ -147,6 +152,7 @@ Each plugin's own setup writes its config file, and its own contract defines the
 |---|---|---|
 | `.claude/workflow.json` | sdlc | `stages`, `capabilities`, `stacks` |
 | `.claude/design-system.json` | design-system | its stages and slots (written by `/ds-setup`) |
+| `.claude/story.json` | story | per-project stack skills, paths, discovery sources (D11) |
 | `docs/agents/code-review.md` | code-review | its own config |
 
 A config file holds wiring, never another plugin's settings: `stages.review.skill` names the
@@ -201,6 +207,58 @@ hand the commit to e.g. `atomic-commit`, which owns the format.
   plugin); moving it into sdlc (couples a repo tool to the pipeline).
 - **Construction error:** a slot naming a skill that isn't installed stops the stage and
   names both.
+
+### D11 — the `story` plugin
+
+`prd-discovery` (skill + agent), `story-plan` and `story-create` become one `story` plugin
+with generic stages: `story:setup`, `story:discovery`, `story:plan`, `story:create`, the
+`story:implementer` agent, `story:docs`. Stack, paths and discovery sources live in its own
+`.claude/story.json` (D8), `projects` matched by path glob like `workflow.json`.
+
+- **Stack skills (D7c):** `story:stack-angular` and `story:stack-react` ship in the plugin
+  as installable defaults (D7 rule); `projects.<p>.skills.create` / `.implement` name them.
+  A Vue repo names its own. Project content (e.g. a reference implementation path) moves to
+  that project's conventions doc.
+- **Create ≠ implement:** `story:create` designs one story (file set, controls, mocks, host
+  shape) and emits a story spec; `story:implementer` writes the code from that spec with
+  `skills.implement`. The story spec is the contract between them.
+- **Discovery absorbs `prd-discovery`:** `story:discovery` = community pain + peer
+  capabilities + internal coverage → PRD. Its peer-capability inventory is a required input
+  to `story:plan`.
+- **Shared contracts (D2/D6):** `story-doc.md` becomes story-owned, synced copy into sdlc;
+  `prd.md` stays sdlc-owned, synced copy into story.
+- **`sources.packages` ≠ `sources.primitives`:** story.json `sources.packages` = peer
+  libraries discovery compares against; design-system.json `sources.primitives` = libraries
+  a DS builds on. Different facts, so neither duplicates the other and story never reads
+  `design-system.json`.
+- `story` does not depend on `sdlc`; it runs standalone.
+- **Why:** the skills were hard-coded to one repo (host-file glob, conventions-doc path,
+  competitor set, Angular/React references) and loose (D3). Splitting create from implement
+  lets sdlc and design-system reuse the same writer.
+- **Rejected:** stack in `workflow.json` (D8 — another plugin's settings); one create stage
+  that also writes code; keeping `prd-discovery` a separate skill beside `story:discovery`.
+
+### D12 — sdlc executor slot per step type
+
+`/implementation` § Route reads `projects.<p>.executors.<type>` from `workflow.json`;
+unset, the step goes to `sdlc:implementer`. Story repos set
+`"executors": { "story": "story:implementer" }`; the stack is read from `story.json`, never
+repeated in `workflow.json`. `docs.prdWriter` repoints to `story:discovery`.
+
+- **Why:** sdlc names the executor by config, so it never depends on `story` (D1/D3) and any
+  plugin can supply an executor for a step type.
+- **Rejected:** sdlc declaring a `story` dependency; keeping the story branch inside
+  `sdlc:implementer`.
+
+### D13 — design-system depends on `story`
+
+`design-system/plugin.json` declares `story`. `ds-scaffold` Phase 5 Storybook calls
+`story:create` → `story:implementer`. `ds-storybook-scaffolder` is deleted;
+`design-system.json` `sources.storybook` / `stacks.storybook.skill` move to the DS project's
+`story.json` entry, written by `ds-setup` via `story:setup`.
+
+- **Why:** one story writer instead of two drifting ones (D1 consumption pattern).
+- **Rejected:** keeping `ds-storybook-scaffolder` beside `story` (duplicate conventions).
 
 ## Still open
 
