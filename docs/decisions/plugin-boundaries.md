@@ -10,13 +10,14 @@ capability: plugin-boundaries
 
 How the marketplace's plugins (`code-review`, `sdlc`, a future `ds`) share work without
 coupling. No separate grill transcript exists, so each decision carries its short why inline.
-D1–D7 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.md).
+D1–D7, D9 and D10 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.md).
 
 ## Source keys
 
 | Key | Record |
 |---|---|
 | **G1** | design discussion 2026-10-24 (handoff 02: code-review placement) |
+| **G2** | grill 2026-10-24 (handoff 04: per-repo commit format) |
 
 ## Decisions
 
@@ -31,6 +32,7 @@ D1–D7 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.md).
 | D7 | Hard-coded refs split three ways: swappable ops → slots; reference files → vendored; stack conventions → `stacks.<stack>.skill` | 10-24 | accepted | G1 |
 | D8 | Each plugin owns its own config file; no shared config that every plugin reads | 10-24 | accepted | G1 |
 | D9 | sdlc has a real `/review` stage skill; the reviewer is a separate `stages.review.reviewer` slot | 10-24 | accepted | G1 |
+| D10 | A capability slot may have no default; unset means the stage's built-in behavior | 10-24 | accepted | G2 |
 
 ### D1 — code-review standalone, consumed by namespaced entry points
 
@@ -129,7 +131,7 @@ Hard-coded references in plugins split into three kinds:
 Plugin-internal agents (`tdd-planner`, the implementers) stay fixed.
 
 - **Rule:** slot only what an org would actually replace. Every slot default must ship in an
-  installable plugin (D3).
+  installable plugin (D3) — or the slot has no default at all (D10).
 - **Why:** slotting contract files lets a repo break pipeline correctness and bloats config.
 - **Rejected:** everything overridable.
 - **Note:** `plugins/sdlc` still references stale `~/.claude/skills/impel/` — impel now lives
@@ -177,6 +179,26 @@ stage. The reviewer only meets `plugins/sdlc/contracts/review-stage.md`.
 - **Rejected:** the reviewer fills `stages.review.skill` directly and writes `state.json`
   itself (couples every reviewer to sdlc's state format).
 - **Scope:** routing names the next stage only. Sending work back automatically is handoff 03.
+
+### D10 — a capability slot may have no default
+
+`capabilities.<name>` may ship with no default. Unset, the stage does the operation itself,
+plainly; set, it hands the operation to the named skill. First case: `capabilities.commit` —
+unset, stages write a plain conventional commit with the tracker's `Refs:` trailer; set, they
+hand the commit to e.g. `atomic-commit`, which owns the format.
+
+```json
+"capabilities": { "commit": { "skill": "atomic-commit" } }
+```
+
+- **Why:** some operations are a repo or user tool, not a pipeline concern. `atomic-commit`
+  is a loose skill shared across repos, mostly commit philosophy plus a format; packing it
+  into a plugin only to satisfy D7's default rule is cost without payoff. With no default,
+  sdlc never depends on a loose skill — the repo opts in by naming one — so D3 holds.
+- **Rejected:** `atomic-commit` as its own plugin (a format toggle doesn't justify a
+  plugin); moving it into sdlc (couples a repo tool to the pipeline).
+- **Construction error:** a slot naming a skill that isn't installed stops the stage and
+  names both.
 
 ## Still open
 

@@ -7,7 +7,8 @@ drift-checked in CI. Review is its own sdlc stage (`impel → review → ship`),
 via `stages.review.skill`; loose `~/.claude` skills are never plugin dependencies.
 Only operations an org would actually replace get a config slot (`capabilities.<name>`
 inside a stage, `stages.<stage>` for a whole stage, `stacks.<stack>.skill` for stack
-conventions), each defaulting to a skill in an installable plugin; reference files the
+conventions), each defaulting to a skill in an installable plugin or, for a capability,
+to no skill at all — unset, the stage does the operation itself; reference files the
 plugin's own steps read are vendored, and plugin-internal agents stay fixed.
 
 **Alternatives considered**
@@ -18,6 +19,7 @@ plugin's own steps read are vendored, and plugin-internal agents stay fixed.
 - Thin per-plugin `review` wrapper skill: the `workflow.json` stage slot is already the seam.
 - Review as a step inside `/impel`: org reviewer not swappable, feedback loop hidden.
 - Everything overridable: slotting contract files lets a repo break pipeline correctness and bloats config.
+- `atomic-commit` as its own plugin so `capabilities.commit` has a plugin default: a format toggle doesn't justify a plugin.
 
 **Consequences**
 
@@ -27,4 +29,5 @@ plugin's own steps read are vendored, and plugin-internal agents stay fixed.
 - A sync script and CI drift job must exist before any shared file lands.
 - Legacy `claude-code/skills/code-review/` is deleted; it is what bare `/code-review` in impel/ship resolves to today, so both must name `code-review:review`.
 - sdlc's loose-skill prerequisites violate the no-loose-skill rule; follow-up required.
+- `capabilities.commit` has no default: unset, stages write a plain conventional commit; set (e.g. `atomic-commit`), every committing stage hands its commits to that skill.
 - `workflow.json` gains `capabilities.<name>` (e.g. commit per impel step via `atomic-commit`) and `stacks.<stack>.skill`; doc-contracts and test references are vendored into sdlc via the sync; sdlc's stale `~/.claude/skills/impel/` references must be repointed to the plugin.
