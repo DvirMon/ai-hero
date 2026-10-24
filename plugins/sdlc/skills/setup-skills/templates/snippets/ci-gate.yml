@@ -1,0 +1,13 @@
+# Paste under `jobs:` in the repo's ci.yml. List EVERY other job in `needs`.
+# The ruleset requires only `ci-gate`, so jobs can be renamed, added or
+# skipped (affected-only) without editing the ruleset.
+# A skipped job counts as ok; failure or cancellation fails the gate.
+  ci-gate:
+    if: always()
+    needs: [main] # ← every job in this workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: All required jobs passed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - run: echo "ci-gate green"

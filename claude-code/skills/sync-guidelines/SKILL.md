@@ -34,7 +34,7 @@ session history, or credentials (mcp.json, settings.json with tokens). Only:
   carry project-specific or credential content.
 - `~/.claude/conventions/` (opt-in / project-dependent — NOT auto-loaded like `rules/` is) → `claude-code/conventions/`
 - `~/.claude/plugins/marketplaces/*/{skills,agents,commands,docs}` → `claude-code/plugins/<marketplace>/`,
-  except `ai-coding-guidelines` — that marketplace *is* this repo; its plugins live in `plugins/`. Also except `sdlc-pipeline` — its source is its own repo, `~/git/sdlc-pipeline`.
+  except `ai-coding-guidelines` — that marketplace *is* this repo; its plugins live in `plugins/`.
   (excludes `.git`, `dist`, `node_modules`, `bin`, `tests`, `benchmarks`, `evals`, `src`,
   `.github`, `.changeset`, `.codex`, `.out-of-scope` — those are the plugin's own source/build
   tree, not guideline docs, and already live upstream)

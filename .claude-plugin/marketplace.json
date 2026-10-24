@@ -9,6 +9,11 @@
       "name": "code-review",
       "source": "./plugins/code-review",
       "description": "Impact-ranked code review: one orchestrator, thin reviewer agents, per-repo config."
+    },
+    {
+      "name": "sdlc",
+      "source": "./plugins/sdlc",
+      "description": "Ticket-to-PR pipeline: intake, ticket, grill, spec, issues, tasks, impel, ship."
     }
   ]
 }
