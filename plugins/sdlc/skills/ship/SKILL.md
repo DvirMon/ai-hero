@@ -73,7 +73,8 @@ This is the pipeline's human gate (`/impel` commits per step without asking). Sh
 - The review record, `review.md` in the tasks root (`/review` § 4): its reviewer, verdict and
   every line under **Still blocking**. Say plainly when it is missing (no review ran — expected
   only with `stages.review.skill: "none"`), `failed`, or **stale** — a commit in
-  `<Reviewed head>..HEAD` without a `review]` tag (`/review` § Re-running). None of these
+  `<Reviewed head>..HEAD` that isn't a listed fix commit or the `review.md` commit
+  (`/review` § Re-running). None of these
   stops the gate; the developer decides with them in view.
 
 Wait for explicit approval. The developer may ask for fixes first — those become new commits

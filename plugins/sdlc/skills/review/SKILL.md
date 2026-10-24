@@ -40,10 +40,9 @@ paths the branch changed). Record `HEAD` now as `reviewedHead`.
 Anything the reviewer changed is a review fix. Commit it as one or more atomic commits, never
 folded into a step's commit, never `--amend`:
 
-`🐛 [#<N> review] fix(<scope>): …` · `🍎 [#<N> review] ref(<scope>): …` ·
-`📚 [#<N> review] docs(<scope>): …` — `Refs: #<N>`. Message format as `/impel` § 3 (commit
-the step), with `review` in place of `s<step>`. Stage by path, never `git add -A`. A branch
-with no issue drops the `#<N>` from the tag and uses `Refs: none`.
+commit each per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md` with type `fix`, `ref` or `docs`,
+issue `#<N>` (none on a branch with no issue) and stage `review`. Stage by path, never
+`git add -A`.
 
 A decision made while fixing goes to the decisions file, phase `review`
 (`${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`), through the same writer `/impel` uses.
@@ -66,8 +65,9 @@ Write `<tasks root>/review.md` (replace any earlier one — only the latest revi
 <the contract's per-finding lines, verbatim | none>
 ```
 
-It sits beside `progress.md`. When the tasks root is in the repo, commit it as
-`📚 [#<N> review] docs(<scope>): record review`; under `.git/pipeline/` it is local only.
+It sits beside `progress.md`. When the tasks root is in the repo, commit it alone per
+`commit.md`: type `docs`, subject `record review`, stage `review`; under `.git/pipeline/` it
+is local only.
 `state.json` does not record reviews: the record belongs to one unit's branch, like
 `progress.md`, and must exist without a workspace too.
 
@@ -93,5 +93,7 @@ Next: <stage> <issue-#-or-slug>
 ## Re-running
 
 Idempotent per branch: each run reviews from the merge-base to the current `HEAD` and replaces
-`review.md`. **Stale** = a commit in `<Reviewed head>..HEAD` whose subject has no
-`review]` tag — work landed after the review. `/ship` shows a stale review at its gate.
+`review.md`. **Stale** = a commit in `<Reviewed head>..HEAD` that is neither listed under
+`Fix commits` nor changes only `review.md` — work landed after the review. Judged by SHA and
+paths, never by subject: the subject's shape depends on the repo's commit format. `/ship`
+shows a stale review at its gate.
