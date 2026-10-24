@@ -181,9 +181,10 @@ Workspace JSON/MD writes this skill makes *outside* a step (`progress.md` status
 `state.json`) are mechanical: they go to a `haiku` writer, not a fork, per
 `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/file-writes.md`. `docs`/`chore` steps themselves stay on the fork above.
 
-**Decisions made while executing or reviewing a step** — anything the step file, spec, design
+**Decisions made while executing a step** — anything the step file, spec, design
 or architecture did not settle — are appended to the ticket's `decisionsPath` per
-`${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`, phase `implement` or `review`, through the same writer.
+`${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`, phase `implement`, through the same writer
+(`/review` writes phase `review`).
 Never a `decisions.md` inside `tasks/`; the step's `progress.md` links to the D-number.
 
 `code` + `node` remains the one row actually handled inline (see "Steps you handle directly"
@@ -295,8 +296,9 @@ other row, including `docs`/`chore`, dispatches — see the row-by-row table abo
 
 ## 4. Verify
 
-After all steps complete, start the machine checks **in the background** and do the reading
-work while they run — they touch no shared files, so the review's wall-clock absorbs them:
+After all steps complete, start the machine checks **in the background** and do the docs pass
+while they run — they touch no shared files, so its wall-clock absorbs them. Review is not
+part of this skill: it is the next stage, `/review`.
 
 1. **Dispatch in background, immediately:**
    - Typecheck across affected projects — `nx run-many -t typecheck -p <affected>`, plus
@@ -312,17 +314,14 @@ work while they run — they touch no shared files, so the review's wall-clock a
      `~/.claude/conventions/doc-contracts/jsdoc.md`. Skip only if no non-spec `.ts` file changed (story hosts and
      `.stories.ts` are out of its scope by design). It sets `context: fork`, so it already
      runs isolated and its file-by-file transcript never lands here — call it plainly, and
-     do not "fix" this by wrapping it in an agent.
-   - Use `/code-review` to review the work, with fixed point
-     `$(git merge-base origin/<default> HEAD)` — the whole branch, every step's commit.
-     `source-docs` edits land as their own `📚 [#<N> review] docs(<scope>): …` commit first, so the review
-     sees them.
+     do not "fix" this by wrapping it in an agent. Its edits land as their own
+     `📚 [#<N>] docs(<scope>): …` commit, so `/review` sees them.
 
 3. **Join before §5.** The typecheck must have reported before you close out. A red typecheck
    is fixed first — never reported as "done pending checks."
 
-   **Fixes are new commits.** A typecheck or review fix is its own commit
-   (`🐛 [#<N> review] fix(<scope>): …` or `🍎 [#<N> review] ref(<scope>): …`, `Refs: #<N>`) — never folded back into a
+   **Fixes are new commits.** A typecheck fix is its own commit
+   (`🐛 [#<N>] fix(<scope>): …` or `🍎 [#<N>] ref(<scope>): …`, `Refs: #<N>`) — never folded back into a
    step's commit, never `--amend`, never a rebase to squash it. The story may show the
    correction; that is honest history.
 
@@ -344,8 +343,8 @@ keep the fix with the agent holding that step's `Watch out` notes. See
 ## 5. Close out
 
 Every step, and every fix, is already committed. Close-out writes no commit of its own and asks
-for no approval — the human gate is `/ship`, where the user reviews the whole commit story
-before anything is pushed.
+for no approval — `/review` comes next, and the human gate is `/ship`, where the user reviews
+the whole commit story before anything is pushed.
 
 Confirm the tree is clean (`git status --porcelain` empty). Anything left over is a step that
 didn't commit its files — commit it now against that step, or report it; never leave it for
@@ -380,9 +379,10 @@ Report per step: which agent ran it, files touched, `Done when` checks met, its 
 (`<short-sha> <subject>`), any inferred type or commit type. Also report any edge the overlap
 check added to the graph, and the branch + `git log --oneline origin/<default>..HEAD` count.
 
-End your final message with a one-line pointer to `/ship`, as the very last line — nothing
-after it:
+End your final message with a one-line pointer to the next stage, as the very last line —
+nothing after it. That is `/review`, or `/ship` when the config sets
+`stages.review.skill: "none"`:
 
 ```
-Next: /ship <issue-#-or-slug>
+Next: /review <issue-#-or-slug>
 ```

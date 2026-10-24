@@ -1,6 +1,6 @@
 ---
 name: setup-skills
-description: Configure this repo for the engineering skills — write its workflow config (`.claude/workflow.json`), set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/impel` → `/ship`. Model-invoked only by `/to-ticket` when the repo has no workflow config; otherwise run it when the user asks.
+description: Configure this repo for the engineering skills — write its workflow config (`.claude/workflow.json`), set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/impel` → `/review` → `/ship`. Model-invoked only by `/to-ticket` when the repo has no workflow config; otherwise run it when the user asks.
 ---
 
 # Setup Skills
@@ -193,4 +193,4 @@ For other issue or ticket trackers, write the file from `tracker.md`'s operation
 
 Tell the user the setup is complete and which engineering skills will now read from these files. `.claude/workflow.json` must exist and parse with every key valid per `workflow-config.md` — every stage resolves it first. If Section E ran, list what is still theirs to do: install the new devDependencies, create the two secrets, and approve the `gh api` calls once the setup PR has merged. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch trackers or restart from scratch. A teammate's own preferences (e.g. `isolation`) go in `.claude/workflow.local.json`.
 
-The code-review config (`docs/agents/code-review.md`) is not written here — the `code-review` plugin owns it. Point the user to `/code-review:code-review init` if the repo has none.
+The code-review config (`docs/agents/code-review.md`) is not written here — the `code-review` plugin owns it. With the default reviewer (`stages.review.reviewer` unset), point the user to `/code-review:review init` if the repo has none.

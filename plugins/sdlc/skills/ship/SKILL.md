@@ -1,12 +1,13 @@
 ---
 name: ship
-description: "Take a finished feature branch to an open, auto-merging PR — show the commit story for approval, rebase onto origin/main, push (force-with-lease after a rebase), open or reuse the PR/MR (gh or glab, from git remote) with an emoji-conventional title and the closing line from the repo's issue-tracker.md, record it in state.json units[].pr, then enable auto-merge (rebase). Handles issue branches (<type>/<N>-<slug>) and epic planning branches (docs/<epic-slug>). Never pushes to main, never merges manually. Use after /impel reports done, or after /to-issues on a planning branch."
+description: "Take a finished feature branch to an open, auto-merging PR — show the commit story for approval, rebase onto origin/main, push (force-with-lease after a rebase), open or reuse the PR/MR (gh or glab, from git remote) with an emoji-conventional title and the closing line from the repo's issue-tracker.md, record it in state.json units[].pr, then enable auto-merge (rebase). Handles issue branches (<type>/<N>-<slug>) and epic planning branches (docs/<epic-slug>). Never pushes to main, never merges manually. Use after /review, or after /to-issues on a planning branch."
 disable-model-invocation: true
 ---
 
 # Ship
 
-One issue = one branch = one PR. `/impel` leaves a feature branch with one commit per step.
+One issue = one branch = one PR. `/impel` leaves a feature branch with one commit per step;
+`/review` adds its fix commits and `review.md`.
 This skill turns that branch into a PR that GitHub merges on its own once required checks pass.
 
 There is one mode. No push to the default branch, ever — the Claude hook, the repo's git hooks
@@ -69,8 +70,11 @@ Check in order, before touching git. Any failure stops here — say which one an
 This is the pipeline's human gate (`/impel` commits per step without asking). Show:
 
 - `git log --reverse --format='%h %s' origin/main..HEAD` — the commit story, oldest first.
-- The latest `/code-review` outcome for this branch, if `/impel` reported one; otherwise say
-  none ran.
+- The review record, `review.md` in the tasks root (`/review` § 4): its reviewer, verdict and
+  every line under **Still blocking**. Say plainly when it is missing (no review ran — expected
+  only with `stages.review.skill: "none"`), `failed`, or **stale** — a commit in
+  `<Reviewed head>..HEAD` without a `review]` tag (`/review` § Re-running). None of these
+  stops the gate; the developer decides with them in view.
 
 Wait for explicit approval. The developer may ask for fixes first — those become new commits
 (never `--amend`, never interactive rebase); then re-run from step 1.

@@ -3,7 +3,7 @@
 The ticket-to-PR pipeline, as a plugin in the `ai-hero` marketplace.
 
 ```
-/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /impel → /ship
+/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /impel → /review → /ship
 ```
 
 Each stage is its own skill. You start each one yourself; the plugin only packages
@@ -56,6 +56,6 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 ```
 .claude-plugin/plugin.json
 skills/      the stages, plus setup-skills
-contracts/   ticket-decisions, prd, workflow-config, tracker
+contracts/   ticket-decisions, prd, workflow-config, tracker, review-stage
 agents/      tdd-planner, test-implementer, angular/react/story-implementer
 ```
