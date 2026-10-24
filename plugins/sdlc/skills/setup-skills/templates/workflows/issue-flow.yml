@@ -132,7 +132,7 @@ jobs:
           git grep -lF "active/$slug" -- '*.md' '*.json' | xargs -r sed -i "s@active/$slug@archive/$slug@g"
           git add -A
 
-          git commit -m "🎨 chore(docs): archive $slug workspace" -m "Refs: #$EPIC"
+          git commit -m "chore(docs): archive $slug workspace" -m "Refs: #$EPIC"
           git push -u origin "$branch"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
           echo "slug=$slug" >> "$GITHUB_OUTPUT"

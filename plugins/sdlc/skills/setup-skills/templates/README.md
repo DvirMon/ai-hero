@@ -2,14 +2,14 @@
 
 Copied into a repo by `setup-skills` § Branch workflow bootstrap.
 Policy: one issue = one branch = one PR; no commits on the default branch;
-rebase-merge only; emoji conventional commits with a `Refs:` trailer;
-`Closes #N` only in the PR body.
+rebase-merge only; every commit carries a `Refs:` trailer;
+`Closes #N` only in the PR body. Commit-format linting (commitlint) comes
+from the repo's commit skill, not these templates.
 
 | Template | Goes to | Layer |
 |---|---|---|
 | `hooks/pre-commit`, `hooks/pre-push` | `.husky/` or `.githooks/` | git hooks |
 | `tools/validate-branch-name.mjs` | `tools/` | single branch-name rule (hook + CI) |
-| `commitlint.config.js` | repo root | commit + PR-title header rule |
 | `pull_request_template.md` | `.github/` | PR body shape `/ship` fills |
 | `workflows/pr-conventions.yml` | `.github/workflows/` | required check |
 | `snippets/ci-gate.yml` | into existing `ci.yml` | required check |

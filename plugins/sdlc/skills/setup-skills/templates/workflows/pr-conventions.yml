@@ -29,12 +29,16 @@ jobs:
           BRANCH: ${{ github.head_ref }}
         run: node tools/validate-branch-name.mjs "$BRANCH"
 
-      - name: PR title (emoji conventional)
+      # Header checks run only when the repo has a commitlint config — the
+      # commit skill writes it; sdlc doesn't own the format.
+      - name: PR title
+        if: hashFiles('commitlint.config.*') != ''
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: printf '%s\n' "$TITLE" | npx commitlint --verbose
 
       - name: Commit headers
+        if: hashFiles('commitlint.config.*') != ''
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}

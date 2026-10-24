@@ -12,7 +12,8 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Ticket tracker** — where intake tickets live, if `to-ticket` is installed (`docs/agents/ticket-tracker.md`)
 - **Triage labels** — the strings used for the five canonical triage roles
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
-- **Branch workflow** — the enforcement for one issue = one branch = one PR, rebase-merge only: git hooks, commitlint, PR template, GitHub Actions, ruleset and repo settings
+- **Branch workflow** — the enforcement for one issue = one branch = one PR, rebase-merge only: git hooks, PR template, GitHub Actions, ruleset and repo settings. Commit-format linting
+  (commitlint) is not setup's — the commit skill named in `capabilities.commit.skill` owns it
 
 Both tracker files implement the operations in `${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`. No stage branches on a tracker name; each reads these files. `examples/` holds filled-in files for common trackers — setup starts from the matching one.
 
@@ -96,7 +97,6 @@ Build one change list from exploration, diffing each template against what exist
 |---|---|---|
 | Branch rule | `templates/tools/validate-branch-name.mjs` | `tools/validate-branch-name.mjs` (merge the type list with an existing one) |
 | Hooks | `templates/hooks/pre-commit`, `pre-push` | `.husky/` when husky is present; `.githooks/` (+ `core.hooksPath` via the repo's `prepare` script) when that's the mechanism; none found → propose `.githooks/`. Append to an existing hook rather than replacing it; mark `.githooks/*` executable (`git update-index --chmod=+x`). |
-| Commit format | `templates/commitlint.config.js` | root; add `@commitlint/cli` + `@commitlint/config-conventional` to devDependencies if missing (the user installs) |
 | PR template | `templates/pull_request_template.md` | `.github/pull_request_template.md` |
 | Actions | `templates/workflows/*.yml` | `.github/workflows/` — pin `uses:` by SHA; `pr-conventions.yml` supersedes a `commitlint.yml` / trailer-check job (remove those after confirm) |
 | CI gate | `templates/snippets/ci-gate.yml` | merged into `ci.yml`, `needs:` = every job there; `ci.yml` must also run on `pull_request` |
