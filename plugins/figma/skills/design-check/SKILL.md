@@ -91,7 +91,7 @@ Template for the decisions table:
 ## Step 3 — Unmapped components (audit §3)
 
 From all fragments' **Unmapped elements** tables, run
-`~/.claude/skills/figma-to-code/references/unmapped-node-audit.md` **§3** only:
+`${CLAUDE_PLUGIN_ROOT}/skills/design-check/references/unmapped-node-audit.md` **§3** only:
 
 - One structured question per node, up to **four nodes per turn**, still **one question at a time**
   in the grill (each batched call is one AskQuestion with multiple nodes only when the skill's

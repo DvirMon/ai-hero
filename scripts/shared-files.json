@@ -7,5 +7,14 @@
   ],
   "plugins/story/contracts/story-doc.md": [
     "plugins/sdlc/contracts/story-doc.md"
+  ],
+  "claude-code/skills/figma-to-code/references/unmapped-node-audit.md": [
+    "plugins/figma/skills/design-check/references/unmapped-node-audit.md"
+  ],
+  "claude-code/skills/figma-to-code/references/project-config.md": [
+    "plugins/figma/skills/design-check/references/project-config.md"
+  ],
+  "claude-code/skills/figma-to-code/references/frame-discovery-output.md": [
+    "plugins/figma/skills/design-check/references/frame-discovery-output.md"
   ]
 }

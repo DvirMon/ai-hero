@@ -26,14 +26,15 @@ the step's `files` include UI templates/styles under the frontend app).
 
 ### Before dispatching the implementer
 
-1. Skills: the project's `skills.code` plus `skills.ui` (e.g. `figma-design-to-code`,
+1. Skills: the project's `skills.code` plus `skills.ui` (e.g.
    `figma-feature-implementation`, `css-styling`), passed to the implementer.
 2. Area rules from `figma-project.json` → `rules[]` (e.g. `frontend/AGENTS.md`).
 3. Brief the implementer with:
    - `designPath` — mappings are authoritative
    - Step `figma` node IDs and matching `fileKey` from `figma[]`
-   - Instruction: run `figma-feature-implementation` Steps 0–5; **Step 6** runs after the step
-     lands unless a `verify-ui` step follows (then Step 6 belongs to verify)
+   - Instruction: implement the frames with the `skills.ui` skills' design-to-code workflow,
+     up to but not including its visual-verify step. That step runs after the step lands,
+     unless a `verify-ui` step follows (then it belongs to verify).
 
 ### Implementer dispatch
 
