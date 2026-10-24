@@ -28,7 +28,7 @@ while IFS=$'\t' read -r src copy; do
     cp "$REPO/$src" "$REPO/$copy"
     echo "synced $copy <- $src"
   fi
-done < <(jq -r 'to_entries[] | .key as $s | .value[] | [$s, .] | @tsv' "$MAP")
+done < <(jq -r 'to_entries[] | .key as $s | .value[] | [$s, .] | @tsv' "$MAP" | tr -d '\r')
 
 if [ "$drift" -ne 0 ]; then
   echo "run: bash scripts/sync-shared.sh" >&2
