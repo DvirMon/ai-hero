@@ -67,11 +67,6 @@ Handled **inline by the dispatcher**, not an implementer.
 Optional: append a short comparison note to the step report; do not commit node IDs into product
 source.
 
-## Motion
-
-When a prior UI step's `get_design_context` flagged motion, load **`figma-implement-motion`**
-before implementing that step only.
-
 ## Stops (construction vs runtime)
 
 | Condition | Action |
