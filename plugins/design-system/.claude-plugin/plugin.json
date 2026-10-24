@@ -1,0 +1,6 @@
+{
+  "name": "design-system",
+  "version": "0.1.0",
+  "description": "Figma-to-component pipeline for any design system: /ds-wayfinder, /ds-discovery, /ds-interview, /ds-spec, /ds-plan, /ds-scaffold, /ds-review, /ds-ship, configured per design system by /ds-setup.",
+  "author": { "name": "DvirMon" }
+}

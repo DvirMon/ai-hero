@@ -14,6 +14,11 @@
       "name": "sdlc",
       "source": "./plugins/sdlc",
       "description": "Ticket-to-PR pipeline: intake, ticket, grill, spec, issues, tasks, impel, ship."
+    },
+    {
+      "name": "design-system",
+      "source": "./plugins/design-system",
+      "description": "Figma-to-component pipeline for any design system, configured per project by /ds-setup."
     }
   ]
 }
