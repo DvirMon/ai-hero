@@ -43,7 +43,11 @@ if [ -d "$GIT_ROOT" ]; then
       mkdir -p "$REPO_DIR/claude-code/project/$sub"
       for item in "$repo_claude/$sub"/*; do
         [ -e "$item" ] || continue
-        rsync -aL "$item" "$REPO_DIR/claude-code/project/$sub/"
+        if command -v rsync >/dev/null 2>&1; then
+          rsync -aL "$item" "$REPO_DIR/claude-code/project/$sub/"
+        else
+          cp -RL "$item" "$REPO_DIR/claude-code/project/$sub/"
+        fi
       done
     done
   done
