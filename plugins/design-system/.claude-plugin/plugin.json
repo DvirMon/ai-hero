@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "description": "Figma-to-component pipeline for any design system: /ds-wayfinder, /ds-discovery, /ds-interview, /ds-spec, /ds-plan, /ds-scaffold, /ds-review, /ds-ship, configured per design system by /ds-setup.",
   "author": { "name": "DvirMon" },
-  "dependencies": [{ "name": "code-review", "version": "^0.1" }],
+  "dependencies": [
+    { "name": "code-review", "version": "^0.1" },
+    { "name": "story", "version": "^0.1" }
+  ],
   "userConfig": {
     "figma_tools": {
       "type": "string",

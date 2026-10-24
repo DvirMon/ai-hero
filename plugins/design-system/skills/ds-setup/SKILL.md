@@ -1,6 +1,6 @@
 ---
 name: ds-setup
-description: Configure a project for the design-system pipeline — read the existing design system (components, tokens, barrels, stories, tests, primitive libraries), then write `.claude/design-system.json` and `docs/agents/design-system.md` from what it actually does, asking only about what the repo can't answer. Run once per design system before `/ds-wayfinder`; `/ds-wayfinder` and `/ds-discovery` run it when the config is missing. Also migrates a legacy `ds-wayfinder.config.json`.
+description: Configure a project for the design-system pipeline — read the existing design system (components, tokens, barrels, tests, primitive libraries), then write `.claude/design-system.json` and `docs/agents/design-system.md` from what it actually does, asking only about what the repo can't answer; hands Storybook to `/story:setup`. Run once per design system before `/ds-wayfinder`; `/ds-wayfinder` and `/ds-discovery` run it when the config is missing. Also migrates a legacy `ds-wayfinder.config.json`.
 ---
 
 # DS Setup
@@ -24,6 +24,7 @@ or the directory the user names. Then read — don't assume:
 
 - **Prior config** — `.claude/design-system.json`, a legacy `.claude/design-system.local.json`,
   `docs/agents/design-system.md`, a legacy `.claude/ds-wayfinder.config.json`,
+  `.claude/story.json` (an existing entry for this DS root — § 3 extends it, never duplicates),
   `.claude/figma-project.json` (its `stack`, `designSystem`, `tokens`, `codeConnect` pre-fill
   this config — never contradict it silently).
 - **Framework** — `package.json` dependencies (`@angular/core`, `react`). Anything else is not
@@ -41,8 +42,10 @@ or the directory the user names. Then read — don't assume:
   (`${CLAUDE_PLUGIN_ROOT}/skills/ds-discovery/references/primitives.{framework}.md`) are
   installed and actually imported by components; any internal overlay/portal/focus wrappers.
 - **Building blocks** — the icon component (and its key format), button, overlay service.
-- **Storybook** — `.storybook/`, where stories live relative to components, file naming, tags,
-  MDX.
+- **Storybook** — only whether it is installed (`.storybook/`, a `storybook` dependency) and
+  the command that runs it. That sets `storybook.enabled` and `commands.storybook`. Where
+  stories live, their conventions and stack skills belong to the `story` plugin — § 3 hands
+  them to `/story:setup`.
 - **Tests** — runner (`jest`, `vitest`, `karma`), spec file naming, the test command.
 - **Convention docs** — `CONTRIBUTING.md`, `README.md`, `AGENTS.md`/`CLAUDE.md` under the DS
   root, ADRs. These become `sources.conventions`.
@@ -50,12 +53,11 @@ or the directory the user names. Then read — don't assume:
   `${user_config.figma_tools}` is empty, suggest the found names as its value in `/config`;
   never write them to the repo.
 - **Slot skills** — installed skills that fit a slot in `ds-config.md` § Slots: a framework
-  developer skill, a CSS/styling skill, a unit-test skill, a Storybook story skill, a
+  developer skill, a CSS/styling skill, a unit-test skill, a
   prototype skill, a map/wayfinder skill, a Code Connect skill. Match by what the skill
   describes, not by name; only skills in the session's available-skills list count.
 
-Read **two or three real components end to end** (class, template, styles, stories, spec,
-exports). Conventions come from what they agree on; where they disagree, note both.
+Read **two or three real components end to end** (class, template, styles, spec, exports). Conventions come from what they agree on; where they disagree, note both.
 
 ## 2. Present findings and ask
 
@@ -67,8 +69,8 @@ are finite). Typical gaps:
 - **Token tiers** — which families a component may use, which file is off-limits (palette).
 - **Theme class** — when tokens resolve only under a class.
 - **Root registration** — whether new components are added to a root barrel.
-- **Sources** — reorder or extend `sources.primitives` / `sources.references`; extra a11y,
-  convention and Storybook sources; exemplar components (`sources.siblings`).
+- **Sources** — reorder or extend `sources.primitives` / `sources.references`; extra a11y and
+  convention sources; exemplar components (`sources.siblings`).
 - **WCAG target** — `a11y.wcag`, default `2.2-AA`.
 - **Slots** — one question per slot with a candidate skill: offer the candidates and
   `Leave unset`. Ask about `stages.review.skill` only when an installed skill reviews
@@ -103,6 +105,25 @@ Show the final drafts and let the user edit them, then write:
    (`project.framework` → `framework`, `designSystem.path` → `paths.root`,
    `references.styleTokensPath` → `tokens.sources`, `references.publicApiBarrel` →
    `publicApi.rootBarrel`, `output.docsDir` → `paths.docs`). Confirm the delete.
+
+5. **Storybook** (`storybook.enabled`): invoke `/story:setup`, passing the DS root
+   (`paths.root`) and `framework` (its § Called by another plugin). It writes or extends
+   `.claude/story.json` with one entry for this DS — `paths.stories`, `skills.create` /
+   `skills.implement`, `docs.conventions`. Its questions are its own; don't repeat them here.
+6. **Legacy Storybook values** — carry these into that `story.json` entry, pass them to
+   `/story:setup` as answers already given, then remove them from `design-system.json`:
+
+   | Legacy (`design-system.json`) | `story.json` entry |
+   |---|---|
+   | `storybook.dir` | `paths.stories` — `{domainDir}/<dir>/` |
+   | `sources.storybook` — a conventions doc | `docs.conventions` |
+   | `sources.storybook` — exemplar stories | `sources.internal` |
+   | `stacks.storybook.skill` | `skills.create` and `skills.implement` |
+
+   A legacy `## Storybook` section in `docs/agents/design-system.md` moves into the
+   `docs.conventions` file (created at the path `/story:setup` proposes) and is deleted here.
+   Never copy `sources.primitives` / `sources.references` into `story.json` — its
+   `sources.packages` are peers to compare against, a different fact. Confirm the moves.
 
 These edits are a change to the repo: make them on a branch, never on the default branch.
 

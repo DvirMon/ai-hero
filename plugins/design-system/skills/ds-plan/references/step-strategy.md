@@ -64,7 +64,7 @@ Every `step-N-*.plan.md` must contain all of these:
 - **Title** — concise name
 - **PR scope** — `Standalone`, `Depends on Step N`, or `Parallel-safe with Step N` (from the dependency graph, not the presentation order)
 - **Skills used** — list the skill names that guide implementation (the `stacks.*.skill` values set in the config; none set → `{conventions}`)
-- **Scaffolding agent** — the `ds-*` agent that executes this step
+- **Scaffolding agent** — the `ds-*` agent that executes this step; a Storybook step names `/story:create` → `story:implementer` and lists its stories (one per mechanism, by capability)
 - **Files** — exact file paths to create or modify
 - **Why This Step Exists** — why it is needed now and what it unlocks
 - **What To Do** — concrete description of changes, traced back to PRD or architecture doc

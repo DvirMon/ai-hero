@@ -18,7 +18,7 @@ Ask the user for the component name, then read `{docsDir}session-handoff.md`.
 
 If Phase 5 is not marked complete → tell the user to finish `ds-scaffold` first.
 
-Read `{docsDir}phase-state.json` and load: `componentFilePath`, `stylesFilePath`, `isComplex`, `planDir`, `a11ySpecText`, and `a11ySpecPath`.
+Read `{docsDir}phase-state.json` and load: `componentFilePath`, `stylesFilePath`, `isComplex`, `planDir`, `includeStorybook`, `a11ySpecText`, and `a11ySpecPath`.
 
 Derive inline `a11ySpec` from the `phase-state.json` keys `a11ySpecText` / `a11ySpecPath` as follows:
 - If `isComplex = false` → use the `a11ySpecText` value as inline `a11ySpec`
@@ -93,6 +93,15 @@ conformance findings; DS rule breaks from template/standards as
 
 If ever unsure which reviewers apply, default to running all of them — a missed reviewer is worse than a wasted one.
 
+### Storybook (when `includeStorybook`)
+
+In parallel with the reviewers, invoke `/story:docs` in **audit** mode on the stories the
+Storybook step(s) in `{planDir}` list. It checks doc comments, `.mdx` wrappers and the
+story-conventions doc against the DS project's `.claude/story.json` entry and edits nothing.
+Each deviation it reports becomes an `SB` issue. Fixes go back through the `story` plugin —
+`/story:docs` apply mode for docs, `/story:create` for a story's content — never hand-edited
+here.
+
 ## After agents return
 
 **Write `{planDir}/review-issues.md`** before fixing anything. Use this format:
@@ -128,7 +137,7 @@ Rules for this format:
 - One line per issue — description ≤ 12 words, fix hint ≤ 8 words after `—`
 - Prefix encodes category + sequence: A=a11y, S=styles, C=code, SB=storybook, D=docs.
   Section by the reviewer that raised it: `a11y-reviewer` → A;
-  `styles-reviewer` → S; correctness, template, public-api, standards,
+  `styles-reviewer` → S; `/story:docs` audit → SB; correctness, template, public-api, standards,
   spec → C. The plugin's kebab-case `id` is dropped; number within the
   section
 - Severity comes from `references/review-contract.md`, unchanged: `P0`–`P3`
@@ -154,7 +163,7 @@ rank conformance against impact.
 
 Fix issues:
 - Simple fixes (single-line, obvious) → fix inline directly, mark `[x]`, add to Fixed section
-- Larger changes → re-launch the relevant scaffolder agent
+- Larger changes → re-launch the relevant scaffolder agent (`SB` issues: see § Storybook)
 
 ### Update progress tracking
 

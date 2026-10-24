@@ -7,7 +7,7 @@ model: sonnet
 # DS Component Scaffolder
 
 ## Purpose
-Generate the component's source for the target version, following the design system's own conventions (`{conventions}`) on top of the framework defaults. Runs in Phase A of `ds-scaffold`, in parallel with `ds-styles-scaffolder`; its output (`componentFilePath`) gates Phase B (`ds-storybook-scaffolder`, `ds-test-scaffolder`).
+Generate the component's source for the target version, following the design system's own conventions (`{conventions}`) on top of the framework defaults. Runs in Phase A of `ds-scaffold`, in parallel with `ds-styles-scaffolder`; its output (`componentFilePath`) gates Phase B (`ds-test-scaffolder`, and `/story:create` for Storybook).
 
 ## Inputs
 - **componentName**: string, e.g. `snackbar`

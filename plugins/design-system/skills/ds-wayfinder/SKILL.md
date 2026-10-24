@@ -87,7 +87,7 @@ workflow choice; a user who asks for it is told to set the slot, and offered Lin
 | 2 | `ds-interview` | Grills API/a11y/edge cases → `decisions.md` |
 | 3 | `ds-spec` | PRD + a11y spec + architecture |
 | 4 | `ds-plan` | Versioned implementation plan |
-| 5 | `ds-scaffold` | Component, styles, Storybook, tests |
+| 5 | `ds-scaffold` | Component, styles, tests; Storybook via `/story:create` |
 | 6 | `ds-review` | A11y, code and styles review via `code-review:*-reviewer`, or `stages.review.skill`; skipped when `none` |
 | 7 | `ds-ship` | Exports, Code Connect, final checklist |
 
@@ -97,6 +97,8 @@ workflow choice; a user who asks for it is told to set the slot, and offered Lin
 - Figma access and a Figma MCP (`figma_tools` in `/config`, or found by search), or the REST
   fallback in discovery
 - The `code-review` plugin (Phase 6) — a declared dependency, installed with this one
+- The `story` plugin (Storybook, Phases 5–6) — a declared dependency; its `.claude/story.json`
+  entry for this DS is written by `/ds-setup` via `/story:setup`
 - Slot skills, when set (`ds-config.md` § Slots) — the config must name only installed skills
 - `commands.storybook` / `commands.test` — run by the user, never by a phase
 

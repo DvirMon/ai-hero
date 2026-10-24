@@ -38,7 +38,7 @@ Translate the PRD (and architecture/a11y spec if present) into a concrete, order
 7. Populate every step file's required sections in full: Title, PR scope, Skills used, Scaffolding agent, Files, Why This Step Exists, What To Do, Implementation Notes, Risks/Watchouts, Non-Goals, Acceptance Checks
 8. Write the styles step with the full DS styling requirements: token source, design token table (Level 1 → Level 2), override API, locked tokens, prior-art analysis of existing components, parent-ownership check, reference-library comparison against `sources.references`
 9. Before naming any behavior-unit (directive/hook) in a step, check `{conventions}` § API conventions and confirm against a live codebase grep
-10. Only generate Storybook steps if `includeStorybook`, only generate test steps if `includeTests`
+10. Only generate Storybook steps if `includeStorybook`, only generate test steps if `includeTests`. A Storybook step lists the stories to create — one per mechanism, named by capability, each with a one-line summary and the PRD criteria it covers — and names `/story:create` → `story:implementer` as its scaffolding agent. It writes no story code and names no story path, file set or stack: those come from the DS project's `.claude/story.json` entry
 11. Plan the smallest working V1 first — defer named-but-not-required enhancements to later versions or `Out of Scope`, never pre-wire for future complexity
 12. Copy Acceptance Criteria verbatim from `docs/prd.md` into the relevant step(s) — never paraphrase the definition of done
 

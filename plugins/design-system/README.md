@@ -35,7 +35,8 @@ has no `.claude/design-system.json`).
 | File | Holds | Contract |
 |---|---|---|
 | `.claude/design-system.json` | values — prefix, paths, token rules, ordered source lists, WCAG target | `contracts/ds-config.md` |
-| `docs/agents/design-system.md` | conventions in prose — component shape, exports, file layout, styling, Storybook, tests, review rules | `contracts/ds-conventions.md` |
+| `docs/agents/design-system.md` | conventions in prose — component shape, exports, file layout, styling, tests, review rules | `contracts/ds-conventions.md` |
+| `.claude/story.json` (one entry) | Storybook — story paths, stack skills, story-conventions doc; written by `/story:setup`, which `/ds-setup` calls | `story` plugin, `contracts/story-config.md` |
 
 Per-user values (your Figma MCP tool names) are the plugin's `userConfig`, prompted when the
 plugin is enabled and editable in `/config` — never a repo file.
@@ -54,14 +55,17 @@ The files load in place; `/reload-plugins` picks up edits.
 ## Prerequisites
 
 - **Plugins:** `code-review` — a declared dependency, installed with this plugin;
-  `/ds-review` runs its `code-review:*-reviewer` agents
+  `/ds-review` runs its `code-review:*-reviewer` agents. `story` — a declared dependency;
+  `/ds-scaffold` creates stories through `/story:create` and the `story:implementer` agent,
+  `/ds-review` audits them with `/story:docs`
 - **Conventions:** `~/.claude/conventions/testing/testing-principles.md` (test scaffolder)
 - **Optional:** a Figma MCP server; the `ng-primitives` MCP
 
 No loose skill is required. Skills the pipeline can use — a framework developer skill, CSS,
-unit-test, Storybook, prototype, map and Code Connect skills, or an org's own reviewer — are
+unit-test, prototype, map and Code Connect skills, or an org's own reviewer — are
 config slots (`contracts/ds-config.md` § Slots). `/ds-setup` fills them from what is installed;
-unset slots fall back to `{conventions}` and the plugin's own references.
+unset slots fall back to `{conventions}` and the plugin's own references. Storybook stack
+skills are `story.json` `skills.create` / `skills.implement`, not slots here.
 
 ## Layout
 
@@ -70,5 +74,5 @@ unset slots fall back to `{conventions}` and the plugin's own references.
 contracts/   ds-config, ds-conventions, phase-state
 skills/      ds-setup, ds-wayfinder, and the seven phases
 agents/      discovery (figma, primitives, codebase, a11y), spec (prd, a11y, architect),
-             planner, scaffolders (component, styles, storybook, test)
+             planner, scaffolders (component, styles, test)
 ```

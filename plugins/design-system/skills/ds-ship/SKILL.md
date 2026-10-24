@@ -46,7 +46,7 @@ Report status for each item:
 - [ ] Building-block conventions met (`{conventions}` § Building blocks — e.g. real icon keys, no placeholders)
 - [ ] Styles file — tokens only, logical CSS, `{conventions}` § Styling
 - [ ] Exports per step 1
-- [ ] Storybook scaffolded (if opted in) — `{conventions}` § Storybook
+- [ ] Storybook stories created (if opted in) — every story the Storybook step lists, via `/story:create`
 - [ ] Unit tests scaffolded (if opted in)
 - [ ] Review passed — a11y, code, styles
 - [ ] Code Connect reminder issued (when available)

@@ -81,9 +81,8 @@ per component.
 
 ## Storybook
 
-- Stories live in `{componentPath}storybook/`, `{fileBase}.stories.tsx`, CSF3 `StoryObj`.
-
-Evidence: (plugin default)
+Not a section of this doc — story conventions live in the file the DS project's
+`.claude/story.json` entry names at `docs.conventions` (written via `/story:setup`).
 
 ## Tests
 

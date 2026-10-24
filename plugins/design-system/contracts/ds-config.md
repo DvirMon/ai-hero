@@ -103,17 +103,19 @@ custom properties, per [Universal rules](#universal-rules).
 | `sources.references` | reference libraries (inspiration only) | by `framework` (below) |
 | `sources.a11y` | extra a11y sources (URLs or repo paths) | `[]` |
 | `sources.conventions` | in-repo docs the DS documents itself in | `[]` |
-| `sources.storybook` | in-repo story conventions or exemplar stories | `[]` |
 | `sources.siblings` | exemplar components to copy structure from | `[]` |
 | `figma.project` | path to `figma-project.json` | `.claude/figma-project.json` when present |
 | `a11y.wcag` | `2.1-AA` · `2.2-AA` · `2.2-AAA` | `2.2-AA` |
 | `storybook.enabled` | boolean | `true` when Storybook is installed |
-| `storybook.dir` | stories folder, relative to `{componentPath}` | `storybook` |
 | `commands.test` | command the user runs | — |
 | `commands.storybook` | command the user runs | — |
 | `stacks.<stack>.skill` | convention skill name · `null` | `null` |
 | `capabilities.<name>.skill` | skill name · `null` | `null` |
 | `stages.review.skill` | skill name · `none` · `null` | `null` (built-in reviewer dispatch) |
+
+Storybook conventions and stack come from the DS project's `.claude/story.json` entry (`story`
+plugin, `contracts/story-config.md`): `paths.stories`, `skills.create` / `skills.implement`,
+`docs.conventions`. This file keeps only `storybook.enabled` and `commands.storybook`.
 
 Unknown key or value: stop and name it. A misconfigured value is a setup error, not a runtime
 one — it fires on first run, every run.
@@ -126,10 +128,9 @@ a reference file the plugin's own steps read is vendored into the plugin; plugin
 
 | Slot | Used by | `null` means |
 |---|---|---|
-| `stacks.{framework}.skill` | component, storybook scaffolders | `{conventions}` + plugin references only |
+| `stacks.{framework}.skill` | component scaffolder | `{conventions}` + plugin references only |
 | `stacks.css.skill` | styles scaffolder, styles review | same |
 | `stacks.test.skill` | test scaffolder | same |
-| `stacks.storybook.skill` | storybook scaffolder | same |
 | `capabilities.prototype.skill` | `/ds-interview`, `/ds-spec` | no prototype offer |
 | `capabilities.map.skill` | `/ds-wayfinder` map mode | map mode not offered |
 | `capabilities.codeConnect.skill` | `/ds-plan`, `/ds-ship` | Code Connect step lists the work, names no skill |
@@ -202,6 +203,9 @@ True for every design system; not configurable.
 - **Legacy `ds-wayfinder.config.json` found:** `/ds-setup` migrates it; phases do not read it.
 - **`design-system.local.json` or a `figma.tools` key found:** setup error — `/ds-setup` removes
   them and gives the user the `figma_tools` value to set in `/config`.
+- **A Storybook folder, story-source or story-skill key found** (keys earlier versions held,
+  now in `story.json`): setup error — `/ds-setup` moves them into the DS project's
+  `.claude/story.json` entry (`/ds-setup` § 3).
 - **No `docs/agents/design-system.md`:** same as a missing config.
 - **A conventions-doc rule contradicts a plugin reference:** the conventions doc wins — it
   describes this design system; the reference describes the framework default.

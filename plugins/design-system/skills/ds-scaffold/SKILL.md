@@ -14,7 +14,9 @@ Agents load their own guides; this skill only gathers inputs. The guides they us
 
 - The stack skills in `stacks.*.skill`, when set (`ds-config.md` § Slots)
 - `references/motion.md`
-- `{conventions}` — component shape, file layout, styling, Storybook, tests
+- `{conventions}` — component shape, file layout, styling, tests
+- Storybook conventions and stack — the DS project's `.claude/story.json` entry, read by
+  `/story:create` and `story:implementer`, not by this skill
 
 ---
 
@@ -53,10 +55,18 @@ Wait for both before Phase B.
 
 Run only after the component scaffolder returned `componentFilePath`.
 
-| Agent | subagent_type | model | When | Extra inputs |
-|---|---|---|---|---|
-| Storybook scaffolder | `design-system:ds-storybook-scaffolder` | sonnet | `includeStorybook` | componentName, prdPath, componentApiSummary, `storybook.dir`, `sources.storybook`, `{frameworkSkill}`, `stacks.storybook.skill` |
-| Test scaffolder | `design-system:ds-test-scaffolder` | sonnet | `includeTests` | componentName, componentFilePath, prdPath, `stacks.test.skill` |
+| Work | Runs | When | Extra inputs |
+|---|---|---|---|
+| Test scaffolder | agent `design-system:ds-test-scaffolder` (sonnet) | `includeTests` | componentName, componentFilePath, prdPath, `stacks.test.skill` |
+| Storybook | skill `/story:create`, once per story | `includeStorybook` | componentName, componentFilePath, prdPath, componentApiSummary, the story's line from the step file |
+
+**Storybook.** The `step-*-storybook*` file(s) in `planDir` list the stories to create, one
+per mechanism. Invoke `/story:create` once per listed story, passing the component, `prdPath`
+and `componentApiSummary` as context. It writes the story spec at `story.json` `paths.specs`
+and dispatches the `story:implementer` agent, which loads the stack from `skills.implement`
+and follows `docs.conventions`. This skill passes no Storybook path, source or skill — those
+live in the DS project's `.claude/story.json` entry. No entry → `/story:create` runs
+`/story:setup`; a `blocked` implementer report is a ❌ for that step.
 
 ### Inputs
 
@@ -65,14 +75,15 @@ Run only after the component scaffolder returned `componentFilePath`.
   `{componentPath}{a11ySpecPath}` (complex). Never a path.
 - `prdPath` — `{docsDir}prd.md`, passed as a path.
 - `apiSpec` — **inline text**: the PRD's API Summary (inputs, outputs, content slots).
-- `componentApiSummary` — the same API Summary, condensed, for the Storybook scaffolder.
+- `componentApiSummary` — the same API Summary, condensed, for `/story:create`.
 
 ## After agents return
 
 ### Update progress tracking
 
 For each scaffolder that returned successfully, flip its step files in `planDir` from
-`Status: pending` → `Status: completed` (Glob for step files naming the agent). Update
+`Status: pending` → `Status: completed` (Glob for step files naming the agent). A Storybook
+step completes when every story it lists came back from `story:implementer` as done. Update
 `progress.md` — ✅ `completed` per finished step, ❌ `failed` per failed one.
 
 Report all generated files as clickable links.

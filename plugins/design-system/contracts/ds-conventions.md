@@ -20,9 +20,12 @@ Every heading below must exist. A section setup could not ground in the repo say
 | `## API conventions` | input/prop naming, slot selection style, behavior-unit naming (directive selectors, hook names), forms integration | interview, scaffold |
 | `## Styling` | how tokens are consumed, the override API (shape, size limit), encapsulation, forbidden escape hatches, units | styles scaffold, review |
 | `## Building blocks` | internal components and services new components must reuse — icon (and its key format), button, overlay/portal, focus helpers | discovery, scaffold, review |
-| `## Storybook` | the story file set, naming, tags/visibility, MDX docs | storybook scaffold |
 | `## Tests` | runner, file name, what is tested, input-driving idiom | test scaffold |
 | `## Review rules` | numbered DS-specific rules, each one checkable | review |
+
+Storybook conventions are not a section here. They live in the story-conventions doc the DS
+project's `.claude/story.json` entry names at `docs.conventions` (`story` plugin), read by
+`/story:create`, `story:implementer` and `/story:docs`.
 
 ## Section format
 

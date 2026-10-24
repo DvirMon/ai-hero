@@ -95,10 +95,8 @@ per component.
 
 ## Storybook
 
-- Stories live in `{componentPath}storybook/`, `{fileBase}.stories.ts`, CSF3 `StoryObj`.
-- Templates use `@if`/`@for`, signal inputs, no `CommonModule`.
-
-Evidence: (plugin default)
+Not a section of this doc — story conventions live in the file the DS project's
+`.claude/story.json` entry names at `docs.conventions` (written via `/story:setup`).
 
 ## Tests
 
