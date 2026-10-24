@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DS-Wayfinder Config (Per-Project)",
+  "description": "Project-level config. Created in {projectPath}/.claude/ds-wayfinder.config.json by /ds-wayfinder setup. Auto-detected framework from package.json.",
+  "type": "object",
+  "required": ["project", "designSystem", "componentPathPattern"],
+  "properties": {
+    "project": {
+      "type": "object",
+      "required": ["name", "framework"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Project name (e.g., 'issa-landing', 'mobile')"
+        },
+        "framework": {
+          "type": "string",
+          "enum": ["angular", "react", "vue", "svelte"],
+          "description": "Framework (auto-detected from package.json)"
+        }
+      }
+    },
+    "designSystem": {
+      "type": "object",
+      "required": ["name", "path"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Design system name (e.g., 'shared-ds')"
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative path to design system from this project (e.g., '../../libs/shared/design-system')"
+        }
+      }
+    },
+    "componentPathPattern": {
+      "type": "string",
+      "description": "Glob pattern for component files in this project (e.g., 'src/lib/components/**')"
+    },
+    "componentDocPattern": {
+      "type": "string",
+      "description": "Where docs live relative to component (e.g., './docs', optional)"
+    },
+    "references": {
+      "type": "object",
+      "description": "Reference doc paths (relative to design system or project root)",
+      "properties": {
+        "wcagPatterns": {
+          "type": "string"
+        },
+        "ariaApg": {
+          "type": "string"
+        },
+        "semanticHtml": {
+          "type": "string"
+        },
+        "styleTokensPath": {
+          "type": "string",
+          "description": "Path to role-token/style partials, relative to design system path (e.g. 'src/lib/style/{prefix}-theme-2'). If unset, search the design system for the token convention instead of assuming one."
+        },
+        "publicApiBarrel": {
+          "type": "string",
+          "description": "Path to the design system's root barrel file, relative to design system path (e.g. 'src/index.ts'). If unset, search the design system root for index.ts/public-api.ts instead of assuming one."
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "docsDir": {
+          "type": "string",
+          "description": "Docs root relative to component (default: './docs')"
+        },
+        "specFile": {
+          "type": "string",
+          "description": "Spec filename (default: 'prd.md')"
+        },
+        "rolesMapFile": {
+          "type": "string",
+          "description": "Complex a11y spec filename (default: 'roles-map.md')"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "project": {
+        "name": "issa-landing",
+        "framework": "angular"
+      },
+      "designSystem": {
+        "name": "shared-ds",
+        "path": "../../libs/shared/design-system"
+      },
+      "componentPathPattern": "src/lib/components/**",
+      "componentDocPattern": "./docs",
+      "references": {
+        "wcagPatterns": "../../libs/shared/design-system/docs/reference/wcag-patterns.md",
+        "ariaApg": "../../libs/shared/design-system/docs/reference/aria-apg.md",
+        "styleTokensPath": "src/lib/style/{prefix}-theme-2",
+        "publicApiBarrel": "src/index.ts"
+      },
+      "output": {
+        "docsDir": "./docs",
+        "specFile": "prd.md",
+        "rolesMapFile": "roles-map.md"
+      }
+    }
+  ]
+}
