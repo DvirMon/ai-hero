@@ -33,8 +33,8 @@ competitor survey — those are inputs to it, and they live in their own files.
 ### 1. Find the house template — do not invent a shape
 
 The doc is `prd.md` at the `docs.prd` path from `.claude/workflow.json` (default
-`{componentDir}/docs/prd.md` — see `doc-contracts/workflow-config.md`). Its shape is the
-**capability variant** of `doc-contracts/prd.md`; that contract wins where this sketch differs.
+`{componentDir}/docs/prd.md` — see `contracts/workflow-config.md` in the `sdlc` plugin). Its shape is the
+**capability variant** of `contracts/prd.md` in the `sdlc` plugin; that contract wins where this sketch differs.
 Discovery-derived lines take no source tag; a line copied from a remote ticket or a grill
 decision keeps its `[PROJ-123 · MM-DD]` / `[Dn]` tag.
 

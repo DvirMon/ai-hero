@@ -24,7 +24,7 @@ story maps to which `.stories.ts` file. This skill produces that table and a pla
 gap, favoring the smallest number of stories that gives honest coverage.
 
 The doc is `prd.md` at the `docs.prd` path from `.claude/workflow.json` (default
-`{componentDir}/docs/prd.md`), in the **capability variant** of `doc-contracts/prd.md`. Its
+`{componentDir}/docs/prd.md`), in the **capability variant** of `contracts/prd.md` in the `sdlc` plugin. Its
 FROZEN rows are what this skill reads and re-derives; keep each line's source tag when you
 correct a coverage mark.
 
