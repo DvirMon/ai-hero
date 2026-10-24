@@ -22,7 +22,7 @@ the file it came from. Ask only for what exploration could not settle.
 Find the project root first: the nearest `package.json` with a design-system library under it,
 or the directory the user names. Then read — don't assume:
 
-- **Prior config** — `.claude/design-system.json`, `.claude/design-system.local.json`,
+- **Prior config** — `.claude/design-system.json`, a legacy `.claude/design-system.local.json`,
   `docs/agents/design-system.md`, a legacy `.claude/ds-wayfinder.config.json`,
   `.claude/figma-project.json` (its `stack`, `designSystem`, `tokens`, `codeConnect` pre-fill
   this config — never contradict it silently).
@@ -46,7 +46,9 @@ or the directory the user names. Then read — don't assume:
 - **Tests** — runner (`jest`, `vitest`, `karma`), spec file naming, the test command.
 - **Convention docs** — `CONTRIBUTING.md`, `README.md`, `AGENTS.md`/`CLAUDE.md` under the DS
   root, ADRs. These become `sources.conventions`.
-- **Figma** — connected Figma MCP tools (`ToolSearch("figma")`).
+- **Figma** — connected Figma MCP tools (`ToolSearch("figma")`). These are per-user: when
+  `${user_config.figma_tools}` is empty, suggest the found names as its value in `/config`;
+  never write them to the repo.
 - **Slot skills** — installed skills that fit a slot in `ds-config.md` § Slots: a framework
   developer skill, a CSS/styling skill, a unit-test skill, a Storybook story skill, a
   prototype skill, a map/wayfinder skill, a Code Connect skill. Match by what the skill
@@ -93,7 +95,10 @@ Show the final drafts and let the user edit them, then write:
 
    The examples are framework defaults, not this DS. A rule kept from an example without repo
    evidence is marked `(plugin default)`.
-3. `.gitignore` gains `.claude/design-system.local.json`.
+3. A legacy `.claude/design-system.local.json` is deleted, and a `figma.tools` key removed,
+   after their values are carried over — into `design-system.json` for team values, or shown
+   to the user as the `figma_tools` value to set in `/config` (plugin `userConfig`; setup
+   can't write it). Confirm the delete.
 4. A legacy `.claude/ds-wayfinder.config.json` is deleted after its values are carried over
    (`project.framework` → `framework`, `designSystem.path` → `paths.root`,
    `references.styleTokensPath` → `tokens.sources`, `references.publicApiBarrel` →

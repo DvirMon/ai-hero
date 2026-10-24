@@ -8,7 +8,7 @@ description: Entry point for building a new DS component from a Figma design. Ro
 ## Config
 
 Resolve the design-system config per `${CLAUDE_PLUGIN_ROOT}/contracts/ds-config.md` (walk up to
-`.claude/design-system.json`, merge the local layer, apply defaults) and read `{conventions}`.
+`.claude/design-system.json`, apply defaults) and read `{conventions}`.
 
 - **Missing config or conventions doc** → run `/ds-setup`, then continue here.
 - **Present** → go to the intent router.
@@ -94,7 +94,8 @@ workflow choice; a user who asks for it is told to set the slot, and offered Lin
 ## Prerequisites
 
 - `design-system.json` + `{conventions}` (`/ds-setup`)
-- Figma access and a Figma MCP (`figma.tools`), or the REST fallback in discovery
+- Figma access and a Figma MCP (`figma_tools` in `/config`, or found by search), or the REST
+  fallback in discovery
 - The `code-review` plugin (Phase 6) — a declared dependency, installed with this one
 - Slot skills, when set (`ds-config.md` § Slots) — the config must name only installed skills
 - `commands.storybook` / `commands.test` — run by the user, never by a phase

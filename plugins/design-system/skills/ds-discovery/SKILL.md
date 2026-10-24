@@ -50,7 +50,7 @@ A design-token-only change to an existing component — no API, no primitive que
 
 ## Pre-flight — tool availability
 
-For each library in `sources.primitives` and each Figma tool in `figma.tools`, check whether an
+For each library in `sources.primitives` and each Figma tool in `{figmaTools}` (`${user_config.figma_tools}`), check whether an
 MCP server serves it (`ToolSearch(query: "<library or tool>")`). A missing one is not a blocker:
 tell the user which agents will fall back to `WebFetch` / the Figma REST flow, and how to add the
 server if they want it. Continue unless they say to stop.
@@ -59,7 +59,7 @@ server if they want it. Continue unless they say to stop.
 
 | Agent | subagent_type | When | Inputs |
 |---|---|---|---|
-| Figma discovery | `design-system:ds-figma-discovery` | Always | componentName, figmaUrl, `figma.tools`, `tokens`, `{componentsRoot}`, `{conventions}` |
+| Figma discovery | `design-system:ds-figma-discovery` | Always | componentName, figmaUrl, `{figmaTools}`, `tokens`, `{componentsRoot}`, `{conventions}` |
 | Primitive discovery | `design-system:ds-discovery` | Always | componentName, componentBehaviour (infer from name), primitiveHint, `framework`, `sources.primitives`, `sources.references` |
 | Codebase discovery | `design-system:ds-codebase-discovery` | User opted in | componentName, componentBehaviour, siblingComponentPath, `{componentsRoot}`, `naming`, `{conventions}` |
 | A11y discovery | `design-system:ds-a11y-discovery` | Always | componentName, componentBehavior, componentType (coarse category), `a11y.wcag`, `sources.a11y` |

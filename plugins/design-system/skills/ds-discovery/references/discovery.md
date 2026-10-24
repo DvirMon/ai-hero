@@ -6,7 +6,7 @@ Always Phase 1. Fetch the Figma design once; every later phase consumes this out
 
 ### Primary: Figma MCP
 
-Call the first available tool in `figma.tools` (none configured → `ToolSearch("figma")` and
+Call the first available tool in `{figmaTools}` (none configured → `ToolSearch("figma")` and
 use what is connected) with the file key and node ID from the Figma URL. Prefer a tool that
 returns design context with variables over a raw node dump.
 

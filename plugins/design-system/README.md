@@ -37,6 +37,9 @@ has no `.claude/design-system.json`).
 | `.claude/design-system.json` | values — prefix, paths, token rules, ordered source lists, WCAG target | `contracts/ds-config.md` |
 | `docs/agents/design-system.md` | conventions in prose — component shape, exports, file layout, styling, Storybook, tests, review rules | `contracts/ds-conventions.md` |
 
+Per-user values (your Figma MCP tool names) are the plugin's `userConfig`, prompted when the
+plugin is enabled and editable in `/config` — never a repo file.
+
 The plugin keeps only the rules true for every design system (token-only styling, atomic
 composition, live a11y sources, reduced motion, logical CSS) — `ds-config.md` § Universal rules.
 

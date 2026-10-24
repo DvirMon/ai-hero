@@ -12,7 +12,7 @@ Fetch and analyze the Figma design for a new/changed DS component, and produce t
 ## Inputs
 - **componentName**: string, e.g. `stepper`, `autocomplete`
 - **figmaUrl**: string, optional — frame or component URL. If absent, follow the no-Figma fallback below.
-- **figma.tools**: Figma MCP tool names in preference order (empty → `ToolSearch("figma")`)
+- **figmaTools**: Figma MCP tool names in preference order (empty → `ToolSearch("figma")`)
 - **tokens**: resolved config — `sources`, `allowed`, `forbidden`, `figmaToCss`
 - **componentsRoot**: the DS components root
 - **conventions**: path to `{conventions}` (§ Building blocks lists components to look for)
@@ -48,7 +48,7 @@ Fetch and analyze the Figma design for a new/changed DS component, and produce t
 - Figma personal access token flow (REST API fallback): instruct the user to run the `curl` command locally and paste back the JSON — never request or handle the token itself
 
 ## Process
-1. If `figmaUrl` provided: call the first available tool in `figma.tools` (or one found via `ToolSearch("figma")`) with the file key and node ID parsed from the URL
+1. If `figmaUrl` provided: call the first available tool in `figmaTools` (or one found via `ToolSearch("figma")`) with the file key and node ID parsed from the URL
 2. If the MCP tool is unavailable or fails: instruct the user to run the Figma REST API `curl` command locally with their own token and paste the JSON response — never ask for or handle the token directly
 3. If no `figmaUrl` at all: search `componentsRoot` for the most similar existing DS component, read its styles/template/public API, and use it as the structural/token reference — clearly label the output "No Figma available — pattern derived from `<existing-component>`"
 4. From the screenshot/output, catalog every visual state and variant dimension

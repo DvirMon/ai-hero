@@ -8,14 +8,15 @@ ordered source lists. The conventions the DS follows, written as prose, live bes
 The plugin holds only what is true for every design system. Anything one design system does
 differently from another goes here or in the conventions doc, never in a skill.
 
-## Files and layering
+## Files
 
-| Layer | Path | Owner | Git |
-|---|---|---|---|
-| 1. team | `<project>/.claude/design-system.json` | the repo | committed |
-| 2. user | `<project>/.claude/design-system.local.json` | one teammate | gitignored |
+`<project>/.claude/design-system.json` is the plugin's only repo config file, committed and
+shared by the team. Per-user values are the plugin's `userConfig` (`plugin.json`), set when
+the plugin is enabled and stored in the user's settings — never a repo file:
 
-The user layer wins. **Merge:** objects merge key by key; arrays and scalars replace.
+| `userConfig` key | Holds | Read as |
+|---|---|---|
+| `figma_tools` | Figma MCP tool names, comma-separated, preference order | `{figmaTools}` |
 
 **Resolve:** walk up from the current directory (or from `{componentPath}`, once known) to the
 first `.claude/design-system.json`. Its directory is `{projectRoot}`; every path in the file is
@@ -104,7 +105,6 @@ custom properties, per [Universal rules](#universal-rules).
 | `sources.conventions` | in-repo docs the DS documents itself in | `[]` |
 | `sources.storybook` | in-repo story conventions or exemplar stories | `[]` |
 | `sources.siblings` | exemplar components to copy structure from | `[]` |
-| `figma.tools` | Figma MCP tool names, in preference order | `[]` (find with `ToolSearch("figma")`) |
 | `figma.project` | path to `figma-project.json` | `.claude/figma-project.json` when present |
 | `a11y.wcag` | `2.1-AA` · `2.2-AA` · `2.2-AAA` | `2.2-AA` |
 | `storybook.enabled` | boolean | `true` when Storybook is installed |
@@ -175,6 +175,10 @@ concrete prefix, path or token family in plugin files.
 | `{themeClass}` | `tokens.themeClass`, rendered (empty when `null`) |
 | `{conventions}` | `{projectRoot}/docs/agents/design-system.md` |
 | `{frameworkSkill}` | `stacks.{framework}.skill` (empty when `null`) |
+| `{figmaTools}` | `userConfig.figma_tools` split on commas; empty → `ToolSearch("figma")` |
+
+`{figmaTools}` is filled by the skill that dispatches discovery: `${user_config.*}` is
+substituted only in skill and agent files, not in references read with Read.
 
 ## Universal rules
 
@@ -196,6 +200,8 @@ True for every design system; not configurable.
 - **No `design-system.json`:** `/ds-wayfinder` and `/ds-discovery` run `/ds-setup`. Any other
   phase stops and points to `/ds-setup`.
 - **Legacy `ds-wayfinder.config.json` found:** `/ds-setup` migrates it; phases do not read it.
+- **`design-system.local.json` or a `figma.tools` key found:** setup error — `/ds-setup` removes
+  them and gives the user the `figma_tools` value to set in `/config`.
 - **No `docs/agents/design-system.md`:** same as a missing config.
 - **A conventions-doc rule contradicts a plugin reference:** the conventions doc wins — it
   describes this design system; the reference describes the framework default.
