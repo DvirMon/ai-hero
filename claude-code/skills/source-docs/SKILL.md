@@ -17,8 +17,8 @@ verification. A `source-docs` run ends in a typecheck; a `kipi` run has no equiv
 
 - **In:** every non-spec `.ts`/`.tsx` file under the given path.
 - **Out, always:** `*.spec.ts(x)`, story hosts (files matching `*story-host*` or living in a
-  `*-story-host/` folder), `*.stories.ts(x)`. Those are owned by the `implementer` agent (on `story` steps) against
-  `doc-contracts/story-doc.md` — never rewrite them here, even if asked to cover "everything."
+  `*-story-host/` folder), `*.stories.ts(x)`. Those are owned by the `story` plugin (`story:implementer`, `/story:docs`) against
+  the `story` plugin's `contracts/story-doc.md` — never rewrite them here, even if asked to cover "everything."
 - The path can be a single file, a feature folder (`api/features/with-sorting/`), or a whole
   lib (`libs/shared/table/src`). Walk recursively from whatever is given.
 
@@ -88,8 +88,8 @@ this skill owns.
 ## Boundaries
 
 - Never writes a `.md` file — that's `kipi`'s job, config-driven from `docs/agents/domain-docs.md`.
-- Never touches story hosts or `.stories.ts` — the `implementer` agent owns those on `story` steps, against
-  `doc-contracts/story-doc.md`, at the point the story is built, not after the fact.
+- Never touches story hosts or `.stories.ts` — the `story` plugin owns those (`story:implementer`, `/story:docs`), against
+  the `story` plugin's `contracts/story-doc.md`, at the point the story is built, not after the fact.
 - Not a truth-checker — this skill trims and reshapes comments to the contract; it doesn't
   verify a comment's claim is still accurate. That's `audit-docs`.
 - Doesn't own concision policy — `concise-docs` does. This skill dispatches `doc-compressor`

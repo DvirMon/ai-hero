@@ -20,7 +20,7 @@ At a plan-approval gate, the plan may be presented with every open decision at o
 "Decide:" line with a recommendation next to the step it affects. Applies only to: `to-tasks`
 §4/§4b, `to-issues` §4, the `ds-plan` checkpoint, and the `ds-spec` checkpoint.
 
-Grilling, interviews and `prd-discovery` questions stay one at a time.
+Grilling, interviews and `story:discovery` questions stay one at a time.
 
 **Why:** user decision, 2026-10-18. Reviewing a whole plan in one pass beats approving it node
 by node. Open-ended design questions still need the one-at-a-time flow. First written for
