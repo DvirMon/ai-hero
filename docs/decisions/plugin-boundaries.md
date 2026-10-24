@@ -141,7 +141,7 @@ Each plugin's own setup writes its config file, and its own contract defines the
 | File | Owner | Holds |
 |---|---|---|
 | `.claude/workflow.json` | sdlc | `stages`, `capabilities`, `stacks` |
-| `.claude/design-system.json` | design-system | its stages and slots (today collected by `ds-wayfinder`) |
+| `.claude/design-system.json` | design-system | its stages and slots (written by `/ds-setup`) |
 | `docs/agents/code-review.md` | code-review | its own config |
 
 A config file holds wiring, never another plugin's settings: `stages.review.skill` names the
