@@ -1,7 +1,7 @@
 # design-system
 
 Builds design-system components from a Figma design, as a plugin in the
-`ai-coding-guidelines` marketplace. Works for any design system: everything one design
+`ai-hero` marketplace. Works for any design system: everything one design
 system does differently from another lives in that project's config, not in the plugin.
 
 ```
@@ -19,9 +19,9 @@ In a repo's `.claude/settings.json` (or `~/.claude/settings.json` for every repo
 ```json
 {
   "extraKnownMarketplaces": {
-    "ai-coding-guidelines": { "source": { "source": "github", "repo": "DvirMon/ai-coding-guidelines" } }
+    "ai-hero": { "source": { "source": "github", "repo": "DvirMon/ai-hero" } }
   },
-  "enabledPlugins": { "design-system@ai-coding-guidelines": true }
+  "enabledPlugins": { "design-system@ai-hero": true }
 }
 ```
 
@@ -43,7 +43,7 @@ composition, live a11y sources, reduced motion, logical CSS) — `ds-config.md` 
 ## Local development
 
 ```bash
-claude --plugin-dir ~/git/ai-coding-guidelines/plugins/design-system
+claude --plugin-dir ~/git/ai-hero/plugins/design-system
 ```
 
 The files load in place; `/reload-plugins` picks up edits.
