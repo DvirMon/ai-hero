@@ -30,7 +30,7 @@ the validation routine inline.
 }
 ```
 
-`figma[]` entry shape (see `references/figma-capture.md`):
+`figma[]` entry shape (owned by the `figma` plugin's wired skills):
 
 ```json
 {
@@ -84,8 +84,8 @@ reads it, not just who writes it.
 | `prdPath` | `to-ticket`, at creation — the `docs.prd` path from the workflow config, resolved for this work (`${CLAUDE_PLUGIN_ROOT}/contracts/prd.md`). | `grill-with-docs` (adds `[Dn]` requirements, marks `⚠ Dn`); `to-spec` (re-fetches remote ACs into it, stops on an open `⚠`). |
 | `decisionsPath` | `to-ticket` (path is fixed at creation; file itself is created lazily by the first stage that decides something). Format: `${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`. | Every stage appends entries tagged with its phase: `grill-with-docs` (`grill`), `to-spec` (`spec`), `to-tasks` (`tasks`), `implementation` (`implement`), `review` (`review`). `to-spec` also synthesizes the spec from it. |
 | `capabilityLogPath` | `to-ticket`, at creation — the permanent decisions log for the capability this work belongs to (`~/.claude/conventions/doc-contracts/decisions-log.md`), if the project keeps them and this work belongs to exactly one capability. `null` otherwise, which is the correct value for cross-capability work, not a missing field. | `grill-with-docs` (reads it before the first question, so the interview does not re-decide something settled; appends a row per capability-scoped decision); `to-spec` (reads it as a second input alongside `decisionsPath` — the log carries what earlier efforts settled, which the workspace's own decisions file does not). |
-| `figma` | `to-ticket` (capture per `references/figma-capture.md`); `grill-with-docs` may append frames after user supplies missing ones. | `grill-with-docs` (Design-check aspect frame list); `to-spec` (frame table in `design.md`); `to-issues` (node IDs on FE slices); `to-tasks` (step `figma:` binding); `implementation` (which nodes to fetch per UI step). |
-| `designPath` | `to-spec`, when `figma[]` is non-empty or grill left `design.draft/` / design-check decisions to promote. | `to-issues`, `to-tasks`, `implementation` (component/token/copy map — UI steps treat absent mapping as stop); `ship` (MR evidence link). |
+| `figma` | `figma:capture` (wired into `to-ticket`); `figma:design-check` may append frames the user supplies. Empty when no Figma skill is wired. | `grill-with-docs` (Design-check aspect frame list); `to-spec` (frame table in `design.md`); `to-issues` (node IDs on FE slices); `to-tasks` (step `figma:` binding); `implementation` (which nodes to fetch per UI step). |
+| `designPath` | a wired skill that writes a design reference — `figma:design-reference` in `to-spec`. `null` otherwise. | `to-issues`, `to-tasks`, `implementation` (component/token/copy map — UI steps treat absent mapping as stop); `ship` (MR evidence link). |
 | `specPath` | `to-spec`. | `to-issues` (default source, read in full); `to-tasks` (read for consistency); `implementation` (read only if a step is ambiguous); `ship` (linked as evidence in the PR body). |
 | `architecturePath` | `to-spec`, only when `isComplex` is `true`. | `to-issues`, `to-tasks`, `implementation` — same read pattern as `specPath`. |
 | `units` | `to-ticket` (writes the entries per `prUnit`, starts each branch/worktree per `isolation`); `to-issues` (appends a unit per created sub-issue when `prUnit` is `sub-issue`); `grill-with-docs` (sets `readiness` + `assessed` on Jira); `to-tasks` (sets `branch` + `worktree` for a unit it starts itself); `ship` (sets `pr`). | `to-tasks` (`branch`, `worktree`); `implementation` (`readiness` on Jira); `ship` (`remoteRef` for the closing reference, `branch`, `pr`). While `pr` is `null`, look it up with `gh pr list --head <branch>`. |

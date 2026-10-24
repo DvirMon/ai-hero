@@ -1,3 +1,11 @@
+---
+name: implementation
+description: "sdlc stage extension for /implementation. Brief UI steps with design.md and node IDs, add the project's skills.ui to their dispatch, and run verify-ui steps inline. Wire it as `stages.implementation.skills: [\"figma:implementation\"]` in .claude/workflow.json."
+---
+
+> **Wired into** `/implementation` § 2 Route — `figma:` steps and the `verify-ui` step type, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
+> ticket (`state.json` `figma[]` empty, no frame URLs) → say so and do nothing.
+
 # Figma UI — `/implementation`
 
 Consumes `state.json` → `designPath`, `figma[]`, and step frontmatter → `figma` (node IDs).

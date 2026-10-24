@@ -19,6 +19,16 @@
       "name": "design-system",
       "source": "./plugins/design-system",
       "description": "Figma-to-component pipeline for any design system, configured per project by /ds-setup."
+    },
+    {
+      "name": "story",
+      "source": "./plugins/story",
+      "description": "Storybook story pipeline for any stack: discovery, plan, create, implement, docs, configured per repo by /story:setup."
+    },
+    {
+      "name": "figma",
+      "source": "./plugins/figma",
+      "description": "Figma extensions for the sdlc pipeline, wired per stage from .claude/workflow.json."
     }
   ]
 }

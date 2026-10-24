@@ -33,6 +33,12 @@ library — with the skills each step type loads there
 ([`contracts/workflow-config.md`](contracts/workflow-config.md) § Projects). Stages name no
 framework; the project config does.
 
+Any stage can also load your own skills without being replaced: `stages.<stage>.skills`
+([`contracts/stage-skills.md`](contracts/stage-skills.md)). Figma support ships that way, as the
+`figma` plugin in this marketplace — one skill per stage (`figma:capture`, `figma:design-check`,
+`figma:design-reference`, `figma:slicing`, `figma:steps`, `figma:implementation`), wired only in
+the projects that have designs.
+
 ## Local development
 
 ```bash
@@ -47,9 +53,11 @@ The files load in place; `/reload-plugins` picks up edits.
 These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 
 - **Skills:** domain-modeling, and whatever the repo's `projects` name — e.g. unit-test,
-  story-create, angular-developer, react-developer, nodejs-developer, figma skills
-- **Contracts** (`~/.claude/conventions/doc-contracts/`): decisions-log, adr, jsdoc,
-  story-doc
+  angular-developer, react-developer, nodejs-developer, figma skills
+- **Contracts** (`~/.claude/conventions/doc-contracts/`): decisions-log, adr, jsdoc.
+  `story-doc` is vendored from the `story` plugin (`contracts/story-doc.md`)
+- **Optional:** the `story` plugin, for `executors.story: "story:implementer"` and
+  `docs.prdWriter: "story:discovery"`
 - **Agents:** doc-compressor, adr-writer
 - **Optional:** a skill that implements a tracker operation, e.g. `jira-grill-comment`
   for `## Post a comment` on Jira
@@ -61,6 +69,6 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 ```
 .claude-plugin/plugin.json
 skills/      the stages, plus setup-skills
-contracts/   ticket-decisions, prd, workflow-config, tracker, review-stage, branch-guard
+contracts/   ticket-decisions, prd, workflow-config, tracker, review-stage, branch-guard, stage-skills, commit
 agents/      implementer, test-implementer, tdd-planner
 ```

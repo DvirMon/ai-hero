@@ -17,7 +17,9 @@ that file is missing). Never branch on a tracker name: follow the file's section
 
 ## Process
 
-### 0. Branch guard
+### 0. Config, wired skills, branch guard
+
+Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it. Then load `stages.to-issues.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
 
 The issue graph and `state.json` update are committed on the epic's planning branch,
 `docs/<slug>`, in its worktree. On the default branch or an issue branch, stop and point the
@@ -62,9 +64,8 @@ Break the work into **tracer bullet** issues.
 
 Give each issue its **blocking edges** — the other issues that must complete before it can start. An issue with no blockers can start immediately.
 
-**Figma-aware FE slices.** When `designPath` or `figma[]` is non-empty, apply
-`references/figma-slicing.md`: each UI slice gets a **Figma frames** table (node IDs), a
-`designPath` link, and blockers for design-system / icon / KB work routed to the right flow.
+**Slice sections from wired skills.** A wired skill may add a section to slice bodies — e.g.
+`figma:slicing` gives each UI slice a **Figma frames** table and routes design-system blockers.
 
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change — rename a column, retype a shared symbol — whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own issue blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in an issue blocked by every migrate batch. A wide refactor is still sequenced issues off `main` — never a shared integration branch: one issue = one branch = one PR, and every branch starts from `origin/main` after its blockers merged. When a batch can't stay green alone, the batch is too big — split it further, or widen the expand step until each batch can land on its own.
 
@@ -155,7 +156,7 @@ with those in the brief. Join it before the final message.
 
 **What to build:** the end-to-end behaviour this issue makes work, from the user's perspective — not a layer-by-layer implementation list.
 
-**Figma frames:** (omit for non-UI slices.) Per `references/figma-slicing.md`.
+<sections wired skills add, if any>
 
 **Blocked by:** the numbers/titles of the issues that gate this one, or "None — can start immediately".
 
@@ -182,9 +183,7 @@ A reference to the intake item (`ticketRef`). Omit when the tracker links the pa
 
 The end-to-end behaviour this issue makes work, from the user's perspective — not layer-by-layer implementation.
 
-## Figma frames
-
-(Omit for non-UI slices.) Per `references/figma-slicing.md` — table of frames this slice renders, node IDs, link to `designPath`.
+<sections wired skills add, if any>
 
 ## Acceptance criteria
 

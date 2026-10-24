@@ -13,15 +13,21 @@ then typecheck and close out. You write no feature code yourself.
 ## 1. Gather
 
 1. Resolve the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it.
-2. Find `state.json` (`<domain-path>/docs/work/<slug>/`) and validate it per
+2. **Load the wired skills.** Invoke each skill in `stages.implementation.skills` with the Skill
+   tool, now, before any other work — reading its file is not loading it. Contract:
+   `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
+3. Find `state.json` (`<domain-path>/docs/work/<slug>/`) and validate it per
    `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`. The issue's Pipeline block
    says `workspace: null` → there is none; don't create one.
-3. **Tasks root** per `/to-tasks` § 5. Read every `step-*.plan.md` in order, and note which have a
-   sibling `step-N-<slug>.test-plan.md` — those run test-first.
-4. Read `progress.md`: skip `✅ done` steps. Its graph (Mermaid `graph LR`) is the schedule.
-5. **No plan** → apply `${CLAUDE_PLUGIN_ROOT}/skills/to-issues/references/pipeline-block.md`
-   § The implementation gate. Never fall through to implementing.
-6. Run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`. An issue with no branch yet (a
+4. **Find the plan.** The tasks root is `<workspaceRoot>/tasks/issue-<N>/`, or with no workspace
+   `$(git rev-parse --git-dir)/pipeline/issue-<N>/` — inside `.git`, so a file search of the
+   tree never finds it; list that directory. Read every `step-*.plan.md` in order, and note which
+   have a sibling `step-N-<slug>.test-plan.md` — those run test-first.
+5. Read `progress.md` there: skip `✅ done` steps. Its graph (Mermaid `graph LR`) is the schedule.
+6. **No plan** (the directory is missing or has no step files) → apply
+   `${CLAUDE_PLUGIN_ROOT}/skills/to-issues/references/pipeline-block.md` § The implementation
+   gate. Never fall through to implementing.
+7. Run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`. An issue with no branch yet (a
    `ready-for-agent` issue with no plan) → run `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks/references/start-branch.md`
    with `<type>/<N>-<slice-slug>` first.
 
@@ -34,12 +40,20 @@ the step's `type`:
 
 | `type` | Executor | Skills passed |
 |---|---|---|
-| `code`, `story`, `docs`, `chore` | `sdlc:implementer` | `skills.<type>` (+ `skills.ui` on a Figma step) |
+| `code`, `story`, `docs`, `chore` | `sdlc:implementer` | `skills.<type>` |
 | `test` | `sdlc:test-implementer` | `testSkills` = `skills.test`, `codeSkills` = `skills.code` |
-| `verify-ui` | inline | `references/figma-ui.md` § `verify-ui` steps |
+
+**`executors.<type>` set** on the step's project → dispatch that agent instead (e.g.
+`story:implementer` for `story`). Pass `stepFilePath` as its spec plus the same `typecheck` /
+`test` / `specPath` inputs; skip `skills` — the named agent resolves its own conventions.
 
 Pass `stepFilePath`, the project's `typecheck` / `test`, and `specPath` / `architecturePath` /
-`designPath` when set. Figma steps also get the brief from `references/figma-ui.md`.
+`designPath` when set.
+
+**Wired skills extend routing.** A step type or frontmatter key not in this table belongs to the
+wired skill that defines it — e.g. `figma:implementation` adds the project's `skills.ui` and a
+node-ID brief to `figma:` steps, and runs `verify-ui` steps inline. No wired skill claims it →
+plan defect: stop and name the step.
 
 - Files that match no project, or span two → plan defect: stop and name the files.
 - A step with no `type` → infer from its files (`*.stories.*` → `story`, `*.spec.*` → `test`,
@@ -74,14 +88,17 @@ Per step:
 
 1. Mark `▶ in progress`.
 2. Dispatch — one agent call per step (a test-first step's three phases are the exception).
+   Background agents notify you when they finish; wait for that, never schedule a wakeup.
 3. Check the agent's claims against the files it says it touched. `done` is a claim, not proof.
 4. Mark `✅ done`, or `🧪 awaiting CI` when `## Done when` is a behavioural claim only the suite
    proves (it counts as done for scheduling). Or stop and surface the blocker.
-5. **Commit** once the `progress.md` flip is on disk.
+5. **Commit this step now**, once the `progress.md` flip is on disk — before marking or
+   committing any other step. Parallel steps finish one at a time; each gets its own commit.
 
 **One step = one commit**, no approval prompt — the human gate is `/ship`.
 
-- Stage the step's `files` plus `progress.md`, by path. Never `git add -A`. A changed file not in
+- Stage the step's `files` plus `progress.md`, by path — `progress.md` only when the tasks root
+  is in the tree; a `.git`-side tasks root is never staged. Never `git add -A`. A changed file not in
   `files` is a plan defect: include it and report it.
 - Commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type = the step's `commit` frontmatter
   (missing → inferred from `type`, reported), subject = the step title, issue `#<N>`, stage
@@ -95,8 +112,8 @@ After the last step:
 
 1. **In the background:** each affected project's `typecheck` (spec configs too where specs
    changed). CI runs lint and the full suite on the PR — don't duplicate them.
-2. **Meanwhile:** run `source-docs` over the non-spec `.ts` files the steps touched; its edits
-   land as their own `docs` commit (per `commit.md`, issue `#<N>`).
+2. **Meanwhile:** run the verify hooks of wired skills — e.g. `source-docs` over the source the
+   steps touched. Their edits land as their own `docs` commit (per `commit.md`, issue `#<N>`).
 3. **Join.** A red typecheck is fixed first, as a new `fix` or `ref` commit (per `commit.md`) —
    never folded into a step's commit.
 
@@ -114,7 +131,7 @@ Say plainly that tests haven't run locally: the work is green in CI or not green
 
 ## 6. Hand off
 
-Report per step: executor, skills, files, `Done when` results, commit (`<sha> <subject>`), and
+Report the wired skills loaded, then per step: executor, skills, files, `Done when` results, commit (`<sha> <subject>`), and
 anything inferred. Also any edge the overlap check added, and `git log --oneline origin/<default>..HEAD`.
 
 Last line, nothing after it — `/review`, or `/ship` when `stages.review.skill` is `none`:

@@ -8,9 +8,13 @@ disable-model-invocation: true
 
 Sharpen a rough ask into something precise enough to spec, by interviewing — one question at a time, not a form to fill in bulk. Every answer either resolves a question or opens a sharper one; keep pulling the thread until nothing looks fuzzy.
 
+## Config and wired skills
+
+Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it. Then load `stages.grill.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
+
 ## Branch guard
 
-Run this before anything else. Planning docs are committed on the epic's planning branch,
+Run this right after. Planning docs are committed on the epic's planning branch,
 never on the default branch.
 
 - On `docs/<slug>` (the `slug` in `state.json`), in its worktree → proceed.
@@ -46,13 +50,8 @@ If no `state.json` exists, grill without a workspace — never create one; only 
    so explicitly. Steps 4–6 run per aspect as it locks; the grill as a whole finishes when every
    aspect is locked.
 
-   **FE design check (Figma)** — when the ticket has a UI surface and `state.json` → `figma[]`
-   is non-empty (or the user supplied an equivalent frame table), include the **FE design check**
-   aspect and run it per `references/design-check-aspect.md`: parallel **`figma-frame-discovery`**
-   per frame, merge `design.draft/` fragments, then unmapped-node audit §3 and one question at a
-   time until the aspect checklist is empty. Prefer grilling this aspect **before** locking
-   backend/behavior contracts when frames can reopen them. Final `design.md` is **`/to-spec`**, not
-   grill — grill only locks decisions and leaves fragments under `{workspaceRoot}/design.draft/`.
+   **Aspects from wired skills** — a wired skill may add an aspect (e.g. `figma:design-check`
+   adds the FE design check when the ticket has frames). Run it like any other aspect.
 
 1. Read the starting material fully before asking anything — don't make the user repeat what they've already told you.
 2. Ask one question at a time. Prefer questions that expose an edge case, a scenario the starting material didn't cover, or a decision that was left implicit. Keep going until you can't find another fuzzy edge — don't stop early just because the obvious questions are exhausted.

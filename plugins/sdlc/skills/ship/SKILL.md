@@ -21,6 +21,9 @@ before that has happened is asserting a result it has no evidence for.
 
 ## 1. Preconditions
 
+Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it, then load
+`stages.ship.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
+
 Check in order, before touching git. Any failure stops here — say which one and why.
 
 1. **On a feature branch.** Run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`. A planning
@@ -132,7 +135,7 @@ gh pr create --base main --head <branch> --title "<title>" --body-file <tmpfile>
 ## Evidence
 - Spec: <specPath>                               (no workspace: omit)
 - Design: <designPath>                           (omit when null)
-- Figma frames: node IDs from the issue **Figma frames** table (when present)
+- <evidence lines wired skills add>
 - Steps: <workspaceRoot>/tasks/issue-<N>/        (no workspace: "issue body")
 
 Closes #<N>

@@ -14,7 +14,8 @@ pipeline.
 ## 1. Resolve
 
 1. Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading
-   it. `stages.review.skill: "none"` never reaches here — the stage is skipped.
+   it. `stages.review.skill: "none"` never reaches here — the stage is skipped. Load
+   `stages.review.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
 2. **Reviewer** = `stages.review.reviewer`, default `code-review:review`. Not installed →
    stop, name the key and the skill (a construction error, per the contract).
 3. **Branch** — run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`.

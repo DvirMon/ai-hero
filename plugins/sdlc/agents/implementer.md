@@ -39,9 +39,8 @@ weren't given.
 4. Read every existing file the step names before editing it. Match the surrounding idiom.
 5. Change only what `files` and `## Do` cover. `## Out of scope` is out. Write every file before
    typechecking — a mid-edit typecheck reports your own unfinished state.
-6. Typecheck once, after all edits: `typecheck` when given, else the project's own tsconfig
-   (`typecheck-with-project-config`). Errors → fix, re-run once to confirm. Skip for steps that
-   touch no typed source.
+6. Typecheck once, after all edits: `typecheck` when given, else what the loaded skills
+   prescribe. Neither → skip and say so. Errors → fix, re-run once to confirm.
 7. Never commit, never start a server or Storybook, never run the full suite. The dispatcher
    commits and CI runs the suite.
 

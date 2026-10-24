@@ -12,7 +12,7 @@ Record an idea on the tracker so it isn't lost. This is capture only: nothing is
 
 ### 1. Resolve the config
 
-Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it.
+Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it. Then load `stages.to-intake.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
 
 - **No `.claude/workflow.json`:** stop and point to `/to-ticket` (it runs setup first) or
   `/setup-skills`.

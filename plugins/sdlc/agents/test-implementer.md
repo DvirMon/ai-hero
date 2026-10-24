@@ -51,14 +51,10 @@ Steps 1, 3, 6 and 8 below apply in both phases.
    that only assert markup, CSS classes, content projection, or a prop passed straight through
    with no logic attached.
 5. One test per meaningful branch. Don't write a case that cannot fail.
-6. Typecheck through the **spec** project config — `typecheck` when given, else
-   `npx tsc -p <project>/tsconfig.spec.json --noEmit`. `tsconfig.lib.json` does
-   not include specs — it will not check what you just wrote. See
-   `typecheck-with-project-config.md`.
-   Scope note: a spec's import graph usually reaches most of the lib, so "check only my files"
-   isn't achievable — don't spend turns trying to narrow it. If the run is slow enough to
-   matter, report it as a follow-up (add `incremental` + `tsBuildInfoFile` to the spec
-   tsconfig); do not edit the tsconfig mid-step.
+6. Typecheck the specs — `typecheck` when given, else what the loaded skills prescribe; neither
+   → skip and say so. TypeScript: the **spec** config (`tsconfig.spec.json`) — `tsconfig.lib.json`
+   does not include specs. Don't try to narrow the run to your files, and don't edit the config
+   mid-step; report a slow run as a follow-up.
 7. Run **only the spec files this step produced** — `test` with `{files}` when given, else the
    project's runner on those paths (e.g. `vitest run <path>`). Not the full suite — the dispatcher runs that once at the end.
 8. Do **not** commit. `/implementation` commits after your step is verified.

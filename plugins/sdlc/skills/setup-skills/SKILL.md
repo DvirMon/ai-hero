@@ -38,7 +38,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - Hook mechanism — `.husky/` (and `"prepare": "husky"`), `.githooks/` (and `core.hooksPath`), or none. Also `commitlint.config.*`, `tools/validate-branch-name.*`, `.github/workflows/*`, `.github/pull_request_template.md`, `.gitignore` entry for `.claude/worktrees/`.
 - Remote enforcement (read-only): `gh api repos/<o>/<r> --jq '{allow_merge_commit,allow_squash_merge,allow_rebase_merge,allow_auto_merge,delete_branch_on_merge,default_branch}'` and `gh api repos/<o>/<r>/rulesets`; `gh secret list` for `ANTHROPIC_API_KEY` / `PIPELINE_TOKEN`.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, `nx.json` / `project.json` files, or a populated `apps/*` / `packages/*` / `libs/*` with its own `src/`. Their absence means one project and single-context, which is most repos.
-- Per project — its framework (dependencies: `@angular/core`, `react`, `express`/`fastify`/`@nestjs/core`, …), whether it has Storybook, its typecheck/test targets (`project.json`, `package.json` scripts), and which installed skills fit it (`*-developer`, `unit-test`, `story-create`, Figma skills).
+- Per project — its framework (dependencies: `@angular/core`, `react`, `express`/`fastify`/`@nestjs/core`, …), whether it has Storybook, its typecheck/test targets (`project.json`, `package.json` scripts), and which installed skills fit it (`*-developer`, `unit-test`, Figma skills), and whether the `story` plugin is installed.
 
 ### 2. Present findings and ask
 
@@ -112,10 +112,15 @@ Show the full list — every file diff and every `gh api` command — and apply 
 
 1. **Projects.** Propose one entry per project exploration found — name, `path` glob, and
    `skills` per step type from the installed skills that fit its framework; `typecheck` / `test`
-   when the project has targets for them; `skills.ui` and `devUrl` for a frontend with Figma
-   skills installed. A single-project repo gets one entry with `"path": "**"`. List more specific
+   when the project has targets for them.
+   **Wired stage skills** (`stages.<stage>.skills`, `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`):
+   for a frontend with Figma (the `figma` plugin installed, a Figma MCP server connected, or
+   `.claude/figma-project.json`), propose the six `figma:*` skills on that project's `stages`,
+   plus `skills.ui` (the repo's Figma implementation skills) and `devUrl`. For TypeScript source,
+   propose `source-docs` on `stages.implementation.skills`. Propose any other installed skill the
+   user names for a stage — that is the point of the slot. A single-project repo gets one entry with `"path": "**"`. List more specific
    paths first. Ask once for the whole table, not per key; the user edits rows.
-2. **Per-project docs.** `docs.prdWriter` — `to-ticket` for apps and services; `prd-discovery`
+2. **Per-project docs.** `docs.prdWriter` — `to-ticket` for apps and services; `story:discovery`
    (or the user's PRD skill) for a component library or design system. Write `docs.prd` only when
    it differs from `{domainDir}/docs/prd.md`.
 3. `prUnit` — `sub-issue` (each sub-issue its own branch and PR) · `ticket` (one branch per
@@ -134,7 +139,8 @@ file (`projectKind`) is rewritten: drop `projectKind`, carry the other keys over
   "projects": {
     "table": {
       "path": "**",
-      "skills": { "code": ["angular-developer"], "test": ["unit-test"], "story": ["story-create"] }
+      "skills": { "code": ["angular-developer"], "test": ["unit-test"] },
+      "executors": { "story": "story:implementer" }
     }
   }
 }

@@ -34,7 +34,9 @@ in this skill writes to the default branch.
 
 ### 1. Gather context
 
-Read the target issue in full (body + comments), via the issue tracker convention from `docs/agents/issue-tracker.md`. If the ticket workspace's `state.json` exists, also read `specPath`, `designPath` (when set), and `architecturePath` — the task plan must stay consistent with all of them, not just the issue's own text. UI issues with a **Figma frames** section follow `references/figma-steps.md`.
+Load `stages.to-tasks.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
+
+Read the target issue in full (body + comments), via the issue tracker convention from `docs/agents/issue-tracker.md`. If the ticket workspace's `state.json` exists, also read `specPath`, `designPath` (when set), and `architecturePath` — the task plan must stay consistent with all of them, not just the issue's own text..
 
 If no `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket). If `state.json` already exists, validate it per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`.
 
@@ -53,8 +55,8 @@ An ordered list of concrete steps — which files to create or edit, in what ord
 - Before numbering, apply `decompose-by-dependency-graph` § Execution grain: list the candidate steps, map real edges, rank core/independent/dependent.
 - Order steps so each one leaves the codebase in a working, testable state — the same discipline `/to-issues` applies to slicing, one level down. This numbering is presentation order, not proof of a dependency — two adjacent steps with no real edge are parallel-safe.
 - Call out where tests should land, using the spec's Testing Decisions.
-- When the issue lists Figma frames, bind `figma:` on UI `code` steps and add a terminal
-  `verify-ui` step per `references/figma-steps.md`.
+- Wired skills may add frontmatter keys and step types — e.g. `figma:steps` binds `figma:` node
+  IDs on UI `code` steps and adds a terminal `verify-ui` step.
 
 ### 4. Quiz the user
 
@@ -108,12 +110,11 @@ One `step-N-<slug>.plan.md` per step — one graph node each:
 ````markdown
 ---
 step: 1
-type: code            # code · test · story · docs · chore · verify-ui
+type: code            # code · test · story · docs · chore, plus types wired skills add
 commit: feat          # the commit type /implementation uses
 depends_on: []
 files:
   - libs/table/with-sorting/schema.ts (new)
-figma: []             # node IDs, UI steps only
 ---
 # Step 1 — Sorting schema module
 

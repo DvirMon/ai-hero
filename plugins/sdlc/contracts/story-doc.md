@@ -1,8 +1,10 @@
 # Story doc comment
 
-The JSDoc block above a story host class or a `.stories.ts` export. Storybook renders it as
+The doc block above a story host class or a `.stories.*` export. Storybook renders it as
 the story's description. Written for a consumer learning how to use the feature — not for
 the person who built it.
+
+Owned by the `story` plugin; `/story:docs` enforces it. Synced copies elsewhere are read-only.
 
 ## Shape
 
@@ -35,9 +37,8 @@ call site inside the body, not here.
     /**
      * Table with client-side filtering
      *
-     * Per-column inputs and a quick filter, all driven by `createFilters()`
-     * feeding `withFiltering()`. Type in the customer box and watch the row
-     * count follow.
+     * Per-column inputs and a quick filter, all driven by `withFiltering()`.
+     * Type in the customer box and watch the row count follow.
      *
      * Reset restores the declared defaults; Clear all empties every criterion.
      */

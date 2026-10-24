@@ -20,7 +20,7 @@ It holds the outcome, never the conversation, and never the full design.
 |---|---|
 | Outcomes of the conversation (above) | `1-decisions.md` |
 | High-level architecture — types, contracts, file layout | `3-architecture.md` |
-| UI / visual design | `design.md` — written by `/to-spec` per `${CLAUDE_PLUGIN_ROOT}/skills/to-spec/references/design-reference.md` |
+| UI / visual design | `design.md` — written in `/to-spec` by a wired design skill (e.g. `figma:design-reference`) |
 | Behavior and edge-case rules | `2-spec.md` |
 | Proof — benchmarks, research, comparisons | `research-*.md` / discovery files |
 | Domain terms | `CONTEXT.md` |

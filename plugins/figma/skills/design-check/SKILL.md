@@ -1,3 +1,11 @@
+---
+name: design-check
+description: "sdlc stage extension for /grill-with-docs. Add the FE design check aspect to /grill-with-docs — per-frame discovery, design.draft fragments, unmapped-component audit, one question at a time. Wire it as `stages.grill.skills: [\"figma:design-check\"]` in .claude/workflow.json."
+---
+
+> **Wired into** `/grill-with-docs` § aspects — adds the FE design check aspect, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
+> ticket (`state.json` `figma[]` empty, no frame URLs) → say so and do nothing.
+
 # Design-check aspect (Figma)
 
 Standard **FE design check** aspect for `grill-with-docs`: Figma frames vs the locked product
@@ -9,7 +17,7 @@ ticket has a UI surface and at least one Figma frame to inspect.
 **Produces:** `1-decisions.md` section (frames table, gaps closed, handoff summary); factual
 fragments under `{workspaceRoot}/design.draft/`; numbered **open gaps** consumed by the one-question
 loop. **Does not** write final `design.md` — `/to-spec` promotes the draft after this aspect locks
-(see `figma-aware-pipeline` § to-spec).
+(see `figma:design-reference`).
 
 ## When this aspect exists
 
@@ -24,7 +32,7 @@ Skip the entire aspect when the ticket is headless (no UI) **and** `figma[]` is 
 ## Frame inventory (before MCP)
 
 Read frames from **`state.json` → `figma[]`** (shape per
-`${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`):
+sdlc's `skills/to-ticket/references/state-schema.md`):
 
 ```json
 { "label": "Session row", "fileKey": "g7SaJ3BzmMA4yzStMWV48m", "nodeId": "4275:4279" }
@@ -47,8 +55,8 @@ locked upstream aspects, run design anyway and **reopen** explicitly when a fram
 
 ## Step 1 — Parallel frame discovery
 
-For **each** frame in `figma[]`, dispatch one **`figma-frame-discovery`** agent in parallel
-(`.claude/agents/figma-frame-discovery.md`). Pass:
+For **each** frame in `figma[]`, dispatch one frame-discovery agent in parallel — the repo's own
+(e.g. `.claude/agents/figma-frame-discovery.md`); none → do the discovery inline, frame by frame. Pass:
 
 | Argument | Value |
 |---|---|

@@ -34,10 +34,12 @@ parsed as JSON when it parses, otherwise it is a string.
   "projects": {
     "table": {
       "path": "**",
-      "skills": { "code": ["angular-developer"], "test": ["unit-test"], "story": ["story-create"] },
-      "docs": { "prdWriter": "prd-discovery" }
+      "skills": { "code": ["angular-developer"], "test": ["unit-test"] },
+      "executors": { "story": "story:implementer" },
+      "docs": { "prdWriter": "story:discovery" }
     }
-  }
+  },
+  "stages": { "implementation": { "skills": ["source-docs"] } }
 }
 ```
 
@@ -48,12 +50,16 @@ parsed as JSON when it parses, otherwise it is a string.
   "version": 2,
   "prUnit": "ticket",
   "capabilities": { "commit": { "skill": "org-commit" } },
-  "stages": { "review": { "reviewer": "org-review" } },
+  "stages": {
+    "review": { "reviewer": "org-review" },
+    "implementation": { "skills": ["source-docs"] }
+  },
   "projects": {
     "ui": {
       "path": "libs/ui/**",
-      "skills": { "code": ["react-developer"], "test": ["unit-test"], "story": ["story-create"] },
-      "docs": { "prd": "{componentDir}/docs/prd.md", "prdWriter": "prd-discovery" }
+      "skills": { "code": ["react-developer"], "test": ["unit-test"] },
+      "executors": { "story": "story:implementer" },
+      "docs": { "prd": "{componentDir}/docs/prd.md", "prdWriter": "story:discovery" }
     },
     "web": {
       "path": "apps/web/**",
@@ -63,7 +69,15 @@ parsed as JSON when it parses, otherwise it is a string.
         "ui": ["figma-design-to-code", "figma-feature-implementation", "css-styling"]
       },
       "typecheck": "nx run web:typecheck",
-      "devUrl": "http://localhost:4200"
+      "devUrl": "http://localhost:4200",
+      "stages": {
+        "to-ticket": { "skills": ["figma:capture"] },
+        "grill": { "skills": ["figma:design-check"] },
+        "to-spec": { "skills": ["figma:design-reference"] },
+        "to-issues": { "skills": ["figma:slicing"] },
+        "to-tasks": { "skills": ["figma:steps"] },
+        "implementation": { "skills": ["figma:implementation"] }
+      }
     },
     "api": {
       "path": "apps/api/**",
@@ -91,10 +105,11 @@ A teammate's `workflow.local.json` changes only what differs:
 | `isolation` | `worktree` · `branch` | `worktree` |
 | `baseBranch` | branch name | the remote's default |
 | `stages.<stage>.skill` | skill name · `none` | the built-in stage skill |
+| `stages.<stage>.skills` | array of skill names | `[]` |
 | `stages.review.reviewer` | skill name | `code-review:review` |
 | `capabilities.commit.skill` | skill name | — (stages commit plain conventional) |
 
-`<stage>`: `to-ticket` · `grill` · `to-spec` · `to-issues` · `to-tasks` · `implementation` · `review` ·
+`<stage>`: `to-intake` · `to-ticket` · `grill` · `to-spec` · `to-issues` · `to-tasks` · `implementation` · `review` ·
 `ship`.
 
 - **`intake.epic`** — what `/to-intake` does with the new item's parent epic: link an existing
@@ -103,6 +118,8 @@ A teammate's `workflow.local.json` changes only what differs:
   `atomic-commit`. Unset: stages commit plain conventional. See [`commit.md`](commit.md).
 - **`prUnit`** — what one PR covers. `sub-issue`: each sub-issue gets its own branch (+ worktree).
   `ticket`: one branch per ticket; Jira sub-tasks are steps on it.
+- **`stages.<stage>.skills`** — skills wired into a stage without replacing it: Figma capture at
+  intake, a docs pass after implementation. Contract: [`stage-skills.md`](stage-skills.md).
 - **`stages.review.reviewer`** — the skill the built-in `/review` stage runs. Swapping it keeps
   the stage's commits, record and routing; `stages.review.skill` replaces the whole stage.
   What a reviewer receives and returns: [`review-stage.md`](review-stage.md).
@@ -113,10 +130,11 @@ A teammate's `workflow.local.json` changes only what differs:
 |---|---|---|
 | `path` | glob, or array of globs, relative to the repo root | required |
 | `skills.<type>` | array of skill names, loaded by the step's executor | `[]` |
-| `skills.ui` | extra skills for steps bound to Figma frames | `[]` |
-| `typecheck` | command | the project's own tsconfig (`typecheck-with-project-config`) |
-| `test` | command, `{files}` = the spec files to run | the project's runner on `{files}` |
-| `devUrl` | URL of the developer's running dev server | — (`verify-ui` falls back to a checklist) |
+| `skills.<other>` | extra skill lists a wired stage skill reads, e.g. `skills.ui` for `figma:implementation` | — |
+| `executors.<type>` | agent name that executes steps of that type | `/implementation` § Route's built-in executor |
+| `typecheck` | command | — (what the project's code skills say; none → skipped and reported) |
+| `test` | command, `{files}` = the spec files to run | — (what the project's test skills say) |
+| `devUrl` | URL of the developer's running dev server, for wired skills that check the UI | — |
 | `docs.prd` | path template | `{domainDir}/docs/prd.md` |
 | `docs.prdWriter` | `to-ticket` · a skill name | `to-ticket` |
 | `stages` | same shape as top-level `stages` | — |
@@ -131,10 +149,16 @@ A teammate's `workflow.local.json` changes only what differs:
   and `stages` overrides.
 - **`skills`** are conventions, not executors: the stage's executor agent loads them before it
   writes anything. `/implementation` § Route has the executor for each type.
+- **`executors.<type>`** — swaps the agent for one step type, e.g.
+  `"story": "story:implementer"` from the `story` plugin. The named agent receives the same
+  inputs as the built-in one and resolves its own conventions (the story implementer reads
+  `.claude/story.json`), so `skills.<type>` is not passed and the stack is never repeated
+  here. Named agent not installed → stop and name it. sdlc depends on no plugin it names here.
 - **`docs.prdWriter`** — `to-ticket` writes the feature PRD at `docs.prd` from the ticket. A
-  skill name means that skill owns the PRD (e.g. `prd-discovery` for library components);
+  skill name means that skill owns the PRD (e.g. `story:discovery` for library components);
   `/to-ticket` only links it when the file exists.
-- **`stages`** merge over the top-level `stages` for that project's tickets.
+- **`stages`** merge over the top-level `stages` for that project's tickets — except
+  `stages.<stage>.skills`, which appends to the top-level list.
 
 The spec is never published to a tracker. `/to-issues` creates children directly under the
 intake item, through `issue-tracker.md`'s create-child operation.

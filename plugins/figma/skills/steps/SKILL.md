@@ -1,3 +1,11 @@
+---
+name: steps
+description: "sdlc stage extension for /to-tasks. Bind Figma node IDs to UI code steps (`figma:` frontmatter) and add a terminal `verify-ui` step. Wire it as `stages.to-tasks.skills: [\"figma:steps\"]` in .claude/workflow.json."
+---
+
+> **Wired into** `/to-tasks` § 3 and § 5 — step frontmatter and a verify-ui step, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
+> ticket (`state.json` `figma[]` empty, no frame URLs) → say so and do nothing.
+
 # Figma-aware task plans
 
 Bind Figma context at plan time so `/implementation` does not re-derive node IDs or token decisions.
@@ -8,7 +16,7 @@ Read on every UI issue plan:
 
 - `state.json` → `designPath` (required when `figma[]` non-empty)
 - `state.json` → `figma[]` (fileKey lookup for MCP)
-- The issue's **`## Figma frames`** table (from `${CLAUDE_PLUGIN_ROOT}/skills/to-issues/references/figma-slicing.md`)
+- The issue's **`## Figma frames`** table (from `figma:slicing`)
 
 ## Code steps — optional `figma` frontmatter
 
@@ -57,7 +65,7 @@ Compare rendered UI on the developer's running app to Figma for this slice's fra
 
 ## Do
 
-Follow `/implementation` `references/figma-ui.md` § Visual verify. Route and states come from the issue
+Follow `figma:implementation` § `verify-ui` steps. Route and states come from the issue
 acceptance criteria and the preceding code steps.
 
 ## Done when

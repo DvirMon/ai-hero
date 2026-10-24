@@ -1,3 +1,11 @@
+---
+name: slicing
+description: "sdlc stage extension for /to-issues. Give each UI slice a Figma frames table (node IDs) and route design-system blockers to their own flow. Wire it as `stages.to-issues.skills: [\"figma:slicing\"]` in .claude/workflow.json."
+---
+
+> **Wired into** `/to-issues` the slice body, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
+> ticket (`state.json` `figma[]` empty, no frame URLs) → say so and do nothing.
+
 # Figma-aware issue slicing
 
 When `state.json` → `designPath` is set (or `figma[]` is non-empty but spec predates
@@ -33,9 +41,11 @@ grill decisions require:
 
 | Need | Route to |
 |---|---|
-| New or changed `@org/design-system` component | design-system two-MR flow (`designSystem.newComponent` in `.claude/figma-project.json`; `org-versions` + implement skill §4b) |
-| Missing icon in `@org/icons` | `org-icons` — block the FE slice until the icon ships or a approved fallback is in `design.md` |
-| KB tooltip copy from a frame | `kb-article-match` when the frame shows KB / Learn more |
+| New or changed design-system component | the flow `designSystem.newComponent` names in `.claude/figma-project.json` |
+| Missing icon | the repo's icon flow from `figma-project.json` — block the FE slice until the icon ships or an approved fallback is in `design.md` |
+| Copy owned by another system (help/KB text) | the skill `figma-project.json` names for it, if any |
+
+No route configured for a need → list it as an open blocker in the report, don't invent a flow.
 
 Name the blocker in **Blocked by** with the issue key, not prose alone.
 

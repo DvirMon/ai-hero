@@ -1,12 +1,15 @@
 ---
 name: to-spec
-description: Turn the current conversation (and, when one exists, a ticket workspace's decisions) into a spec checklist — plus an architecture doc when the work is complex and a design doc when Figma frames exist. The spec stays local; it is never published to a tracker. No interview, just synthesis of what's already been decided.
+description: Turn the current conversation (and, when one exists, a ticket workspace's decisions) into a spec checklist — plus an architecture doc when the work is complex, and any document a wired skill adds (e.g. a design reference). The spec stays local; it is never published to a tracker. No interview, just synthesis of what's already been decided.
 disable-model-invocation: true
 ---
 
 This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`, format `${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md` — a settled entry is never re-asked) and the ticket it was grilled from — and produces a spec: a checklist for the agent, derived from the decisions. User stories live in the PRD (`prdPath`, `${CLAUDE_PLUGIN_ROOT}/contracts/prd.md`), never in the spec. Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
 
-**Branch guard, first.** The spec is committed on the epic's planning branch, `docs/<slug>`
+**Config and wired skills, first.** Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md`
+§ Reading it. Then load `stages.to-spec.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
+
+**Branch guard, next.** The spec is committed on the epic's planning branch, `docs/<slug>`
 (the `slug` in `state.json`), in its worktree. On the default branch or an issue branch, stop
 and point the user to `/to-ticket`, which starts it via `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks/references/start-branch.md`.
 
@@ -46,17 +49,15 @@ Check with the user that these seams match their expectations.
 
 3. Write the spec using the checklist template below. If the ticket workspace's `state.json` exists, also write it to `<workspaceRoot>/2-spec.md` (using `state.json`'s `workspaceRoot`) and update `state.json`'s `specPath` and `updatedAt`.
 
-   **Design reference (`design.md`).** When `figma[]` is non-empty, or `{workspaceRoot}/design.draft/`
-   has fragments, or `decisionsPath` records a locked FE design-check aspect, also write
-   `<workspaceRoot>/design.md` per `references/design-reference.md` (merge drafts + grill
-   decisions into the locked component/token/copy maps). Set `designPath` to that path and add a
-   **Design reference** section in `2-spec.md` that links to `design.md` only — do not duplicate
-   the tables. When there is no Figma surface, leave `designPath` null and omit the section.
+   **Documents from wired skills.** A wired skill may write a document beside the spec and set the
+   `state.json` field it owns — `figma:design-reference` writes `design.md` and sets `designPath`.
+   When `designPath` is set, `2-spec.md` gets a **Design reference** section that links to it
+   only.
 
    A decision settled while writing the spec is appended to `decisionsPath` as an entry per
    `${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`, phase `spec`.
 
-   **These writes — step 3's `design.md`, step 4's `3-architecture.md`, any decisions entry and
+   **These writes — any wired skill's document, step 4's `3-architecture.md`, any decisions entry and
    any capability-log row — go to one `haiku` writer**, per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/file-writes.md`. Compose every
    file's full text here and hand it over verbatim, so the write is mechanical. Join the
    writer before step 5's commit.
@@ -130,8 +131,7 @@ Any further notes about the feature.
 
 ## Design reference
 
-(Omit when `designPath` is null.) Link only — e.g. `See [design.md](./design.md) for Figma
-frames, component map, tokens, typography, and copy → i18n keys. Do not restate those tables here.
+(Omit when `designPath` is null.) Link only — e.g. `See [design.md](./design.md)`. Do not restate its tables here.
 
 </spec-template>
 

@@ -1,3 +1,11 @@
+---
+name: design-reference
+description: "sdlc stage extension for /to-spec. Write the locked design reference (design.md) from frames, grill fragments and decisions, and set state.json designPath. Wire it as `stages.to-spec.skills: [\"figma:design-reference\"]` in .claude/workflow.json."
+---
+
+> **Wired into** `/to-spec` § 3, alongside the spec, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
+> ticket (`state.json` `figma[]` empty, no frame URLs) → say so and do nothing.
+
 # `design.md` — design reference artifact
 
 Locked CSS/UI context for the epic. **`/to-spec` writes it**; `/to-issues`, `/to-tasks`, and

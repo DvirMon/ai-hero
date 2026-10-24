@@ -1,3 +1,11 @@
+---
+name: capture
+description: "sdlc stage extension for /to-ticket. Capture a ticket's Figma frames and screenshots into the workspace and set `state.json` figma[] — no design analysis. Wire it as `stages.to-ticket.skills: [\"figma:capture\"]` in .claude/workflow.json."
+---
+
+> **Wired into** `/to-ticket` § 4, before the writer finishes `state.json`, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
+> ticket (`state.json` `figma[]` empty, no frame URLs) → say so and do nothing.
+
 # Figma capture at intake
 
 `/to-ticket` records frames and screenshots **without analysis**. Grill and `/to-spec` consume

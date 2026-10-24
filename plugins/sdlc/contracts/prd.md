@@ -8,7 +8,7 @@ One contract, two variants. Both share the core, so `/to-spec` reads either one 
 
 | Variant | Written by | Read by |
 |---|---|---|
-| capability (library / DS) | `prd-discovery` | `story-plan`, `/to-spec` |
+| capability (library / DS) | `story:discovery` | `story:plan`, `/to-spec` |
 | feature (app) | `/to-ticket` | `grill-with-docs`, `/to-spec` |
 
 ## Shared core
@@ -21,7 +21,7 @@ One contract, two variants. Both share the core, so `/to-spec` reads either one 
 
 ## Capability variant
 
-`story-plan` re-derives every coverage mark against real story code. The frozen rows are its
+`story:plan` re-derives every coverage mark against real story code. The frozen rows are its
 interface — a trim that touches them breaks the tool. Here the user stories are the `# 1..k`
 sections themselves, not nested under a `## User stories` heading.
 

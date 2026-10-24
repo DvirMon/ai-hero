@@ -23,6 +23,9 @@ then continue here — the first ticket must not fail on missing config. Every t
 below goes through the repo's `docs/agents/ticket-tracker.md` (contract
 `${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`); this skill never branches on a tracker name.
 
+Load the repo-level `stages.to-ticket.skills` now, per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`; the
+ticket's project list follows once step 4 has resolved `<domain-path>`.
+
 ### 1. Gather context
 
 **Ref path:** skip to step 3 — the ticket already says what's wanted. Still settle the
@@ -170,14 +173,12 @@ filled in; `sonnet` if the writer must fit the PRD into an existing file. Join i
   `[<ticketRef> · MM-DD]` (today's pull date). `/to-spec` re-fetches and flags changes
   against these. On the idea path, ACs drafted in step 2 that live only in the PRD (the
   ticket holds the summary) have no remote source and take no tag.
-- **`docs.prdWriter: <skill>`** — that skill owns the PRD (e.g. `prd-discovery`); don't write
+- **`docs.prdWriter: <skill>`** — that skill owns the PRD (e.g. `story:discovery`); don't write
   it. Set `prdPath` to the resolved path when that file exists, else `null`. The remote ACs
   stay on the ticket and are not copied — `/to-spec` reads them from the tracker.
 
-**Figma capture (UI tickets).** When the ticket or user supplies Figma frame URLs, run
-`references/figma-capture.md` **before** the writer finishes `state.json`: parse each frame,
-call `get_screenshot` per frame into `<workspace-root>/figma/`, and set `figma[]` on the JSON
-below. No design analysis at intake — capture only. Backend-only tickets: `figma: []`.
+**Wired skills** that hook § 4 run here, before the writer finishes `state.json` — e.g.
+`figma:capture` saves frame screenshots under `<workspace-root>/figma/` and fills `figma[]`.
 
 Write `<workspace-root>/state.json` (substituting whichever root was decided above), per
 `references/state-schema.md`:
@@ -221,14 +222,14 @@ moves forward on every later write, per `references/state-schema.md`'s validatio
 
 Once the writer has joined, commit on the branch from step 4 — one commit, staged by path
 (`git add <workspace-root>/state.json`, plus `prd.md` when written, plus
-`<workspace-root>/figma/` when capture ran, plus the ticket file if the tracker keeps local
+any workspace files wired skills wrote, plus the ticket file if the tracker keeps local
 files; never `-A`). Commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`,
 subject `open <slug> workspace`, issue = `ticketRef`. Do not push — `/ship` pushes the branch.
 
 ### 6. Hand off
 
-Tell the user the ticket reference/URL, the workspace path, the PRD path (if written), and the
-branch (+ worktree path, when `isolation` is `worktree`). Then end your final message with a one-line pointer, as the very last line — nothing after it:
+Tell the user the ticket reference/URL, the workspace path, the PRD path (if written), the wired
+skills that ran, and the branch (+ worktree path, when `isolation` is `worktree`). Then end your final message with a one-line pointer, as the very last line — nothing after it:
 
 ```
 Next: /grill-with-docs <ticket-id-or-slug>
