@@ -23,7 +23,7 @@ plugin's own steps read are vendored, and plugin-internal agents stay fixed.
 
 - sdlc calls `code-review:review` explicitly and declares `code-review` in its `plugin.json` dependencies.
 - code-review needs `code-review--vX` release tags so semver ranges resolve.
-- The review stage contract is sdlc-owned: input is a fixed point or file set plus spec sources; output is P0-P3 findings in one format, written to `state.json`.
+- The review stage contract is sdlc-owned: input is a fixed point or file set plus spec sources; output is P0-P3 findings in one format. Revised by D9 in `docs/decisions/plugin-boundaries.md`: a `/review` stage skill runs the reviewer from `stages.review.reviewer` and records `review.md`, not `state.json`.
 - A sync script and CI drift job must exist before any shared file lands.
 - Legacy `claude-code/skills/code-review/` is deleted; it is what bare `/code-review` in impel/ship resolves to today, so both must name `code-review:review`.
 - sdlc's loose-skill prerequisites violate the no-loose-skill rule; follow-up required.

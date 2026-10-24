@@ -25,11 +25,12 @@ D1–D7 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.md).
 | D1 | `code-review` stays a standalone plugin; consumers depend on it, never on its files | 10-24 | accepted | G1 |
 | D2 | Small shared files have one source, synced into each plugin, CI fails on drift | 10-24 | accepted | G1 |
 | D3 | Loose `~/.claude` skills are never a plugin dependency | 10-24 | accepted | G1 |
-| D4 | Review is its own sdlc stage, swappable via `stages.review.skill` | 10-24 | accepted | G1 |
+| D4 | Review is its own sdlc stage, swappable via `stages.review.skill` | 10-24 | revised by D9 | G1 |
 | D5 | Delete legacy loose `code-review` skill; callers name `code-review:review` explicitly | 10-24 | accepted | G1 |
 | D6 | A shared file's source lives in the plugin that owns its contract; `scripts/shared-files.json` maps copies | 10-24 | accepted | G1 |
 | D7 | Hard-coded refs split three ways: swappable ops → slots; reference files → vendored; stack conventions → `stacks.<stack>.skill` | 10-24 | accepted | G1 |
 | D8 | Each plugin owns its own config file; no shared config that every plugin reads | 10-24 | accepted | G1 |
+| D9 | sdlc has a real `/review` stage skill; the reviewer is a separate `stages.review.reviewer` slot | 10-24 | accepted | G1 |
 
 ### D1 — code-review standalone, consumed by namespaced entry points
 
@@ -159,6 +160,23 @@ tracker → `docs/agents/*-tracker.md`). Per-user values go in the plugin's `use
 - **Cost:** no single file shows the whole setup. If needed, add a read-only command that
   prints every plugin's config, not a shared file.
 - **Source:** <https://code.claude.com/docs/en/plugins-reference> (`userConfig`).
+
+### D9 — the review stage skill and the reviewer slot
+
+Revises D4. sdlc ships a `/review` stage skill (`plugins/sdlc/skills/review/`). It resolves
+the reviewer from `stages.review.reviewer` (default `code-review:review`), runs it, commits its
+fixes as `[#N review]` commits, writes `review.md` beside `progress.md`, and names the next
+stage. The reviewer only meets `plugins/sdlc/contracts/review-stage.md`.
+
+- **Why:** if the reviewer *were* the stage, it would have to read and write `state.json` and
+  decide what runs next — code-review would depend on sdlc's internals (D1). D4's "no wrapper"
+  holds for the reviewer itself: it needs no sdlc adapter.
+- **Record:** `review.md`, not `state.json` — the review belongs to one unit's branch, like
+  `progress.md`, and must exist without a workspace; the schema admits no field without a
+  consumer.
+- **Rejected:** the reviewer fills `stages.review.skill` directly and writes `state.json`
+  itself (couples every reviewer to sdlc's state format).
+- **Scope:** routing names the next stage only. Sending work back automatically is handoff 03.
 
 ## Still open
 
