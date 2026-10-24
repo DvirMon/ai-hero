@@ -20,8 +20,8 @@ pipeline.
    stop, name the key and the skill (a construction error, per the contract).
 3. **Branch** — run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`.
 4. **Tasks root** — as `/implementation` resolves it (`<workspaceRoot>/tasks/issue-<N>/`, or
-   `$(git rev-parse --git-dir)/pipeline/issue-<N>/` with no workspace). A planning or no-issue
-   branch has none: use `$(git rev-parse --git-dir)/pipeline/<branch, / → ->/`.
+   `.pipeline/issue-<N>/` with no workspace). A planning or no-issue branch has none: use
+   `.pipeline/<branch, / → ->/`.
 5. **Clean tree.** `git status --porcelain` empty — the reviewer's edits must be the only
    changes the stage commits. Leftovers → stop; they belong to `/implementation`.
 
@@ -41,7 +41,7 @@ Anything the reviewer changed is a review fix. Commit it as one or more atomic c
 folded into a step's commit, never `--amend`:
 
 commit each per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md` with type `fix`, `ref` or `docs`,
-issue `#<N>` (none on a branch with no issue) and stage `review`. Stage by path, never
+issue = its ref per `commit.md` (none on a branch with no issue) and stage `review`. Stage by path, never
 `git add -A`.
 
 A decision made while fixing goes to the decisions file, phase `review`
@@ -66,8 +66,8 @@ Write `<tasks root>/review.md` (replace any earlier one — only the latest revi
 ```
 
 It sits beside `progress.md`. When the tasks root is in the repo, commit it alone per
-`commit.md`: type `docs`, subject `record review`, stage `review`; under `.git/pipeline/` it
-is local only.
+`commit.md`: type `docs`, subject `record review`, stage `review`; under the gitignored
+`.pipeline/` it is local only.
 `state.json` does not record reviews: the record belongs to one unit's branch, like
 `progress.md`, and must exist without a workspace too.
 

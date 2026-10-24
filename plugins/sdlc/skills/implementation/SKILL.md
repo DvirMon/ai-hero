@@ -20,8 +20,8 @@ then typecheck and close out. You write no feature code yourself.
    `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`. The issue's Pipeline block
    says `workspace: null` → there is none; don't create one.
 4. **Find the plan.** The tasks root is `<workspaceRoot>/tasks/issue-<N>/`, or with no workspace
-   `$(git rev-parse --git-dir)/pipeline/issue-<N>/` — inside `.git`, so a file search of the
-   tree never finds it; list that directory. Read every `step-*.plan.md` in order, and note which
+   `.pipeline/issue-<N>/` at the checkout root. `.pipeline/` is gitignored, so a search that
+   honours `.gitignore` skips it — list that directory. Read every `step-*.plan.md` in order, and note which
    have a sibling `step-N-<slug>.test-plan.md` — those run test-first.
 5. Read `progress.md` there: skip `✅ done` steps. Its graph (Mermaid `graph LR`) is the schedule.
 6. **No plan** (the directory is missing or has no step files) → apply
@@ -98,10 +98,10 @@ Per step:
 **One step = one commit**, no approval prompt — the human gate is `/ship`.
 
 - Stage the step's `files` plus `progress.md`, by path — `progress.md` only when the tasks root
-  is in the tree; a `.git`-side tasks root is never staged. Never `git add -A`. A changed file not in
+  is tracked; the gitignored `.pipeline/` is never staged. Never `git add -A`. A changed file not in
   `files` is a plan defect: include it and report it.
 - Commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type = the step's `commit` frontmatter
-  (missing → inferred from `type`, reported), subject = the step title, issue `#<N>`, stage
+  (missing → inferred from `type`, reported), subject = the step title, issue = its ref (`commit.md`), stage
   `s<step>`, plus the epic and ticket title when known. A commit-skill blocker is a step blocker.
 - No plan (the issue body is the step): one commit, staged by path, type from the change, no
   stage.
@@ -113,7 +113,7 @@ After the last step:
 1. **In the background:** each affected project's `typecheck` (spec configs too where specs
    changed). CI runs lint and the full suite on the PR — don't duplicate them.
 2. **Meanwhile:** run the verify hooks of wired skills — e.g. `source-docs` over the source the
-   steps touched. Their edits land as their own `docs` commit (per `commit.md`, issue `#<N>`).
+   steps touched. Their edits land as their own `docs` commit (per `commit.md`, same issue ref).
 3. **Join.** A red typecheck is fixed first, as a new `fix` or `ref` commit (per `commit.md`) —
    never folded into a step's commit.
 

@@ -92,9 +92,11 @@ If the ticket workspace's `state.json` does not exist, ask the user whether to c
 | Case | `<tasks-root>` |
 |------|----------------|
 | `state.json` with `workspaceRoot` | `<workspaceRoot>/tasks/issue-<N>/` |
-| Pipeline `workspace: null` (standalone issue, no epic) | `$(git rev-parse --git-dir)/pipeline/issue-<N>/` inside the issue worktree (untracked; deleted with the worktree) |
+| Pipeline `workspace: null` (standalone issue, no epic) | `.pipeline/issue-<N>/` at the root of the issue's checkout — gitignored, never committed |
 
-Each issue branch touches only its own tasks root. Never a repo-root scratch folder.
+Each issue branch touches only its own tasks root. Never inside `.git/` — Claude Code treats it
+as a protected path and blocks the writes. `.pipeline/` not gitignored → stop and point to
+`/setup-skills`, which adds it.
 
 **Dispatch every write in this step — step files, test plans, `progress.md`, the `state.json`
 update — to one `sonnet` writer**, per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/file-writes.md`. It renders step
@@ -185,7 +187,7 @@ story. Skip this when the tasks root is the untracked no-workspace folder (§5).
 `<tasks-root>/` (plus `state.json` when this run created it or recorded its unit), never `-A`:
 
 commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`, subject
-`plan tasks for #<N>`, issue `#<N>`, stage `plan`. Don't push — `/ship` pushes.
+`plan tasks for <ref>`, issue = its ref per `commit.md`, stage `plan`. Don't push — `/ship` pushes.
 
 End your final message with a one-line pointer, as the very last line — nothing after it:
 

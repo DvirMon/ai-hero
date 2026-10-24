@@ -35,7 +35,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
 - Is the `to-ticket` skill installed? (a `to-ticket` skill folder alongside this one, or `to-ticket` in your available skills.) This decides whether Section B runs at all.
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section C runs at all.
-- Hook mechanism — `.husky/` (and `"prepare": "husky"`), `.githooks/` (and `core.hooksPath`), or none. Also `commitlint.config.*`, `tools/validate-branch-name.*`, `.github/workflows/*`, `.github/pull_request_template.md`, `.gitignore` entry for `.claude/worktrees/`.
+- Hook mechanism — `.husky/` (and `"prepare": "husky"`), `.githooks/` (and `core.hooksPath`), or none. Also `commitlint.config.*`, `tools/validate-branch-name.*`, `.github/workflows/*`, `.github/pull_request_template.md`, `.gitignore` entries for `.claude/worktrees/` and `.pipeline/`.
 - Remote enforcement (read-only): `gh api repos/<o>/<r> --jq '{allow_merge_commit,allow_squash_merge,allow_rebase_merge,allow_auto_merge,delete_branch_on_merge,default_branch}'` and `gh api repos/<o>/<r>/rulesets`; `gh secret list` for `ANTHROPIC_API_KEY` / `PIPELINE_TOKEN`.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, `nx.json` / `project.json` files, or a populated `apps/*` / `packages/*` / `libs/*` with its own `src/`. Their absence means one project and single-context, which is most repos.
 - Per project — its framework (dependencies: `@angular/core`, `react`, `express`/`fastify`/`@nestjs/core`, …), whether it has Storybook, its typecheck/test targets (`project.json`, `package.json` scripts), and which installed skills fit it (`*-developer`, `unit-test`, Figma skills), and whether the `story` plugin is installed.
@@ -146,7 +146,8 @@ file (`projectKind`) is rewritten: drop `projectKind`, carry the other keys over
 }
 ```
 
-Also add `.claude/workflow.local.json` to `.gitignore` — it holds one teammate's overrides.
+Also add to `.gitignore`: `.claude/workflow.local.json` (one teammate's overrides) and `.pipeline/`
+(task plans for issues with no workspace — `/to-tasks` § 5).
 
 ### 3. Confirm and edit
 
@@ -155,7 +156,7 @@ Show the user a draft of:
 - The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
 - The contents of `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
 - The contents of `docs/agents/ticket-tracker.md` (only when `to-ticket` is installed)
-- `.claude/workflow.json`, and the `.gitignore` line for `.claude/workflow.local.json`
+- `.claude/workflow.json`, and the `.gitignore` lines for `.claude/workflow.local.json` and `.pipeline/`
 - The Section E change list (only when Section E ran)
 
 Let them edit before writing.
