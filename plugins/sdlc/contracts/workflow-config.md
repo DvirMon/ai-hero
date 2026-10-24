@@ -66,7 +66,7 @@ parsed as JSON when it parses, otherwise it is a string.
       "skills": {
         "code": ["react-developer"],
         "test": ["unit-test"],
-        "ui": ["figma-design-to-code", "figma-feature-implementation", "css-styling"]
+        "ui": ["figma-feature-implementation", "css-styling"]
       },
       "typecheck": "nx run web:typecheck",
       "devUrl": "http://localhost:4200",
