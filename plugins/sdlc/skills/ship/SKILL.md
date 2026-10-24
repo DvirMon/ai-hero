@@ -32,7 +32,7 @@ Check in order, before touching git. Any failure stops here — say which one an
      that issue's branch. Skips checks 3–4; body per step 5d.
    - Anything else → stop; renaming a branch is the developer's call.
 2. **Clean tree.** `git status --porcelain` is empty. Leftover changes → stop and suggest
-   `atomic-commit` to turn them into commits first.
+   committing them first (`capabilities.commit.skill` when set).
 3. **`state.json` resolves** in the workspace (`<domain-path>/docs/work/<slug>/state.json`, per
    `/to-ticket`'s workspace-root rule). Read `specPath`, `ticketRef`, `units[]`, `workspaceRoot`;
    a version-3 file is read through `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md` § Reading version 3
@@ -113,11 +113,10 @@ gh pr list --head <branch> --state open --json number,url
   `gh pr create`.
 - **None:** draft, review, create (5a / 5b / 5d), then 5c.
 
-**Title** — emoji-conventional, same format as a commit subject, ending in the issue ref
-(no-issue branch: no ref):
-`<emoji> [#N stage] <type>(<project>[/<domain>]): <summary> (#N)` (story tag optional;
-usually omit on a PR title). Format SSOT: `skills/atomic-commit/SKILL.md`, rule at
-`docs/agents/issue-tracker.md#issue-references` — don't restate them here. The repo's `pr-conventions.yml` checks this.
+**Title** — per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md` § PR title: the subject the
+repo's commit renderer produces for the branch's summary, without a stage, ending in ` (#N)`
+(no-issue branch: no ref). Don't restate the format here. The repo's `pr-conventions.yml`
+checks it when the repo has a commitlint config.
 
 **Body drafting** goes to a writer: `Agent`, `subagent_type: "general-purpose"`,
 `model: "sonnet"`. It starts with no context, so hand it everything: the commit log

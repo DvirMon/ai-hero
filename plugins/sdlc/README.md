@@ -43,13 +43,15 @@ The files load in place; `/reload-plugins` picks up edits.
 
 These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 
-- **Skills:** domain-modeling, atomic-commit, unit-test, story-create,
+- **Skills:** domain-modeling, unit-test, story-create,
   angular-developer, react-developer, figma-to-code
 - **Contracts** (`~/.claude/conventions/doc-contracts/`): decisions-log, adr, jsdoc,
   story-doc
 - **Agents:** doc-compressor, adr-writer
 - **Optional:** a skill that implements a tracker operation, e.g. `jira-grill-comment`
   for `## Post a comment` on Jira
+- **Optional:** a commit skill named in `capabilities.commit.skill`, e.g. `atomic-commit`;
+  unset, stages commit plain conventional (`contracts/commit.md`)
 
 ## Layout
 

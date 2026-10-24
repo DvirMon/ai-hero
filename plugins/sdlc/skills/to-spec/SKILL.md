@@ -137,8 +137,9 @@ frames, component map, tokens, typography, and copy → i18n keys. Do not restat
 
 5. **Commit.** Join the writer, then make one commit on `docs/<slug>`, staged by path:
    `2-spec.md`, `design.md` (if written), `3-architecture.md` (if written), `prd.md` (if the gate
-   changed it), `state.json`, any capability-log row. Never `-A`. Message per `atomic-commit` § Commit format: `📚 docs(<scope>): spec <slug>`, trailer
-   `Refs:` the `ticketRef`, per `issue-tracker.md` `## Issue references`. Do not push — `/ship` does, after `/to-issues`.
+   changed it), `state.json`, any capability-log row. Never `-A`. Commit per
+   `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`, subject `spec <slug>`, issue =
+   `ticketRef`. Do not push — `/ship` does, after `/to-issues`.
 
 End your final message with a one-line pointer, as the very last line — nothing after it:
 

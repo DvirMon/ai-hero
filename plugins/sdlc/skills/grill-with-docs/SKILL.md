@@ -105,9 +105,9 @@ With a workspace, steps 3 and 5 always apply — write `1-decisions.md` and upda
 
 7. **Commit.** Join the writer (and any `/domain-modeling` writers), then make one commit for
    this stage's artifacts, staged by path — `1-decisions.md`, `prd.md`, `state.json`, the capability-log
-   row, and any ADR/glossary files `/domain-modeling` wrote. Never `-A`. Message per
-   `atomic-commit` § Commit format: `📚 docs(<scope>): record <slug> decisions`, trailer
-   per `docs/agents/issue-tracker.md` `## Issue references` for the source item (or `Refs: none` if there is none yet). Do not push — `/ship` does,
+   row, and any ADR/glossary files `/domain-modeling` wrote. Never `-A`. Commit per
+   `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`, subject `record <slug> decisions`,
+   issue = the source item (none if there is none yet). Do not push — `/ship` does,
    after `/to-issues`.
 
 8. `/to-spec` has `disable-model-invocation: true` — it cannot be launched programmatically from here, only typed by the user. Reference whatever grounds the synthesis: name the workspace's `decisionsPath` (and `ticketRef`, if set). Then end your final message with a one-line pointer, as the very last line — nothing after it:

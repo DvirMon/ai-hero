@@ -6,7 +6,7 @@ implements the operations in two files of its own, written by `setup-skills`:
 | File | Holds | Read by |
 |---|---|---|
 | `docs/agents/ticket-tracker.md` | the intake item — the ask that starts the pipeline | `/to-intake`, `/to-ticket`, `grill-with-docs`, `/to-spec` |
-| `docs/agents/issue-tracker.md` | the work items under it, and how commits and PRs reference them | `/to-issues`, `/impel`, `/ship`, `atomic-commit`, `code-review` |
+| `docs/agents/issue-tracker.md` | the work items under it, and how commits and PRs reference them | `/to-issues`, `/impel`, `/ship`, the commit renderer ([`commit.md`](commit.md)), `code-review` |
 
 Both files may name the same tool. A stage reads the file, follows the section, and never
 branches on a tracker name.

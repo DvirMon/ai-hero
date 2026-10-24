@@ -69,6 +69,7 @@ A teammate's `workflow.local.json` changes only what differs:
 | `docs.prd` | path template | by `projectKind` (below) |
 | `stages.<stage>.skill` | skill name · `none` | the built-in stage skill |
 | `stages.review.reviewer` | skill name | `code-review:review` |
+| `capabilities.commit.skill` | skill name | — (stages commit plain conventional) |
 
 `<stage>`: `to-ticket` · `grill` · `to-spec` · `to-issues` · `to-tasks` · `impel` · `review` ·
 `ship`.
@@ -79,6 +80,8 @@ A teammate's `workflow.local.json` changes only what differs:
 
 - **`intake.epic`** — what `/to-intake` does with the new item's parent epic: link an existing
   one, create a new one, or none.
+- **`capabilities.commit.skill`** — the skill every stage hands its commits to, e.g.
+  `atomic-commit`. Unset: stages commit plain conventional. See [`commit.md`](commit.md).
 - **`prUnit`** — what one PR covers. `sub-issue`: each sub-issue gets its own branch (+ worktree).
   `ticket`: one branch per ticket; Jira sub-tasks are steps on it.
 

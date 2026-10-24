@@ -254,9 +254,8 @@ from the configured issue tracker on <date>. Related docs: <spec/architecture/de
 ### 8. Commit and ship the planning PR
 
 Join the writer, then make one commit on `docs/<slug>`, staged by path: `issue-graph.md` and
-`state.json`. Never `-A`. Message per `atomic-commit` § Commit format:
-`📚 docs(<scope>): slice <slug> into issues`, trailer `Refs: <ticketRef>` per
-`issue-tracker.md` `## Issue references`.
+`state.json`. Never `-A`. Commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`,
+subject `slice <slug> into issues`, issue = `ticketRef`.
 
 The planning branch now holds the epic's whole planning story — workspace, decisions, spec,
 graph — one commit per stage. `/ship` pushes it and opens the planning PR; GitHub auto-merges

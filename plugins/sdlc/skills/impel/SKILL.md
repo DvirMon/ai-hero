@@ -229,26 +229,16 @@ prompt: this is a feature branch, nothing is final until `/ship`, and the human 
   half-written files must not leak into this commit. A file the step changed that isn't in
   `files` is a plan defect: include it and report it.
   **Issue body as the step** (no plan, §1b): one commit for the issue's changes, staged by path
-  from what you changed; pick the type from the change (atomic-commit's table) — there is no
-  `commit:` frontmatter to read; no step number, so omit the story tag. A `.git`-side tasks
+  from what you changed; pick the type from the change (the `type` list in `commit.md`) — there
+  is no `commit:` frontmatter to read; no step number, so no stage. A `.git`-side tasks
   root is never staged.
-- **Message**, per `~/.claude/skills/atomic-commit/SKILL.md` (emoji, scope, types):
-
-  ```
-  <emoji> [#<N> s<step>] <commit>(<scope>): <step title, imperative, lower-case start>
-
-  Refs: #<N>
-  ```
-
-  In a repo whose `~/.config/org/commit-format.json` matches it, use that
-  format instead (see `atomic-commit` § Commit format).
-
-  `<commit>` is the step's `commit` frontmatter (`ref`, not `refactor`). Missing (legacy file) → infer from `type`
+- **Message** — commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md` with: type = the step's
+  `commit` frontmatter (`ref`, not `refactor`), subject = the step title (imperative,
+  lower-case start), issue `#<N>`, stage `s<step>` (the step number from the plan), plus the
+  epic and ticket title when known. Missing `commit` (legacy file) → infer from `type`
   (`docs`→`docs`, `chore`→`chore`, `test`/`story`→`test`, `code`→`feat` unless the step is
-  plainly a fix or restructure) and say so in the report. No closing keyword anywhere in the
-  message (`Closes`, `Fixes`, `Resolves` before `#N`) — the PR body owns `Closes #N`.
-  `s<step>` is the step number from the plan; the tag's issue must equal `Refs:`. Format rule:
-  `docs/agents/issue-tracker.md#issue-references`.
+  plainly a fix or restructure) and say so in the report. A blocker from the commit skill
+  (`commit.md` § Failures) is a step blocker.
 - **Parallel steps** commit one at a time, in the order they finish. Their `files` don't overlap
   (the check below enforces it), so each commit stays clean.
 - **A test-first step** (red → green → types) is still one step and one commit, made after the

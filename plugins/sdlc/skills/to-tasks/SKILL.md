@@ -168,13 +168,8 @@ After the writer's report, commit the plan on the issue branch — the first com
 story. Skip this when the tasks root is the untracked no-workspace folder (§5). Stage only
 `<tasks-root>/` (plus `state.json` when this run created it or recorded its unit), never `-A`:
 
-```
-📚 [#<N> plan] docs(<scope>): plan tasks for #<N>
-
-Refs: #<N>
-```
-
-`<scope>` and emoji per `~/.claude/skills/atomic-commit/SKILL.md`. Don't push — `/ship` pushes.
+commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`, subject
+`plan tasks for #<N>`, issue `#<N>`, stage `plan`. Don't push — `/ship` pushes.
 
 End your final message with a one-line pointer, as the very last line — nothing after it:
 

@@ -232,9 +232,8 @@ per-step routing lives in the step files `/to-tasks` writes.
 Once the writer has joined, commit on the branch from step 4 — one commit, staged by path
 (`git add <workspace-root>/state.json`, plus `prd.md` when written, plus
 `<workspace-root>/figma/` when capture ran, plus the ticket file if the tracker keeps local
-files; never `-A`). Message per `atomic-commit` § Commit format:
-`📚 docs(<scope>): open <slug> workspace`, trailer referencing `ticketRef` per
-`docs/agents/issue-tracker.md` `## Issue references`. Do not push — `/ship` pushes the branch.
+files; never `-A`). Commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`,
+subject `open <slug> workspace`, issue = `ticketRef`. Do not push — `/ship` pushes the branch.
 
 ### 6. Hand off
 
