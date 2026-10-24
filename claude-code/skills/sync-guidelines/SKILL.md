@@ -1,6 +1,6 @@
 ---
 name: sync-guidelines
-description: Mirror general (non-project-specific) code-generation guidelines — CLAUDE.md, rules, skills, agents, and installed plugin skills — from ~/.claude (and ~/.cursor) into the ai-coding-guidelines GitHub repo. Manual trigger only. Use when the user says "sync guidelines", "/sync-guidelines", or asks to update the guideline mirror repo.
+description: Mirror general (non-project-specific) code-generation guidelines — CLAUDE.md, rules, skills, agents, and installed plugin skills — from ~/.claude (and ~/.cursor) into the ai-hero GitHub repo. Manual trigger only. Use when the user says "sync guidelines", "/sync-guidelines", or asks to update the guideline mirror repo.
 ---
 
 # sync-guidelines
@@ -16,7 +16,7 @@ description: Mirror general (non-project-specific) code-generation guidelines �
 > under `claude-code/project/`, Cursor) and port drift; the PR flow in steps 1–6 applies to those.
 
 Mirrors general, non-project-specific coding guidance from local AI harness configs into
-the clone `~/.claude/skills` links into (GitHub: `DvirMon/ai-coding-guidelines`, private), then commits
+the clone `~/.claude/skills` links into (GitHub: `DvirMon/ai-hero`, private), then commits
 on a `chore/sync-<date>` branch and opens a PR. Never commits or pushes on `master`.
 
 **Scope — general guidance only.** Never sync per-project CLAUDE.md files, project memory,
@@ -34,7 +34,7 @@ session history, or credentials (mcp.json, settings.json with tokens). Only:
   carry project-specific or credential content.
 - `~/.claude/conventions/` (opt-in / project-dependent — NOT auto-loaded like `rules/` is) → `claude-code/conventions/`
 - `~/.claude/plugins/marketplaces/*/{skills,agents,commands,docs}` → `claude-code/plugins/<marketplace>/`,
-  except `ai-coding-guidelines` — that marketplace *is* this repo; its plugins live in `plugins/`.
+  except `ai-hero` — that marketplace *is* this repo; its plugins live in `plugins/`.
   (excludes `.git`, `dist`, `node_modules`, `bin`, `tests`, `benchmarks`, `evals`, `src`,
   `.github`, `.changeset`, `.codex`, `.out-of-scope` — those are the plugin's own source/build
   tree, not guideline docs, and already live upstream)

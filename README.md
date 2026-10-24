@@ -1,4 +1,4 @@
-# ai-coding-guidelines
+# ai-hero
 
 General, non-project-specific code-generation guidelines mirrored from local AI coding
 harnesses. Not tied to any single codebase — file organization conventions, doc conventions,
@@ -51,8 +51,8 @@ Pushing is manual; pulling is automatic at session start. No background job, no 
 
 ```bash
 gh auth login   # the repo is private; skip if already authenticated
-gh repo clone DvirMon/ai-coding-guidelines ~/git/ai-coding-guidelines
-bash ~/git/ai-coding-guidelines/scripts/link.sh
+gh repo clone DvirMon/ai-hero ~/git/ai-hero
+bash ~/git/ai-hero/scripts/link.sh
 ```
 
 Any clone path works: scripts locate the repo from their own location.
@@ -95,8 +95,8 @@ Cursor (`~/.cursor`) are not symlinked. The `sync-guidelines` skill copies them 
 One-time copy instead of symlinks (Windows, or Cursor). No live sync afterwards.
 
 ```bash
-git clone https://github.com/DvirMon/ai-coding-guidelines.git
-cd ai-coding-guidelines
+git clone https://github.com/DvirMon/ai-hero.git
+cd ai-hero
 bash scripts/install.sh                       # interactive: pick claude-code / cursor / all
 bash scripts/install.sh --harness=claude-code # non-interactive
 bash scripts/install.sh --harness=all --yes-plugins  # also imports mirrored plugin skills, no prompts
@@ -119,8 +119,8 @@ and `sync.sh` skips this repo's own marketplace so it is never copied back into
 `claude-code/plugins/`. Install:
 
 ```bash
-claude plugin marketplace add DvirMon/ai-coding-guidelines   # or a local clone's path
-claude plugin install code-review@ai-coding-guidelines
+claude plugin marketplace add DvirMon/ai-hero   # or a local clone's path
+claude plugin install code-review@ai-hero
 ```
 
 Never touches `settings.json`, `mcp.json`, or credentials — not in this repo, not copied by the

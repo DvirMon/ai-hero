@@ -3,10 +3,10 @@ set -euo pipefail
 
 CLAUDE_DIR="$HOME/.claude"
 CURSOR_DIR="$HOME/.cursor"
-REPO_DIR="$HOME/repos/ai-coding-guidelines"
+REPO_DIR="$HOME/repos/ai-hero"
 
 if [ ! -d "$REPO_DIR/.git" ]; then
-  echo "error: $REPO_DIR is not a git repo. Clone it first: gh repo clone DvirMon/ai-coding-guidelines $REPO_DIR" >&2
+  echo "error: $REPO_DIR is not a git repo. Clone it first: gh repo clone DvirMon/ai-hero $REPO_DIR" >&2
   exit 1
 fi
 

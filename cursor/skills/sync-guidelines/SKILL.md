@@ -1,14 +1,14 @@
 ---
 name: sync-guidelines
 portedFrom: independent
-description: Mirror general (non-project-specific) guidelines — rules and skills — from ~/.cursor (and ~/.claude) into the ai-coding-guidelines GitHub repo, and report what your Cursor-side edits still owe the Claude Code side. Manual trigger only. Use when the user says "sync guidelines" or asks to update the guideline mirror repo.
+description: Mirror general (non-project-specific) guidelines — rules and skills — from ~/.cursor (and ~/.claude) into the ai-hero GitHub repo, and report what your Cursor-side edits still owe the Claude Code side. Manual trigger only. Use when the user says "sync guidelines" or asks to update the guideline mirror repo.
 ---
 
 # sync-guidelines (Cursor side)
 
 Two jobs, in this order:
 
-1. **Mirror** both harnesses into `~/repos/ai-coding-guidelines` (GitHub: `DvirMon/ai-coding-guidelines`, private), then commit and push.
+1. **Mirror** both harnesses into `~/repos/ai-hero` (GitHub: `DvirMon/ai-hero`, private), then commit and push.
 2. **Report drift** between `~/.cursor` and `~/.claude`, in both directions — because the mirror copies each harness into the repo but never between them.
 
 The Claude Code side has its own copy of this skill. Either side can run either job; the scripts are identical and the mirror is direction-agnostic.
@@ -35,7 +35,7 @@ Never syncs `~/.cursor/skills-cursor/` — that's Cursor's own built-in skill bu
    ```bash
    bash ~/.cursor/skills/sync-guidelines/sync.sh
    ```
-2. `cd ~/repos/ai-coding-guidelines && git status` — review the diff before committing. If nothing changed, stop (no empty commits).
+2. `cd ~/repos/ai-hero && git status` — review the diff before committing. If nothing changed, stop (no empty commits).
 3. `git add -A`
 4. Commit with a message summarizing what changed (e.g. "sync: update rules/, add new ds-* skills").
 5. **Ask the user before `git push`** — pushing updates a shared/remote repo, confirm each time unless the user has said to always push automatically.

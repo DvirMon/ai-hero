@@ -1,6 +1,6 @@
 # sdlc
 
-The ticket-to-PR pipeline, as a plugin in the `ai-coding-guidelines` marketplace.
+The ticket-to-PR pipeline, as a plugin in the `ai-hero` marketplace.
 
 ```
 /to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /impel → /ship
@@ -17,9 +17,9 @@ In a repo's `.claude/settings.json`:
 ```json
 {
   "extraKnownMarketplaces": {
-    "ai-coding-guidelines": { "source": { "source": "github", "repo": "DvirMon/ai-coding-guidelines" } }
+    "ai-hero": { "source": { "source": "github", "repo": "DvirMon/ai-hero" } }
   },
-  "enabledPlugins": { "sdlc@ai-coding-guidelines": true }
+  "enabledPlugins": { "sdlc@ai-hero": true }
 }
 ```
 
@@ -29,7 +29,7 @@ Then run `/setup-skills` once (or `/to-ticket`, which runs it when the repo has 
 ## Local development
 
 ```bash
-claude --plugin-dir ~/git/ai-coding-guidelines/plugins/sdlc
+claude --plugin-dir ~/git/ai-hero/plugins/sdlc
 ```
 
 The files load in place; `/reload-plugins` picks up edits.

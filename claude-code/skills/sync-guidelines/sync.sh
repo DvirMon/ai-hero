@@ -11,7 +11,7 @@ CURSOR_DIR="$HOME/.cursor"
 REPO_DIR="${GUIDELINES_REPO:-$(cd -P "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
 
 if [ ! -e "$REPO_DIR/.git" ]; then
-  echo "error: $REPO_DIR is not a git repo. Clone it first: gh repo clone DvirMon/ai-coding-guidelines $REPO_DIR" >&2
+  echo "error: $REPO_DIR is not a git repo. Clone it first: gh repo clone DvirMon/ai-hero $REPO_DIR" >&2
   exit 1
 fi
 
@@ -61,7 +61,7 @@ if [ -d "$CLAUDE_DIR/plugins/marketplaces" ]; then
     name="$(basename "$marketplace_dir")"
     # The mirror repo is itself a marketplace (plugins/*); its plugin
     # source lives in the repo already — never mirror it back.
-    [ "$name" = "ai-coding-guidelines" ] && continue
+    [ "$name" = "ai-hero" ] && continue
     dest="$REPO_DIR/claude-code/plugins/$name"
     mkdir -p "$dest"
     for sub in skills agents commands docs; do

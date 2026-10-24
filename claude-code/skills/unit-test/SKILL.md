@@ -71,6 +71,6 @@ too. Nothing layer-specific may contradict it.
 
 Layers without their own skill yet (backend, contract, e2e) are stubs in that same folder —
 create a skill when there's a real need, don't scaffold ahead of it. Tracked in
-`DvirMon/ai-coding-guidelines#1`.
+`DvirMon/ai-hero#1`.
 
 `references/` here holds the unit-testing files only, and is this skill's own — edit in place.
