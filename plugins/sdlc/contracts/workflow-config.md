@@ -44,7 +44,8 @@ parsed as JSON when it parses, otherwise it is a string.
   "projectKind": "app",
   "prUnit": "ticket",
   "stages": {
-    "grill": { "skill": "org-grill" }
+    "grill": { "skill": "org-grill" },
+    "review": { "reviewer": "org-review" }
   }
 }
 ```
@@ -67,8 +68,14 @@ A teammate's `workflow.local.json` changes only what differs:
 | `baseBranch` | branch name | the remote's default |
 | `docs.prd` | path template | by `projectKind` (below) |
 | `stages.<stage>.skill` | skill name · `none` | the built-in stage skill |
+| `stages.review.reviewer` | skill name | `code-review:review` |
 
-`<stage>`: `to-ticket` · `grill` · `to-spec` · `to-issues` · `to-tasks` · `impel` · `ship`.
+`<stage>`: `to-ticket` · `grill` · `to-spec` · `to-issues` · `to-tasks` · `impel` · `review` ·
+`ship`.
+
+- **`stages.review.reviewer`** — the skill the built-in `/review` stage runs. Swapping it keeps
+  the stage's commits, record and routing; `stages.review.skill` replaces the whole stage.
+  What a reviewer receives and returns: [`review-stage.md`](review-stage.md).
 
 - **`intake.epic`** — what `/to-intake` does with the new item's parent epic: link an existing
   one, create a new one, or none.
