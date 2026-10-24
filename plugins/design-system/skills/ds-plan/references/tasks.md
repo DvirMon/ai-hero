@@ -84,7 +84,7 @@ Steps must be:
 
 ## Phase 7 — Code Connect *(only when the Figma project config has `codeConnect.available: true`)*
 
-- [ ] Create `{fileBase}.figma.ts` via the `code-connect-authoring` skill
+- [ ] Create `{fileBase}.figma.ts` (via `capabilities.codeConnect.skill` when set)
 - [ ] Map all Figma variant props to framework props/inputs
 - [ ] Publish via code-connect tooling
 

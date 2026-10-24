@@ -32,6 +32,19 @@ Derive inline `a11ySpec` from the `phase-state.json` keys `a11ySpecText` / `a11y
 5. If no matching component plan folder or no version subfolders exist, stop and ask the user which scaffolded plan/version folder to use
 6. `planDir` = repo-relative path to the selected versioned subfolder
 
+## Review stage
+
+`stages.review.skill` (`ds-config.md` § Slots) picks who reviews:
+
+- **`null`** → the built-in dispatch below.
+- **`"none"`** → mark Phase 6 skipped in `session-handoff.md` and point to `ds-ship`.
+- **A skill name** → invoke it with `report-only` and the same inputs the built-in dispatch
+  builds: the file scope, the spec sources (`{docsDir}prd.md`, the step files in `{planDir}`,
+  `a11ySpec`), the rule files (`references/ds-code-rules.md`, `references/ds-styles-rules.md`,
+  `{conventions}`), the resolved `tokens` config and `a11y.wcag`. Its findings must come back
+  as P0–P3 plus `RULE` / `SPEC` conformance; anything else is a setup error — stop and name
+  the skill. Continue at § After agents return.
+
 ## Launch agents (parallel)
 
 Don't launch all three surfaces (A11y, Code, Styles) by default — reason from `workType` (read alongside the other `phase-state.json` keys above) about which surfaces actually changed:

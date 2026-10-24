@@ -32,7 +32,7 @@ Generate the component's spec covering only its actual logic — computed state,
 
 ## Standards & References
 - `~/.claude/conventions/testing/testing-principles.md` — cross-cutting rules (taxonomy, coverage philosophy, mocking boundaries)
-- `unit-test` skill — `references/unit-testing.md` + `unit-testing.{framework}.md`
+- `stacks.test.skill` (Skill tool), when set; `{conventions}` overrides it where they conflict
 - `{conventions}` § Tests
 - `{planDir}/step-*-tests.plan.md`
 

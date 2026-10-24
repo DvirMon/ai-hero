@@ -27,7 +27,8 @@ Previous phase must be `ds-review`. If not complete → tell the user to run it 
    - `paths.importPath` set → `{importPath}` resolves to the component (tsconfig `paths` /
      package `exports`).
 2. **Code Connect** — if the Figma project config (`figma.project`) has
-   `codeConnect.available: true`, remind the user to run the `code-connect-authoring` skill.
+   `codeConnect.available: true`, remind the user to run `capabilities.codeConnect.skill`
+   (unset → list the Code Connect work from the plan, naming no skill).
 
 ## Final checklist
 

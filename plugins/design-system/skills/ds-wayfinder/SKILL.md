@@ -63,11 +63,12 @@ AskUserQuestion({
 
 ## Wayfinder map
 
-Requires the `wayfinder` skill; if it isn't available, say so and offer Linear instead.
+Requires `capabilities.map.skill` (`ds-config.md` § Slots). Unset → don't offer map mode in the
+workflow choice; a user who asks for it is told to set the slot, and offered Linear.
 
 1. **Setup** as Linear: config, component name, Figma URL, work type (via `ds-discovery`'s setup
    prompts).
-2. **Create map** via `/wayfinder`:
+2. **Create map** via `capabilities.map.skill`:
    - Destination: "DS component `{selector}` (work type: {workType}) specified and planned"
    - Notes: framework, design-system `name`, `sources` lists.
    - Frontier tickets: discovery (Phase 1), optional prototype, design interview (Phase 2,
@@ -87,14 +88,15 @@ Requires the `wayfinder` skill; if it isn't available, say so and offer Linear i
 | 3 | `ds-spec` | PRD + a11y spec + architecture |
 | 4 | `ds-plan` | Versioned implementation plan |
 | 5 | `ds-scaffold` | Component, styles, Storybook, tests |
-| 6 | `ds-review` | A11y, code and styles review via the `code-review` plugin |
+| 6 | `ds-review` | A11y, code and styles review via `code-review:*-reviewer`, or `stages.review.skill`; skipped when `none` |
 | 7 | `ds-ship` | Exports, Code Connect, final checklist |
 
 ## Prerequisites
 
 - `design-system.json` + `{conventions}` (`/ds-setup`)
 - Figma access and a Figma MCP (`figma.tools`), or the REST fallback in discovery
-- The `code-review` plugin (Phase 6)
+- The `code-review` plugin (Phase 6) — a declared dependency, installed with this one
+- Slot skills, when set (`ds-config.md` § Slots) — the config must name only installed skills
 - `commands.storybook` / `commands.test` — run by the user, never by a phase
 
 ## Shared references

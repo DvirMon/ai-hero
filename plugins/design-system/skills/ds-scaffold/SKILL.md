@@ -12,8 +12,7 @@ Missing either → stop and point to `/ds-setup`.
 
 Agents load their own guides; this skill only gathers inputs. The guides they use:
 
-- `css-styling` skill — its "DS Components" section and `references/styles.{framework}.md`
-- `unit-test` skill — `references/unit-testing.md` + `unit-testing.{framework}.md`
+- The stack skills in `stacks.*.skill`, when set (`ds-config.md` § Slots)
 - `references/motion.md`
 - `{conventions}` — component shape, file layout, styling, Storybook, tests
 
@@ -45,8 +44,8 @@ Every agent also receives: `framework`, the resolved `naming` patterns, `{compon
 
 | Agent | subagent_type | model | When | Extra inputs |
 |---|---|---|---|---|
-| Component scaffolder | `design-system:ds-component-scaffolder` | sonnet | Always | componentName, prdPath, a11ySpec, apiSpec, srpClassification, `publicApi`, `{importPath}` |
-| Styles scaffolder | `design-system:ds-styles-scaffolder` | sonnet | Always | componentName, prdPath, figmaTokens, `tokens`, `styles.language` |
+| Component scaffolder | `design-system:ds-component-scaffolder` | sonnet | Always | componentName, prdPath, a11ySpec, apiSpec, srpClassification, `publicApi`, `{importPath}`, `{frameworkSkill}` |
+| Styles scaffolder | `design-system:ds-styles-scaffolder` | sonnet | Always | componentName, prdPath, figmaTokens, `tokens`, `styles.language`, `stacks.css.skill` |
 
 Wait for both before Phase B.
 
@@ -56,8 +55,8 @@ Run only after the component scaffolder returned `componentFilePath`.
 
 | Agent | subagent_type | model | When | Extra inputs |
 |---|---|---|---|---|
-| Storybook scaffolder | `design-system:ds-storybook-scaffolder` | sonnet | `includeStorybook` | componentName, prdPath, componentApiSummary, `storybook.dir`, `sources.storybook` |
-| Test scaffolder | `design-system:ds-test-scaffolder` | sonnet | `includeTests` | componentName, componentFilePath, prdPath |
+| Storybook scaffolder | `design-system:ds-storybook-scaffolder` | sonnet | `includeStorybook` | componentName, prdPath, componentApiSummary, `storybook.dir`, `sources.storybook`, `{frameworkSkill}`, `stacks.storybook.skill` |
+| Test scaffolder | `design-system:ds-test-scaffolder` | sonnet | `includeTests` | componentName, componentFilePath, prdPath, `stacks.test.skill` |
 
 ### Inputs
 

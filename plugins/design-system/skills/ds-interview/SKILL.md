@@ -58,11 +58,11 @@ During grilling, watch for signals that a decision is uncertain or UX/async timi
 - **UX signals:** "How should X render?" / "Does this layout work?" / "Will consumers find this confusing?" / "What about edge-case rendering?"
 - **Async/timing signals:** "What's the order of operations?" / "Can these race?" / "When does X update relative to Y?" / "What if the async call fails mid-flow?"
 
-When you hit either signal, offer: *"This UX/timing is tricky to visualize in text. Want me to `/prototype` a quick UI stub / state-machine sketch on a throwaway branch?"*
+When you hit either signal and `capabilities.prototype.skill` is set (`ds-config.md` § Slots), offer: *"This UX/timing is tricky to visualize in text. Want me to prototype a quick UI stub / state-machine sketch on a throwaway branch?"* Unset → no offer; keep grilling.
 
 If yes:
 1. Create throwaway branch `prototype/component-{question-area}`
-2. Invoke `/prototype` with the specific question and constraints
+2. Invoke `capabilities.prototype.skill` with the specific question and constraints
 3. Wait for prototype to land
 4. Review with user: *"Does this match the behavior you want?"*
 5. Record the validated decision in `decisions.md` — note that it was prototype-validated

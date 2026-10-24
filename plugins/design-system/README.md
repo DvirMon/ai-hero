@@ -50,13 +50,15 @@ The files load in place; `/reload-plugins` picks up edits.
 
 ## Prerequisites
 
-These live outside the plugin, in `~/.claude`, and the pipeline calls them:
+- **Plugins:** `code-review` — a declared dependency, installed with this plugin;
+  `/ds-review` runs its `code-review:*-reviewer` agents
+- **Conventions:** `~/.claude/conventions/testing/testing-principles.md` (test scaffolder)
+- **Optional:** a Figma MCP server; the `ng-primitives` MCP
 
-- **Skills:** angular-developer, react-developer, css-styling, unit-test, code-connect-authoring,
-  story-create (optional)
-- **Conventions:** `~/.claude/conventions/testing/testing-principles.md`
-- **Plugins:** `code-review` (same marketplace; `/ds-review` runs its reviewers)
-- **Optional:** a Figma MCP server; the `ng-primitives` MCP; the `wayfinder` skill for map mode
+No loose skill is required. Skills the pipeline can use — a framework developer skill, CSS,
+unit-test, Storybook, prototype, map and Code Connect skills, or an org's own reviewer — are
+config slots (`contracts/ds-config.md` § Slots). `/ds-setup` fills them from what is installed;
+unset slots fall back to `{conventions}` and the plugin's own references.
 
 ## Layout
 

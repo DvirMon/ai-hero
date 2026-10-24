@@ -41,7 +41,7 @@ Generate the component's source for the target version, following the design sys
 10. Split code by concern once it outgrows class+types (store, utils) — one concern per file
 
 ## Standards & References
-- Framework developer skill (Skill tool) — `angular-developer` or `react-developer`; load first. `{conventions}` overrides it where they conflict
+- `{frameworkSkill}` (Skill tool), when set; load first. `{conventions}` overrides it where they conflict
 - Angular only: angular-cli MCP `list_projects` + `get_best_practices` for this workspace, when available
 - `{conventions}` — Component shape, Types and exports, File layout, API conventions, Building blocks
 - `${CLAUDE_PLUGIN_ROOT}/skills/ds-interview/references/component-api.md` + `component-api.{framework}.md` — API patterns, Figma variant → input mapping, export shapes

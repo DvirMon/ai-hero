@@ -47,6 +47,10 @@ relative to it. A monorepo with two design systems has two files, one per projec
   "sources": {
     "primitives": ["@angular/cdk", "ng-primitives"],
     "references": ["angular-material"]
+  },
+  "stacks": {
+    "angular": { "skill": "angular-developer" },
+    "css": { "skill": "css-styling" }
   }
 }
 ```
@@ -107,9 +111,35 @@ custom properties, per [Universal rules](#universal-rules).
 | `storybook.dir` | stories folder, relative to `{componentPath}` | `storybook` |
 | `commands.test` | command the user runs | — |
 | `commands.storybook` | command the user runs | — |
+| `stacks.<stack>.skill` | convention skill name · `null` | `null` |
+| `capabilities.<name>.skill` | skill name · `null` | `null` |
+| `stages.review.skill` | skill name · `none` · `null` | `null` (built-in reviewer dispatch) |
 
 Unknown key or value: stop and name it. A misconfigured value is a setup error, not a runtime
 one — it fires on first run, every run.
+
+### Slots
+
+The plugin depends on no skill outside an installed plugin. What an org would swap is a slot;
+a reference file the plugin's own steps read is vendored into the plugin; plugin agents
+(`design-system:ds-*`) and the `code-review:*-reviewer` agents are fixed.
+
+| Slot | Used by | `null` means |
+|---|---|---|
+| `stacks.{framework}.skill` | component, storybook scaffolders | `{conventions}` + plugin references only |
+| `stacks.css.skill` | styles scaffolder, styles review | same |
+| `stacks.test.skill` | test scaffolder | same |
+| `stacks.storybook.skill` | storybook scaffolder | same |
+| `capabilities.prototype.skill` | `/ds-interview`, `/ds-spec` | no prototype offer |
+| `capabilities.map.skill` | `/ds-wayfinder` map mode | map mode not offered |
+| `capabilities.codeConnect.skill` | `/ds-plan`, `/ds-ship` | Code Connect step lists the work, names no skill |
+| `stages.review.skill` | Phase 6 | `/ds-review` dispatches the `code-review:*-reviewer` agents |
+
+- **A slot names a skill that isn't installed:** stop and name it — setup error.
+- **A stack skill and `{conventions}` disagree:** `{conventions}` wins.
+- **`stages.review.skill` set:** `/ds-review` runs that skill instead of its own dispatch,
+  with the same inputs (`/ds-review` § Review stage), and records its findings the same way.
+- **`stages.review.skill: "none"`:** Phase 6 is skipped; `/ds-ship` runs next.
 
 ### `sources` defaults
 
@@ -144,6 +174,7 @@ concrete prefix, path or token family in plugin files.
 | `{publicApiBarrel}` | `publicApi.rootBarrel` |
 | `{themeClass}` | `tokens.themeClass`, rendered (empty when `null`) |
 | `{conventions}` | `{projectRoot}/docs/agents/design-system.md` |
+| `{frameworkSkill}` | `stacks.{framework}.skill` (empty when `null`) |
 
 ## Universal rules
 

@@ -34,8 +34,8 @@ The file set `{conventions}` § Storybook defines, written into `{componentPath}
 
 ## Standards & References
 - `{conventions}` § Storybook and `sources.storybook`
-- Framework developer skill — `angular-developer` or `react-developer`
-- `story-create` skill, when installed — story naming and one-story-per-mechanism rules
+- `{frameworkSkill}` (Skill tool), when set
+- `stacks.storybook.skill` (Skill tool), when set — story naming and structure; `{conventions}` wins on conflict
 - `docs/prd.md` — API Summary, Variants & States
 - The generated styles file — the real override API
 - `{planDir}/step-*-storybook.plan.md`

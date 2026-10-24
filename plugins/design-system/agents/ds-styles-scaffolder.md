@@ -39,10 +39,10 @@ Generate the component's styles file implementing every variant/state from the P
 6. Expose the override API from the styles step plan — overridable vs locked documented; defaults resolve to DS tokens
 7. Respect the plan's parent-ownership check — don't duplicate a concern a parent owns
 8. Add motion only if the PRD/discovery notes it, per `motion.md` (`tokens.motion`, else fallback values via component custom properties); always with a reduced-motion override
-9. Logical properties over physical, per the `css-styling` skill
+9. Logical properties over physical (`ds-config.md` § Universal rules)
 
 ## Standards & References
-- `css-styling` skill — its "DS Components" section and `references/styles.{framework}.md`
+- `stacks.css.skill` (Skill tool), when set; `{conventions}` overrides it where they conflict
 - `{conventions}` § Styling
 - `${CLAUDE_PLUGIN_ROOT}/skills/ds-scaffold/references/motion.md`
 - `{planDir}/step-*-styles.plan.md` — token table, locked tokens, prior art, reference-library comparison

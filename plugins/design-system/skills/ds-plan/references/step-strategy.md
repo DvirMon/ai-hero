@@ -63,7 +63,7 @@ Every `step-N-*.plan.md` must contain all of these:
 
 - **Title** — concise name
 - **PR scope** — `Standalone`, `Depends on Step N`, or `Parallel-safe with Step N` (from the dependency graph, not the presentation order)
-- **Skills used** — list the skill names that guide implementation (e.g. `angular-developer` / `react-developer`, `css-styling`)
+- **Skills used** — list the skill names that guide implementation (the `stacks.*.skill` values set in the config; none set → `{conventions}`)
 - **Scaffolding agent** — the `ds-*` agent that executes this step
 - **Files** — exact file paths to create or modify
 - **Why This Step Exists** — why it is needed now and what it unlocks

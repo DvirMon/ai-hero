@@ -32,11 +32,11 @@ Before launching agents, scan `decisions.md` for async/timing/state-machine comp
 - Are there decision sections describing async flows, loading states, or complex state transitions?
 - Do any decisions mention "order of operations", "race conditions", or "unclear timing"?
 
-If yes, offer: *"Your state/async logic looks complex. Should I prototype a minimal reducer or state-machine scaffold to validate the sequence before locking the spec?"*
+If yes and `capabilities.prototype.skill` is set (`ds-config.md` § Slots), offer: *"Your state/async logic looks complex. Should I prototype a minimal reducer or state-machine scaffold to validate the sequence before locking the spec?"* Unset → no offer; launch the agents.
 
 If yes:
 1. Create throwaway branch `prototype/logic-{component-name}`
-2. Invoke `/prototype` with the async/state challenge and design-decisions context
+2. Invoke `capabilities.prototype.skill` with the async/state challenge and design-decisions context
 3. Wait for prototype to land
 4. Review: Does the logic flow match expectations? Any race conditions exposed?
 5. Update `decisions.md` with learnings (e.g., "Async order confirmed via prototype: fetch → error check → state update")

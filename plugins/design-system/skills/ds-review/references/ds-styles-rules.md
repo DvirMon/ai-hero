@@ -16,7 +16,7 @@ markup; otherwise it is a RULE finding.
 A `docs/decisions.md` / `docs/narrative.md` entry that explicitly
 addresses a rule wins — cite the decision instead of flagging.
 
-Sources: `css-styling` skill ("DS Components" section),
+Sources: `stacks.css.skill` when set,
 `ds-scaffold/references/motion.md`; `{planDir}/step-*-styles.plan.md`;
 `docs/prd.md`; `docs/discovery-summary.md`.
 

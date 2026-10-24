@@ -47,6 +47,10 @@ or the directory the user names. Then read — don't assume:
 - **Convention docs** — `CONTRIBUTING.md`, `README.md`, `AGENTS.md`/`CLAUDE.md` under the DS
   root, ADRs. These become `sources.conventions`.
 - **Figma** — connected Figma MCP tools (`ToolSearch("figma")`).
+- **Slot skills** — installed skills that fit a slot in `ds-config.md` § Slots: a framework
+  developer skill, a CSS/styling skill, a unit-test skill, a Storybook story skill, a
+  prototype skill, a map/wayfinder skill, a Code Connect skill. Match by what the skill
+  describes, not by name; only skills in the session's available-skills list count.
 
 Read **two or three real components end to end** (class, template, styles, stories, spec,
 exports). Conventions come from what they agree on; where they disagree, note both.
@@ -64,6 +68,9 @@ are finite). Typical gaps:
 - **Sources** — reorder or extend `sources.primitives` / `sources.references`; extra a11y,
   convention and Storybook sources; exemplar components (`sources.siblings`).
 - **WCAG target** — `a11y.wcag`, default `2.2-AA`.
+- **Slots** — one question per slot with a candidate skill: offer the candidates and
+  `Leave unset`. Ask about `stages.review.skill` only when an installed skill reviews
+  components (default: the built-in `code-review` dispatch).
 
 Skip a gap the repo settled. Never ask the user to confirm a value you have evidence for —
 show it in the draft instead.
