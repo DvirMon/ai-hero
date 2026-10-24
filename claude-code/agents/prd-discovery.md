@@ -5,13 +5,13 @@ model: opus
 tools: Read, Glob, Grep, WebFetch, WebSearch, Write
 ---
 
-# Story Discovery (product/UX)
+# PRD Discovery (product/UX)
 
 ## Purpose
 
 Find what a **person in front of the screen** needs, struggles with, or already gets — as opposed
 to what an API exposes. Pairs with the `prd-discovery` skill, which owns the orchestration and
-dispatches you as one of three parallel nodes. Named to match that skill, following the
+dispatches you as one of four parallel nodes. Named to match that skill, following the
 `ds-discovery` precedent.
 
 Sibling of `discovery`. The split is the **question**, not the topic:

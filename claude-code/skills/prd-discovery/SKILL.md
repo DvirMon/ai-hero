@@ -150,7 +150,7 @@ pasted on top.
 - **"Not user-facing" is load-bearing.** Listing the integrator's real problems there is what stops
   them being mistaken for missing stories.
 
-Write the coverage marks from N3's evidence, not from optimism. Marks drift in **both** directions
+Write the coverage marks from N4's evidence, not from optimism. Marks drift in **both** directions
 — under-crediting shipped work is as common as over-crediting it.
 
 ### 4. Split every gap by the layer that owes the fix
@@ -218,7 +218,7 @@ and finding out at implementation time is the expensive way.
 - **Marking a capability covered because the function exists.** Covered means a person can see it
   happen, failure path included.
 - **Letting discovery agents multiply.** One agent per node, no subagents, stated in the prompt.
-- **Skipping N3 because "we know our own code".** N3 is the node that keeps the doc honest, and
+- **Skipping N4 because "we know our own code".** N4 is the node that keeps the doc honest, and
   it's the one whose absence shows up as a doc that contradicts a settled decision.
 - **One flat gap list.** Without the layer split, UI gaps get filed against the state spec and
   quietly never actioned, because the person reading that spec correctly concludes none of it is
