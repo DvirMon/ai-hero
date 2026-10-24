@@ -43,15 +43,16 @@ D1–D7 and D9–D13 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.
 Consumers (`sdlc`, the future `ds` plugin) declare it in `plugin.json`:
 
 ```json
-"dependencies": [{ "name": "code-review", "version": "^0.1" }]
+"dependencies": ["code-review"]
 ```
 
 They call only namespaced entry points — `code-review:review`, `code-review:*-reviewer` — and
 never read its internal files.
 
 - **Why:** installing a consumer installs and enables the dependency, so the install stays one
-  unit. Namespaced names are a versioned contract (ranges resolve against
-  `code-review--v<version>` tags). Internal paths are not: `ds-review/SKILL.md:70` already
+  unit. Namespaced names are the contract. No version pins or ranges: a
+  plugin's version is its commit SHA, so every push reaches auto-updating
+  users. Internal paths are not: `ds-review/SKILL.md:70` already
   points at a stale `skills/code-review/references/` path (real: `skills/review/references/`).
 - **Rejected:** merging into sdlc (ds-review and ad-hoc reviews would need all of sdlc);
   full duplication per plugin (eight reviewer agents drifting in two copies).

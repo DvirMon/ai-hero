@@ -1,6 +1,5 @@
 {
   "name": "story",
-  "version": "0.1.0",
   "description": "Storybook story pipeline for any stack: /story:discovery, /story:plan, /story:create, the story:implementer agent and /story:docs, configured per repo by /story:setup.",
   "author": { "name": "DvirMon" }
 }

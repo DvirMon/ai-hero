@@ -1,6 +1,5 @@
 {
   "name": "figma",
-  "version": "0.1.0",
   "description": "Figma extensions for the sdlc pipeline — one skill per stage, wired per repo through stages.<stage>.skills in .claude/workflow.json.",
   "author": { "name": "DvirMon" }
 }
