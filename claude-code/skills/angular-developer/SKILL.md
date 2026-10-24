@@ -10,11 +10,15 @@ metadata:
 # Angular Developer Guidelines
 
 > **Role in the pipeline:** this skill is the *knowledge* SSOT for Angular conventions — it
-> does not own execution. When `/impel` works a task plan, it dispatches `Task type: code`
-> steps to the **`angular-implementer` agent**, which loads this skill and then writes the code.
-> Read this skill directly for ad-hoc Angular guidance; go through the agent for planned work.
-> Note the agent suppresses rule 3's `ng build` — the dispatcher runs builds and tests once, at
-> the end.
+> does not own execution. When `/implementation` works a task plan, it dispatches each step to
+> the sdlc **`implementer` agent** with the skills the step's project names in
+> `.claude/workflow.json` — this one, for an Angular project. Read this skill directly for ad-hoc
+> Angular guidance; go through the agent for planned work. The agent suppresses rule 3's
+> `ng build` — the dispatcher runs builds and tests once, at the end.
+>
+> **Before writing code:** call the angular-cli MCP `list_projects`, then `get_best_practices`
+> with that `workspacePath` — best practices are version-specific. Nx repos with no
+> `angular.json` return no workspace: skip it and rely on this skill.
 
 ---
 

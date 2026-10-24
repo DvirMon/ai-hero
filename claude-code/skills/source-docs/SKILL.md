@@ -1,6 +1,6 @@
 ---
 name: source-docs
-description: Bring JSDoc/`//` comments on TypeScript source to the two-channel contract in doc-contracts/jsdoc.md (consumer-facing `/** */` vs maintainer `//`) — CONTRACT CONFORMANCE is the job, then dispatches `doc-compressor` so what it wrote is also concise. Takes a path at any granularity (one file, a feature folder, a whole lib) and walks non-spec `.ts` files under it, excluding story hosts and `.stories.ts` (owned by story-implementer via doc-contracts/story-doc.md). Edits in place, reports a per-file comment-line delta, ends in a project typecheck. Writes no Markdown (that is `kipi`) and never verifies a claim against code (that is `audit-docs`). Use when source comments should match the JSDoc contract.
+description: Bring JSDoc/`//` comments on TypeScript source to the two-channel contract in doc-contracts/jsdoc.md (consumer-facing `/** */` vs maintainer `//`) — CONTRACT CONFORMANCE is the job, then dispatches `doc-compressor` so what it wrote is also concise. Takes a path at any granularity (one file, a feature folder, a whole lib) and walks non-spec `.ts` files under it, excluding story hosts and `.stories.ts` (owned by the sdlc implementer agent on story steps, via doc-contracts/story-doc.md). Edits in place, reports a per-file comment-line delta, ends in a project typecheck. Writes no Markdown (that is `kipi`) and never verifies a claim against code (that is `audit-docs`). Use when source comments should match the JSDoc contract.
 context: fork
 background: false
 ---
@@ -9,7 +9,7 @@ background: false
 
 Rewrite comments on TypeScript source in place against one contract:
 [doc-contracts/jsdoc.md](../../conventions/doc-contracts/jsdoc.md). This is the TypeScript-side
-counterpart to `kipi` (markdown) and `story-implementer`'s story-doc pass (D24 in
+counterpart to `kipi` (markdown) and the `implementer` agent's story-doc pass on `story` steps (D24 in
 `libs/shared/table`'s trim-docs plan) — same seam, different file class, different
 verification. A `source-docs` run ends in a typecheck; a `kipi` run has no equivalent.
 
@@ -17,7 +17,7 @@ verification. A `source-docs` run ends in a typecheck; a `kipi` run has no equiv
 
 - **In:** every non-spec `.ts`/`.tsx` file under the given path.
 - **Out, always:** `*.spec.ts(x)`, story hosts (files matching `*story-host*` or living in a
-  `*-story-host/` folder), `*.stories.ts(x)`. Those are owned by `story-implementer` against
+  `*-story-host/` folder), `*.stories.ts(x)`. Those are owned by the `implementer` agent (on `story` steps) against
   `doc-contracts/story-doc.md` — never rewrite them here, even if asked to cover "everything."
 - The path can be a single file, a feature folder (`api/features/with-sorting/`), or a whole
   lib (`libs/shared/table/src`). Walk recursively from whatever is given.
@@ -88,7 +88,7 @@ this skill owns.
 ## Boundaries
 
 - Never writes a `.md` file — that's `kipi`'s job, config-driven from `docs/agents/domain-docs.md`.
-- Never touches story hosts or `.stories.ts` — `story-implementer` owns those against
+- Never touches story hosts or `.stories.ts` — the `implementer` agent owns those on `story` steps, against
   `doc-contracts/story-doc.md`, at the point the story is built, not after the fact.
 - Not a truth-checker — this skill trims and reshapes comments to the contract; it doesn't
   verify a comment's claim is still accurate. That's `audit-docs`.

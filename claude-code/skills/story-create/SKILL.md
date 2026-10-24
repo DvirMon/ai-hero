@@ -10,9 +10,9 @@ execution layer, held apart deliberately: the reasoning for *what* to demonstrat
 stories to write transfers across frameworks; *how* a story is built (render function vs.
 component class, args vs. signals, `.tsx` vs. a template file) does not.
 
-> **Role in the pipeline:** knowledge SSOT, not an executor. `/impel` dispatches
-> `Task type: story` steps to a framework-specific implementer agent (e.g. `story-implementer`
-> for React), which loads this skill and then writes the stories. Read it directly for ad-hoc
+> **Role in the pipeline:** knowledge SSOT, not an executor. `/implementation` dispatches
+> `type: story` steps to the sdlc `implementer` agent, which loads this skill (when the step's
+> project lists it under `skills.story`) and then writes the stories. Read it directly for ad-hoc
 > story work.
 
 ## Goal
