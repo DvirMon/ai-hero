@@ -1,6 +1,6 @@
 ---
 name: atomic-commit
-description: Split all current changes (staged and/or unstaged) into multiple atomic commits, each scoped to a single responsibility/concern, instead of one big commit. Use when the user asks to commit current changes "in an SRP way", "atomically", "split into logical commits", or when `git diff HEAD` clearly mixes unrelated concerns (e.g. a feature change bundled with an unrelated fix, a refactor, or a formatting pass).
+description: Split all current changes (staged and/or unstaged) into multiple atomic commits, each scoped to a single responsibility/concern, instead of one big commit. Use when the user asks to commit current changes "in an SRP way", "atomically", "split into logical commits", or when `git diff HEAD` clearly mixes unrelated concerns (e.g. a feature change bundled with an unrelated fix, a refactor, or a formatting pass). Also commits one change for a caller that hands it a commit intent (e.g. sdlc's `capabilities.commit.skill`), and writes `commitlint.config.js` from the repo's commit format (`lint`). Formats are per repo, in `~/.claude/commit-formats.json`.
 ---
 
 # Commit current changes (SRP)
@@ -9,20 +9,23 @@ Turn all current uncommitted changes in the working tree — staged or not — i
 
 This only ever touches the **index** (staging area) and creates **new** commits. It never rewrites existing history, never discards or edits any file's contents, and never pushes.
 
-This skill is also the **commit-format SSOT** for the pipeline (§ Commit format). `/impel` writes its per-step commits in this format; this skill itself is the ad-hoc splitter for leftover or hand-made changes, not a step of the main flow.
+## Modes
+
+| Invocation | Does |
+|---|---|
+| *(default)* | split current changes into atomic commits — §1–§5 |
+| a commit intent from a caller (e.g. an sdlc stage via `capabilities.commit.skill`) | render that one commit in the repo's format and commit the given `paths` — skip §2–§3; run §1's branch check, then §4–§5 for that commit |
+| `lint` | write `commitlint.config.js` from the repo's format — § Lint |
 
 ## Commit format
 
-**Per-repo override first.** Read `~/.config/org/commit-format.json`. If its
-`repo` equals the current repo root, use its format for every commit made here:
+Every message renders from the repo's **format** — its entry in `~/.claude/commit-formats.json`
+(keyed by the repo's `origin`), else the built-in
+[`references/default-format.json`](references/default-format.json). Lookup, fields, placeholders
+and errors: [`references/format.md`](references/format.md). Load the format before drafting any
+message.
 
-- First commit on the branch: `subject` with `{issue}` and `{ticketTitle}`
-  filled in, then the `firstCommit.body` fields (`Resolution Description`,
-  `Testing Instructions`, `Reviewed By`).
-- Later commits: `laterCommits.subject`, body optional.
-- Skip the emoji/type/`Refs:` rules below for these commits.
-
-Otherwise (another repo, or no file) use the default format:
+The default renders as:
 
 ```
 <emoji> [#<issue> <stage>] <type>(<project>[/<domain>]): <imperative subject>
@@ -34,28 +37,31 @@ Epic: #M
 Co-Authored-By: <the exact line from this session's attribution reminder>
 ```
 
-- **Types** — only commitlint `config-conventional` types, each with a fixed emoji:
+- **Types** — only commitlint `config-conventional` types; the emoji comes from the format's
+  `emoji` map:
 
-  | Emoji | Type | For |
-  |---|---|---|
-  | 🎸 | `feat` | new feature |
-  | 🐛 | `fix` | bug fix |
-  | 🔒 | `fix` | security fix |
-  | 🍎 | `ref` | refactor, no behavior change (`refactor` is a legacy alias — never emit it) |
-  | ⚡ | `perf` | performance |
-  | ✅ | `test` | tests only |
-  | 📚 | `docs` | documentation |
-  | 🎨 | `chore` | tooling, dependencies, housekeeping |
-  | 📦 | `build` | build system |
-  | 👷 | `ci` | CI config |
-  | 💄 | `style` | formatting only |
-  | ⏪ | `revert` | revert |
+  | Type | For |
+  |---|---|
+  | `feat` | new feature |
+  | `fix` | bug fix, security fix |
+  | `ref` | refactor, no behavior change (`refactor` is a legacy alias — never emit it) |
+  | `perf` | performance |
+  | `test` | tests only |
+  | `docs` | documentation |
+  | `chore` | tooling, dependencies, housekeeping |
+  | `build` | build system |
+  | `ci` | CI config |
+  | `style` | formatting only |
+  | `revert` | revert |
 
 - **Story tag** `[#<issue> <stage>]` — optional. Stage `s<N>` = step N of `tasks/issue-<N>/step-<N>-*.plan.md`; `plan` = task/test plans; `review` = changes answering review. Omit for `Refs: none` work or commits that fit no stage. The tag's issue must also appear in `Refs:`.
 - **Trailers** — `Refs: #N` for the issue the commit belongs to; `Epic: #M` when the epic is known; `Refs: none` when unrelated to any issue. If `docs/agents/issue-tracker.md` names a different partial trailer, use that name instead.
-- **Never close from a commit.** No `Closes #N` / `Ships: #N` and no GitHub closing keyword (`close[sd]`, `fix(e[sd])`, `resolve[sd]` before `#N`) anywhere in the message — the PR body owns `Closes #N`.
+- **Never close from a commit.** No `Closes #N` / `Ships: #N` and no GitHub closing keyword (`close[sd]`, `fix(e[sd])`, `resolve[sd]` before `#N`) anywhere in the message — the PR body owns `Closes #N`. Holds for every format.
 - Imperative mood, subject explains *why* when it fits.
 - Full rule (tag, scope, trailers, enforcement): `docs/agents/issue-tracker.md#issue-references` — link, don't restate.
+
+**Values** come from the caller's intent, never from a tracker. Ad-hoc: `{issue}` from the
+branch name (`<type>/<N>-<slug>`); ask the user for any other required value the format needs.
 
 ## 1. Preconditions
 
@@ -126,3 +132,22 @@ Show the user the bucket breakdown (files/hunks + draft message per commit) befo
 ## 5. Report
 
 List the commits created (short SHA + subject, in order). Do not push — pushing and opening the PR is `/ship`.
+
+## Lint
+
+Derive `commitlint.config.js` from the repo's format, so lint and format share one source.
+
+1. Load the format (§ Commit format). It has no `{type}` → stop: commitlint's conventional
+   rules need a type; tell the user.
+2. Build `headerPattern` from `subject` (with `laterSubject` when set: `(?:A|B)`): escape
+   literal text; a `[...]` group becomes optional; `{emoji}` →
+   `(?:\p{Extended_Pictographic}[️‍\p{Extended_Pictographic}]*\s+)?`; `{type}` → `(\w+)`;
+   `{scope}` → `([^)]+)` with its parentheses optional; `{subject}` → `(.+)`; any other
+   placeholder → `\S+`. Flag `u`. `headerCorrespondence` = the capture order of `type`,
+   `scope`, `subject`.
+3. Write it at the repo root, extending `@commitlint/config-conventional`
+   (`commitlint.config.cjs` when `package.json` has `"type": "module"`). Show the diff and
+   confirm before replacing an existing config.
+4. Check the pattern with `node -e` against one rendered sample per subject template; report
+   the result. Adding `@commitlint/cli` + `@commitlint/config-conventional` to devDependencies
+   is the user's install.

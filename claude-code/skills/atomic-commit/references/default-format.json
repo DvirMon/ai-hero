@@ -1,0 +1,17 @@
+{
+  "subject": "{emoji} [#{issue} {stage}] {type}({scope}): {subject}",
+  "trailers": ["Refs: #{issue}", "Epic: #{epic}"],
+  "emoji": {
+    "feat": "🎸",
+    "fix": "🐛",
+    "ref": "🍎",
+    "perf": "⚡",
+    "test": "✅",
+    "docs": "📚",
+    "chore": "🎨",
+    "build": "📦",
+    "ci": "👷",
+    "style": "💄",
+    "revert": "⏪"
+  }
+}
