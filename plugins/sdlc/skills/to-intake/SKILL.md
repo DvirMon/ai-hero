@@ -15,9 +15,9 @@ Record an idea on the tracker so it isn't lost. This is capture only: nothing is
 Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it. Then load `stages.to-intake.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
 
 - **No `.claude/workflow.json`:** stop and point to `/to-ticket` (it runs setup first) or
-  `/setup-skills`.
+  `/sdlc:setup`.
 - **No `docs/agents/ticket-tracker.md`, or no `## Create an intake item` section in it:** stop
-  and name what is missing (`${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`). Run `/setup-skills`.
+  and name what is missing (`${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`). Run `/sdlc:setup`.
 
 ### 2. Draft the item
 

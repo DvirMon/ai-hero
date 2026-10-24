@@ -1,9 +1,9 @@
 ---
-name: setup-skills
+name: setup
 description: Configure this repo for the engineering skills — write its workflow config (`.claude/workflow.json`), set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/implementation` → `/review` → `/ship`. Model-invoked only by `/to-ticket` when the repo has no workflow config; otherwise run it when the user asks.
 ---
 
-# Setup Skills
+# Setup
 
 Scaffold the per-repo configuration that the engineering skills assume:
 
@@ -161,7 +161,7 @@ Show the user a draft of:
 
 Let them edit before writing.
 
-These edits are themselves a change to the repo: make them on a branch (`chore/setup-skills`), never on the default branch, and ship them with `/ship`. The `gh api` server calls run after that PR merges.
+These edits are themselves a change to the repo: make them on a branch (`chore/sdlc-setup`), never on the default branch, and ship them with `/ship`. The `gh api` server calls run after that PR merges.
 
 ### 4. Write
 

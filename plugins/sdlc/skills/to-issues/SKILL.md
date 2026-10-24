@@ -12,7 +12,7 @@ Every child is created **under the intake item** (`state.json` `ticketRef`) — 
 creates a parent item. Capturing a new item is `/to-intake`.
 
 Read `docs/agents/issue-tracker.md` — the repo's implementation of
-`${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md` — for every tracker operation (run `/setup-skills` if
+`${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md` — for every tracker operation (run `/sdlc:setup` if
 that file is missing). Never branch on a tracker name: follow the file's section.
 
 ## Process

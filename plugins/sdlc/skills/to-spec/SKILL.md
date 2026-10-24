@@ -19,7 +19,7 @@ If it carries a non-null `capabilityLogPath`, **read that log too.** It holds wh
 
 If no ticket workspace's `state.json` exists, stop and point to `/to-ticket`. It is the only stage that creates a workspace.
 
-The repo's `docs/agents/ticket-tracker.md` and `docs/agents/issue-tracker.md` (contract: `${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`) should have been provided to you — run `/setup-skills` if not.
+The repo's `docs/agents/ticket-tracker.md` and `docs/agents/issue-tracker.md` (contract: `${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`) should have been provided to you — run `/sdlc:setup` if not.
 
 **PRD gate, before step 1.** When `prdPath` is set:
 

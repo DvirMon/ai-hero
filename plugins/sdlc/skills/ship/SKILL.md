@@ -163,7 +163,7 @@ branch with no matching unit → skip.
 ### 5d. No-issue branch body
 
 Same shape as 5a without the closing line and without a spec or steps: **Evidence** names what
-produced the change (e.g. `/setup-skills`) and says the PR closes nothing.
+produced the change (e.g. `/sdlc:setup`) and says the PR closes nothing.
 
 ## 6. Enable auto-merge
 
@@ -176,7 +176,7 @@ when the required checks (`ci-gate`, `pr-conventions`) and any required review p
 branch, and the closing line closes the issue (GitHub/GitLab).
 
 If `gh` reports auto-merge isn't allowed on this repo, stop and say so — the repo hasn't had the
-`setup-skills` branch-workflow bootstrap (rulesets + `allow_auto_merge`). Do not merge by hand
+`setup` branch-workflow bootstrap (rulesets + `allow_auto_merge`). Do not merge by hand
 as a workaround.
 
 ## 7. Report and stop

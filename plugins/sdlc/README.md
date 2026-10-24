@@ -27,7 +27,7 @@ Installing `sdlc` also installs and enables `code-review` from the same marketpl
 a declared dependency (`.claude-plugin/plugin.json`), which `/implementation` and `/ship` call as
 `code-review:review`.
 
-Then run `/setup-skills` once (or `/to-ticket`, which runs it when the repo has no
+Then run `/sdlc:setup` once (or `/to-ticket`, which runs it when the repo has no
 `.claude/workflow.json`). It writes one entry per project in the repo — an app, a server, a
 library — with the skills each step type loads there
 ([`contracts/workflow-config.md`](contracts/workflow-config.md) § Projects). Stages name no
@@ -68,7 +68,7 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 
 ```
 .claude-plugin/plugin.json
-skills/      the stages, plus setup-skills
+skills/      the stages, plus setup
 contracts/   ticket-decisions, prd, workflow-config, tracker, review-stage, branch-guard, stage-skills, commit
 agents/      implementer, test-implementer, tdd-planner
 ```

@@ -1,6 +1,6 @@
 # Branch-workflow templates
 
-Copied into a repo by `setup-skills` § Branch workflow bootstrap.
+Copied into a repo by `setup` § Branch workflow bootstrap.
 Policy: one issue = one branch = one PR; no commits on the default branch;
 rebase-merge only; every commit carries a `Refs:` trailer;
 `Closes #N` only in the PR body. Commit-format linting (commitlint) comes

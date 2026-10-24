@@ -96,7 +96,7 @@ If the ticket workspace's `state.json` does not exist, ask the user whether to c
 
 Each issue branch touches only its own tasks root. Never inside `.git/` — Claude Code treats it
 as a protected path and blocks the writes. `.pipeline/` not gitignored → stop and point to
-`/setup-skills`, which adds it.
+`/sdlc:setup`, which adds it.
 
 **Dispatch every write in this step — step files, test plans, `progress.md`, the `state.json`
 update — to one `sonnet` writer**, per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/file-writes.md`. It renders step

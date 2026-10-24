@@ -1,6 +1,6 @@
 # Workflow config
 
-`<repo>/.claude/workflow.json` — one per repo, written by `setup-skills`. Every pipeline stage
+`<repo>/.claude/workflow.json` — one per repo, written by `setup`. Every pipeline stage
 reads it first.
 
 It holds **values**: which skill, which path, how work is split into PRs, and the repo's
@@ -169,7 +169,7 @@ Every stage resolves the config first: read the three layers, merge, apply defau
 
 - **No `workflow.json`:** `/to-ticket` runs setup and writes it. Any other stage stops and
   points to `/to-ticket`.
-- **`version: 1`** (`projectKind`, no `projects`): stop and point to `/setup-skills`, which
+- **`version: 1`** (`projectKind`, no `projects`): stop and point to `/sdlc:setup`, which
   rewrites it as version 2.
 - **Unknown key or value:** stop and name it. A misconfigured value is a setup error, not
   a runtime one — it fires on first run, every run.

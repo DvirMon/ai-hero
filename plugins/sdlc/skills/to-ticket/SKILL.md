@@ -18,7 +18,7 @@ Both end with a v5 `state.json` and a branch.
 ### 0. Resolve the workflow config
 
 Read the merged config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it. **No
-`.claude/workflow.json`, or no `docs/agents/ticket-tracker.md`** → run `/setup-skills` first,
+`.claude/workflow.json`, or no `docs/agents/ticket-tracker.md`** → run `/sdlc:setup` first,
 then continue here — the first ticket must not fail on missing config. Every tracker call
 below goes through the repo's `docs/agents/ticket-tracker.md` (contract
 `${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`); this skill never branches on a tracker name.

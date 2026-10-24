@@ -84,7 +84,7 @@ Report what was pruned, one line per branch.
 3. `git worktree add <path> -b <branch> origin/<default>` — always from the fresh remote
    default, never from local HEAD.
 4. Confirm `.claude/worktrees/` is gitignored (`git check-ignore -q <path>`). If not, say so
-   — the repo bootstrap in `/setup-skills` adds it; don't edit `.gitignore` from here.
+   — the repo bootstrap in `/sdlc:setup` adds it; don't edit `.gitignore` from here.
 
 ### 3. Enter it (`isolation: worktree`)
 

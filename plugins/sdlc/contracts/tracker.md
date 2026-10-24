@@ -1,7 +1,7 @@
 # Tracker
 
 The operations a pipeline stage asks of a tracker. This contract names no tracker. Each repo
-implements the operations in two files of its own, written by `setup-skills`:
+implements the operations in two files of its own, written by `setup`:
 
 | File | Holds | Read by |
 |---|---|---|
@@ -18,7 +18,7 @@ branches on a tracker name.
 - `manual` — the stage prints what to do and waits.
 
 Setup writes each section after asking which tracker the repo uses and checking which CLIs and
-MCP servers are available. `${CLAUDE_PLUGIN_ROOT}/skills/setup-skills/examples/` holds filled-in files for common trackers;
+MCP servers are available. `${CLAUDE_PLUGIN_ROOT}/skills/setup/examples/` holds filled-in files for common trackers;
 setup starts from the matching one. No stage reads `examples/`.
 
 ## `ticket-tracker.md`
