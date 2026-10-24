@@ -1,5 +1,5 @@
 ---
-name: story-discovery
+name: prd-discovery
 description: >
   Run product discovery on a feature and write its user-stories doc (PRD) — what a person
   needs to be able to do, what they should experience when it goes wrong, and which scenarios the

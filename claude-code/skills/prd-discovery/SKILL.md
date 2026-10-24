@@ -1,5 +1,5 @@
 ---
-name: story-discovery
+name: prd-discovery
 description: >
   Run product discovery on a feature and write its user-stories doc (PRD) — what a person
   needs to be able to do, what they should experience when it goes wrong, and which scenarios the
@@ -83,7 +83,7 @@ N4 internal coverage audit  ─┘
 
 N1–N4 are parallel-safe — dispatch them in **one message, multiple tool calls**.
 
-**Dispatch the `story-discovery` agent** (`~/.claude/agents/story-discovery.md`), once per node,
+**Dispatch the `prd-discovery` agent** (`~/.claude/agents/prd-discovery.md`), once per node,
 passing `mode` (`community-pain` | `competitor-capabilities` | `product-ux` |
 `internal-coverage`), `feature`,
 `outputPath`, and `competitorSet` where you have one. That agent carries the source-reliability

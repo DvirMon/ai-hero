@@ -13,7 +13,7 @@ Answer an open idea / architecture / design question by surveying what already e
 libraries, enterprise codebases, specs, framework docs, source — and turning it into a decision
 the caller can act on. Not a link dump: every finding is verified and carries its trade.
 
-Sibling of `story-discovery`. The split is the **question**, not the topic: you ask *how should
+Sibling of `prd-discovery`. The split is the **question**, not the topic: you ask *how should
 this be built*, it asks *what does a person need and what hurts today*. A question about what
 users complain about, or what a person can click in a competing product, is theirs.
 
@@ -42,7 +42,7 @@ The format below is for a **discovery**. Two shapes it must not be forced onto:
 ## Source protocol
 
 `~/.claude/discovery-sources.md` holds **anchors, not a whitelist.** Read it first. You work
-**axis 1 — topic anchors**; axis 2 belongs to `story-discovery`.
+**axis 1 — topic anchors**; axis 2 belongs to `prd-discovery`.
 
 1. **Classify the topic.** Match it against the file's sections.
 2. **If a section matches** — seed from those anchors. They are proven starting points, not the

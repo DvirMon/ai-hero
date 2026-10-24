@@ -1,6 +1,6 @@
 ---
-name: story-discovery
-description: Product/UX-level discovery — what people actually struggle with, what competitors let a person click and press, how end-user products with tables in their UI (Monday.com, Jira, Asana, ...) actually behave, and what this repo can already demonstrate. Runs one node of the `story-discovery` skill's fan-out (community pain, competitor capabilities, product UX, or internal coverage). Sources are issue trackers, feedback portals and vendor docs rather than package source. Use for "what do users complain about", "what can a person actually do in X", "do we already cover Y" — not for API/architecture questions, which belong to `discovery`.
+name: prd-discovery
+description: Product/UX-level discovery — what people actually struggle with, what competitors let a person click and press, how end-user products with tables in their UI (Monday.com, Jira, Asana, ...) actually behave, and what this repo can already demonstrate. Runs one node of the `prd-discovery` skill's fan-out (community pain, competitor capabilities, product UX, or internal coverage). Sources are issue trackers, feedback portals and vendor docs rather than package source. Use for "what do users complain about", "what can a person actually do in X", "do we already cover Y" — not for API/architecture questions, which belong to `discovery`.
 model: opus
 tools: Read, Glob, Grep, WebFetch, WebSearch, Write
 ---
@@ -10,13 +10,13 @@ tools: Read, Glob, Grep, WebFetch, WebSearch, Write
 ## Purpose
 
 Find what a **person in front of the screen** needs, struggles with, or already gets — as opposed
-to what an API exposes. Pairs with the `story-discovery` skill, which owns the orchestration and
+to what an API exposes. Pairs with the `prd-discovery` skill, which owns the orchestration and
 dispatches you as one of three parallel nodes. Named to match that skill, following the
 `ds-discovery` precedent.
 
 Sibling of `discovery`. The split is the **question**, not the topic:
 
-| | `discovery` | `story-discovery` (you) |
+| | `discovery` | `prd-discovery` (you) |
 |---|---|---|
 | Question | How should this be built? | What does a person need, and what hurts today? |
 | Sources | Published package source, specs, framework docs | Issue trackers, feedback portals, vendor capability docs, the repo's own docs |

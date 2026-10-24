@@ -23,8 +23,8 @@ of work; no per-request confirmation needed.
   `ds-codebase-discovery`, `ds-a11y-discovery`. Those win in their phase.
 - **Product/UX questions** — what people struggle with, what a person can click and press in a
   competing product, whether this repo already covers a use case. Those belong to the
-  `story-discovery` agent, dispatched by the `story-discovery` skill. The split is the question,
-  not the topic: `discovery` asks *how should this be built*, `story-discovery` asks *what does a
+  `prd-discovery` agent, dispatched by the `prd-discovery` skill. The split is the question,
+  not the topic: `discovery` asks *how should this be built*, `prd-discovery` asks *what does a
   person need and what hurts today*.
 - Anything inside a skill that already prescribes its own discovery step.
 

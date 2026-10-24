@@ -132,7 +132,7 @@ D6 — tdd-planner agent definition: lives at
 `${CLAUDE_PLUGIN_ROOT}/agents/tdd-planner.md`; `model: opus` (seam choice
 is the reasoning the user wants to learn from, and it runs
 once per code step at plan time, not in a loop — matches
-discovery/story-discovery/sdlc-assessor); `tools: Read, Glob,
+discovery/prd-discovery/sdlc-assessor); `tools: Read, Glob,
 Grep` (read-only per D4). Rejected: sonnet (cheaper, but a
 weak plan weakens every later phase); inherit.
 

@@ -8,7 +8,7 @@ One contract, two variants. Both share the core, so `/to-spec` reads either one 
 
 | Variant | Written by | Read by |
 |---|---|---|
-| capability (library / DS) | `story-discovery` | `story-plan`, `/to-spec` |
+| capability (library / DS) | `prd-discovery` | `story-plan`, `/to-spec` |
 | feature (app) | `/to-ticket` | `grill-with-docs`, `/to-spec` |
 
 ## Shared core

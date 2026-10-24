@@ -175,7 +175,7 @@ filled in; `sonnet` if the writer must fit the PRD into an existing file. Join i
   `[<ticketRef> · MM-DD]` (today's pull date). `/to-spec` re-fetches and flags changes
   against these. On the idea path, ACs drafted in step 2 that live only in the PRD (the
   ticket holds the summary) have no remote source and take no tag.
-- **`library` / `design-system`** — the capability PRD is `story-discovery`'s; don't write
+- **`library` / `design-system`** — the capability PRD is `prd-discovery`'s; don't write
   it. Set `prdPath` to the resolved path when that file exists, else `null`. The remote ACs
   stay on the ticket and are not copied — `/to-spec` reads them from the tracker.
 
