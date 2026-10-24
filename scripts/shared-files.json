@@ -1,1 +1,5 @@
-{}
+{
+  "plugins/code-review/skills/review/references/review-contract.md": [
+    "plugins/design-system/skills/ds-review/references/review-contract.md"
+  ]
+}

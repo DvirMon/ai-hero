@@ -75,13 +75,12 @@ when `publicApi.rootBarrel` is set.
 | Code — spec | `code-review:spec-reviewer` | spec sources: `{docsDir}prd.md` and the step files in `{planDir}` (their Acceptance Checks are acceptance criteria) |
 | Styles | `code-review:styles-reviewer` | `references: [references/ds-styles-rules.md, {conventions}]`; the resolved `tokens` config |
 
-Every dispatch prompt carries the plugin's common inputs — build them
-from `docs/agents/code-review.md` exactly as the plugin's SKILL.md §5
-does:
+Every dispatch prompt carries these common inputs; `standards` and
+`skills` come from the repo's `docs/agents/code-review.md`:
 
 ```
 scope: files: [componentFilePath, its template (if separate), stylesFilePath, public-api.ts]
-contract: <code-review plugin root>/skills/review/references/review-contract.md
+contract: ${CLAUDE_PLUGIN_ROOT}/skills/ds-review/references/review-contract.md
 files: <path — type — library — design-system>, one per line
 standards: <config knowledge.standards, resolved>
 decisions: [{docsDir}decisions.md, {docsDir}narrative.md]
@@ -132,7 +131,7 @@ Rules for this format:
   `styles-reviewer` → S; correctness, template, public-api, standards,
   spec → C. The plugin's kebab-case `id` is dropped; number within the
   section
-- Severity comes from the plugin's review contract, unchanged: `P0`–`P3`
+- Severity comes from `references/review-contract.md`, unchanged: `P0`–`P3`
   for impact findings; `RULE` (axis `standards`) or `SPEC` (axis `spec`)
   for conformance findings, which carry no P level. A conformance finding
   with `blocking: false` gets ` (non-blocking)` after the description
@@ -145,9 +144,9 @@ Rules for this format:
 - **Fixed section**: one line per fix — `[x] {id}: {what changed} ({date})`
 - **Dismissed**: flat comment list — `- {id}: {reason}`
 
-Before writing the file, verify P0–P2 and conformance findings exactly as
-the plugin's SKILL.md §6 does (review contract §8): drop what's
-disproved; an unconfirmed P2 becomes P3.
+Before writing the file, verify P0–P2 and conformance findings per
+`references/review-contract.md` §8: drop what's disproved; an
+unconfirmed P2 becomes P3.
 
 Present a unified **Review Report** after writing the file: P0–P2 first,
 then a Conformance block (RULE / SPEC), then the capped P3 list — never
