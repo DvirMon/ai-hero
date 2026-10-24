@@ -9,9 +9,8 @@ capability: plugin-boundaries
 **Read this before moving a skill, agent or shared file between plugins.**
 
 How the marketplace's plugins (`code-review`, `sdlc`, a future `ds`) share work without
-coupling. This log is currently the record itself: no separate grill transcript exists, so
-each decision carries its short why inline. Promote D1–D4 to an ADR (`adr-writer`) once
-accepted.
+coupling. No separate grill transcript exists, so each decision carries its short why inline.
+D1–D7 are summarized in [ADR 0001](../adr/0001-plugin-boundaries.md).
 
 ## Source keys
 
@@ -30,6 +29,7 @@ accepted.
 | D5 | Delete legacy loose `code-review` skill; callers name `code-review:review` explicitly | 10-24 | accepted | G1 |
 | D6 | A shared file's source lives in the plugin that owns its contract; `scripts/shared-files.json` maps copies | 10-24 | accepted | G1 |
 | D7 | Hard-coded refs split three ways: swappable ops → slots; reference files → vendored; stack conventions → `stacks.<stack>.skill` | 10-24 | accepted | G1 |
+| D8 | Each plugin owns its own config file; no shared config that every plugin reads | 10-24 | accepted | G1 |
 
 ### D1 — code-review standalone, consumed by namespaced entry points
 
@@ -133,6 +133,32 @@ Plugin-internal agents (`tdd-planner`, the implementers) stay fixed.
 - **Rejected:** everything overridable.
 - **Note:** `plugins/sdlc` still references stale `~/.claude/skills/impel/` — impel now lives
   in the plugin.
+
+### D8 — one config file per plugin
+
+Each plugin's own setup writes its config file, and its own contract defines the schema:
+
+| File | Owner | Holds |
+|---|---|---|
+| `.claude/workflow.json` | sdlc | `stages`, `capabilities`, `stacks` |
+| `.claude/design-system.json` | design-system | its stages and slots (today collected by `ds-wayfinder`) |
+| `docs/agents/code-review.md` | code-review | its own config |
+
+A config file holds wiring, never another plugin's settings: `stages.review.skill` names the
+reviewer; the reviewer's own config stays in its own file.
+
+A value several plugins need is read from the repo when possible (default branch from git),
+otherwise owned by one plugin that the others call (commit format → `capabilities.commit`;
+tracker → `docs/agents/*-tracker.md`). Per-user values go in the plugin's `userConfig`
+(`plugin.json`), not in a repo file.
+
+- **Why:** a shared file needs one schema owner that knows every plugin's keys, which
+  re-couples them (D1); an uninstalled plugin leaves a dead section behind; plugins couldn't
+  change their config shape independently.
+- **Rejected:** one `workflow.json` with a section per plugin.
+- **Cost:** no single file shows the whole setup. If needed, add a read-only command that
+  prints every plugin's config, not a shared file.
+- **Source:** <https://code.claude.com/docs/en/plugins-reference> (`userConfig`).
 
 ## Still open
 
