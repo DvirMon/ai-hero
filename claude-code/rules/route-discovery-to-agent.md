@@ -18,9 +18,9 @@ of work; no per-request confirmation needed.
   (Same line as [[ask-dont-search-on-ambiguity]] draws.)
 - A judgment call about direction or preference — ask the user, don't dispatch an agent to
   guess.
-- Work a phase-specific agent already owns: `kipi-discovery` globally; inside `org`, also
-  `ds-discovery`, `ds-figma-discovery`, `ds-codebase-discovery`, `ds-a11y-discovery`
-  (project-scoped agents there, not global). Those win in their phase.
+- Work a phase-specific agent already owns: `kipi-discovery` globally; with the
+  `design-system` plugin enabled, also `ds-discovery`, `ds-figma-discovery`,
+  `ds-codebase-discovery`, `ds-a11y-discovery`. Those win in their phase.
 - **Product/UX questions** — what people struggle with, what a person can click and press in a
   competing product, whether this repo already covers a use case. Those belong to the
   `story-discovery` agent, dispatched by the `story-discovery` skill. The split is the question,

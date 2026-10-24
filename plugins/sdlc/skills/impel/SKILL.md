@@ -135,7 +135,7 @@ implementer return, run verify there or defer to a later `verify-ui` step in the
 
 One exception on tests: if the step belongs to a DS component going through the `ds-plan` /
 `ds-scaffold` pipeline (there's a `docs/prd.md` and a versioned plan folder), dispatch
-`ds-test-scaffolder` instead — it takes `componentName`/`componentFilePath`/`prdPath`/`planDir`,
+`design-system:ds-test-scaffolder` instead — it takes `componentName`/`componentFilePath`/`prdPath`/`planDir`,
 not a step file. Everywhere else, `sdlc:test-implementer`.
 
 **`code` steps with a test plan run test-first.** When `step-N-<slug>.test-plan.md` sits beside

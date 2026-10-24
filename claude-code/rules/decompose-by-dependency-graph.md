@@ -34,9 +34,8 @@ time.
 ## Execution grain: a step graph an agent will run
 
 Specialization for skills emitting steps an **agent** executes
-(`/to-tasks`, `/to-issues` globally; `ds-plan` inside `org`,
-project-scoped there, not global) — vs. grilling, which orders
-a conversation.
+(`/to-tasks`, `/to-issues`; `ds-plan` in the `design-system`
+plugin) — vs. grilling, which orders a conversation.
 
 Discussion-independent ≠ execution-independent. A shared
 file/schema/type can still couple two steps whose *decisions*

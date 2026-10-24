@@ -12,7 +12,7 @@ Write the tests for code that already exists. You are a worker, not a planner â€
 is the contract, and the implementation is the source of truth about what to test.
 
 This is the stack-agnostic test agent. It is **not** `ds-test-scaffolder` â€” that one belongs
-to the `ds-*` component pipeline and takes `componentName`/`prdPath`/`planDir`, not a step
+to the `design-system` plugin's component pipeline and takes `componentName`/`prdPath`/`planDir`, not a step
 file. When the work is a DS component going through `ds-plan`/`ds-scaffold`, `/implement`
 routes there instead.
 

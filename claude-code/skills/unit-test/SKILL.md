@@ -12,7 +12,7 @@ each framework's developer skill (see "Division of labour" below).
 > **Role in the pipeline:** knowledge SSOT, not an executor. `/impel` dispatches
 > `Task type: test` steps to the **`test-implementer` agent**, which loads this skill and then
 > writes the specs. DS components going through `ds-plan`/`ds-scaffold` use
-> `ds-test-scaffolder` instead — it reads the same references directly. Read this skill
+> the `design-system` plugin's `ds-test-scaffolder` instead — it reads the same references directly. Read this skill
 > directly for ad-hoc test work or when reviewing someone else's specs.
 
 ## The rule
