@@ -182,7 +182,7 @@ review-contract P labels.
 
 ```
 .claude-plugin/plugin.json
-skills/review-threads/SKILL.md     orchestrator; main session, no `context: fork`
+skills/run/SKILL.md               orchestrator; main session, no `context: fork`
 agents/fixer.md                    sonnet, edit-only tools
 bin/rt-*.mjs                       scripts (§6)
 lib/provider/{github,gitlab}.mjs

@@ -1,5 +1,5 @@
 ---
-name: review-threads
+name: run
 description: "Triage the unresolved review threads on the current branch's PR (GitHub) or MR (GitLab): auto-fix trusted trivial threads, ask before fixing the rest, then commit, push once, reply and resolve. Optional argument: PR/MR number or URL."
 argument-hint: "[PR/MR number or URL]"
 disable-model-invocation: true

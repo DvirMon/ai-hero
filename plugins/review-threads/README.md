@@ -3,7 +3,7 @@
 Triage the unresolved review threads on a GitHub PR or GitLab MR from Claude Code.
 
 ```
-/review-threads [PR/MR number or URL]
+/review-threads:run [PR/MR number or URL]
 ```
 
 Trusted trivial threads (typo, naming, unused import) are fixed automatically, each as its
