@@ -84,4 +84,6 @@ fi
 # --- Cursor: rules ---
 [ -d "$CURSOR_DIR/rules" ] && sync_dir "$CURSOR_DIR/rules" "$REPO_DIR/cursor/rules"
 
+bash "$REPO_DIR/scripts/check-denylist.sh"
+
 echo "Extras mirrored. autosync commits claude-code/ within 60s; cursor/ needs a manual commit."

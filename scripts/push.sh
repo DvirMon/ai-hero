@@ -6,6 +6,7 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO"
 [ "$(git branch --show-current)" = "master" ] || { echo "not on master" >&2; exit 1; }
+bash scripts/check-denylist.sh
 
 if [ -n "$(git status --porcelain -- claude-code)" ]; then
   git add -A -- claude-code

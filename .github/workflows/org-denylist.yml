@@ -1,0 +1,15 @@
+name: org-denylist
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/check-denylist.sh
+        env:
+          DENYLIST: ${{ secrets.DENYLIST }}
