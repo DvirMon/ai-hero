@@ -42,14 +42,30 @@ fi
 for d in "${DIRS[@]}"; do link "$d"; done
 for f in "${FILES[@]}"; do link "$f"; done
 
+# Pre-commit denylist check (.githooks/pre-commit) for this clone. Runs
+# before anything optional, so a later failure can't skip it.
+git -C "$REPO" config core.hooksPath .githooks
+echo "enabled .githooks (org-content pre-commit check)"
+
+# First interpreter that actually runs. On Windows `python3` can be the
+# Microsoft Store alias: found by `command -v`, but fails when executed.
+find_python() {
+  local bin
+  for bin in python3 python; do
+    "$bin" -c 'import sys' >/dev/null 2>&1 && { echo "$bin"; return; }
+  done
+}
+
 # SessionStart hook -> pull.sh. Adds only this one entry to settings.json;
 # idempotent, leaves every other setting untouched.
 install_pull_hook() {
-  command -v python3 >/dev/null 2>&1 || {
-    echo "python3 not found: add a SessionStart hook running 'bash $REPO/scripts/pull.sh' to $CLAUDE/settings.json by hand"
+  local py
+  py="$(find_python)"
+  [ -n "$py" ] || {
+    echo "no working python: add a SessionStart hook running 'bash $REPO/scripts/pull.sh' to $CLAUDE/settings.json by hand"
     return
   }
-  python3 -I - "$CLAUDE/settings.json" "bash \"$REPO/scripts/pull.sh\"" <<'PY'
+  "$py" -I - "$CLAUDE/settings.json" "bash \"$REPO/scripts/pull.sh\"" <<'PY'
 import json, os, sys
 path, cmd = sys.argv[1], sys.argv[2]
 data = json.load(open(path)) if os.path.exists(path) else {}
@@ -63,7 +79,3 @@ else:
 PY
 }
 install_pull_hook
-
-# Pre-commit denylist check (.githooks/pre-commit) for this clone.
-git -C "$REPO" config core.hooksPath .githooks
-echo "enabled .githooks (org-content pre-commit check)"
