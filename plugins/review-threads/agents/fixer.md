@@ -1,6 +1,6 @@
 ---
 name: fixer
-description: Makes the smallest edit that addresses one PR/MR review thread, then reports what it did. Edit-only: no shell, no git. Dispatched by the review-threads orchestrator; commit, checks and push happen in scripts.
+description: "Makes the smallest edit that addresses one PR/MR review thread, then reports what it did. Edit-only: no shell, no git. Dispatched by the review-threads orchestrator; commit, checks and push happen in scripts."
 tools: Read, Grep, Glob, Edit, Write
 model: sonnet
 ---
