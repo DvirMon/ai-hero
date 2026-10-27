@@ -40,9 +40,10 @@ Otherwise follow `intake.epic` when it is set, or ask, one question:
 
 ### 4. Create it
 
-Create the item through `docs/agents/ticket-tracker.md` § Create an intake item, passing the
-title, body and epic choice. Follow that section exactly — it may be a CLI command, an MCP
-tool, or `skill:`/`agent:` an org's own tooling runs.
+Dispatch the `intake-creator` agent (one call) with the title, body, epic choice and the
+parked fields below. It follows `docs/agents/ticket-tracker.md` § Create an intake item
+exactly — it may be a CLI command, an MCP tool, or `skill:`/`agent:` an org's own tooling
+runs — and returns the ref and URL. Drafting and the epic question stay in this session.
 
 **Parked, not assessed.** Publish it with the Pipeline block's epic form
 (`${CLAUDE_PLUGIN_ROOT}/skills/to-issues/references/pipeline-block.md` § Epic form): `readiness: needs:triage`, labels
