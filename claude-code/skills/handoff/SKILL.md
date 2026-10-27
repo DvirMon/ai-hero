@@ -10,16 +10,20 @@ not documentation — keep it very short, usually under 15 lines.
 **This produces a file for a future session, it does not spawn an agent.** If the user says "hand
 off to another agent/session", they mean write the document — don't dispatch a subagent.
 
-Save it to `/tmp`, **not** the workspace, and not any session-scoped scratchpad — a scratchpad is
-invisible to the fresh session this is written for, so `/tmp` overrides any scratchpad instruction
-in effect. Name it `handoff-<slug>.md`. Handoffs are deleted after use; one left in the repo goes
-stale and competes with the durable record for authority.
+Save it in the task's **gitignored work folder**, next to the docs it routes to — e.g. a ticket's
+`docs/work/<slug>/`. Confirm with `git check-ignore <path>` before writing: a committed handoff
+goes stale and competes with the durable record for authority, now shared with everyone.
 
-If the repo has a gitignored handoff folder (e.g. `handoffs/`), write there instead — it survives
-a reboot, which `/tmp` does not. Only ever a gitignored one: a committed handoff is the stale-record
-problem above, now shared with everyone.
+Name it `<YYYY-MM-DD>-<HHMM>-handoff.md`, timestamped when written — several can land on one task,
+and the name alone must show which is newest. Never overwrite an earlier handoff; a newer one
+supersedes it.
 
-Tell the user the path once written — a handoff nobody can locate is inert.
+Never `/tmp` or a session-scoped scratchpad: the app's file pane can't open either, so links to
+them don't work, and `/tmp` doesn't survive a reboot. If no gitignored folder fits, ask where to
+put it.
+
+Tell the user the path once written, as a link relative to the working directory — a handoff
+nobody can locate is inert.
 
 ## Every handoff opens with a delete instruction
 
