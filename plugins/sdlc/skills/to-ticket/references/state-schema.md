@@ -14,6 +14,7 @@ the validation routine inline.
   "slug": "<slug>",
   "ticketRef": "<id/key returned by the repo's resolved ticket tracker>",
   "ticketUrl": "<url, if the tracker has one>",
+  "ticketOwner": "<optional: per ticket-tracker.md § Ticket owner; omit if the tracker has none>",
   "domainPath": "<path to the owning domain, e.g. libs/shared/table>",
   "workspaceRoot": "<domainPath>/docs/work/<slug>",
   "isComplex": null,
@@ -78,6 +79,7 @@ reads it, not just who writes it.
 | `slug` | `to-ticket`. | All six pipeline skills (workspace identification); `org/.claude/hooks/pipeline-current-ticket.sh` (argument matching); `to-ticket`, `grill-with-docs`, `to-spec`, `to-issues` (the epic's planning branch, `docs/<slug>`). It does **not** name issue branches — each issue's branch is `<type>/<N>-<slice-slug>`, recorded in that unit's `units[].branch`. |
 | `ticketRef` | `to-ticket`. | `grill-with-docs` (fetches the ticket this points at); `pipeline-current-ticket.sh` (displays it in suggested context). |
 | `ticketUrl` | `to-ticket`. | `to-ticket` itself, in its own hand-off message to the user (step 5). |
+| `ticketOwner` (optional) | `to-ticket`, at creation, per `ticket-tracker.md` § Ticket owner; omitted when the tracker has none. The person to ask about spec questions; distinct from the assignee. | Any skill that addresses the owner by name (e.g. `jira-grill-comment`). |
 | `domainPath` | `to-ticket`, resolved during workspace creation (step 4's domain-path resolution). | No skill re-reads it today. Stated consumer: any future stage that needs the domain root without re-deriving it from `workspaceRoot` — e.g. locating the domain's own `CONTEXT.md` / `docs/adr/` for cross-referencing. Step 7 made the layout domain-colocated; this is the field that records the domain once instead of re-deriving it every stage. |
 | `workspaceRoot` | `to-ticket`. | `grill-with-docs`, `to-spec`, `to-issues`, `to-tasks`, `implementation` — every path they read or write is built from this. |
 | `isComplex` | `grill-with-docs`. | `to-spec` (step 4 — gates whether `3-architecture.md` gets written). |

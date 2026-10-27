@@ -7,7 +7,7 @@ description: Drafts and posts a Jira comment @-mentioning a named person with sp
 
 **Draft in chat → post only after explicit approval.** Atlassian MCP: cache `cloudId` from `getAccessibleAtlassianResources`, then `addOrEditJiraIssueComment` (markdown `commentBody`).
 
-Collect: issue key, `@` display name, topic, who implements if silent (`FE` / `BE` / `we`), items from spec/decisions (each needs id, question, recommendation, basis). Optional “Separate follow-up later: …” paragraph. No TBD rows.
+Collect: issue key, `@` display name (default: the ticket owner per `ticket-tracker.md` § Ticket owner, via `state.json` `ticketOwner` when present; else ask), topic, who implements if silent (`FE` / `BE` / `we`), items from spec/decisions (each needs id, question, recommendation, basis). Optional “Separate follow-up later: …” paragraph. No TBD rows.
 
 **Reference:** UI-related → Loom or Figma the user confirms; ask before posting if missing. Non-UI → spec/flow/page. Generic toasts → note platform-standard, no Figma.
 

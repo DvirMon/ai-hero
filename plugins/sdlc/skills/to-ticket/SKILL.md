@@ -190,6 +190,7 @@ Write `<workspace-root>/state.json` (substituting whichever root was decided abo
   "slug": "<slug>",
   "ticketRef": "<the id/key/path the tracker convention returned>",
   "ticketUrl": "<url, if the tracker has one>",
+  "ticketOwner": "<optional: per ticket-tracker.md § Ticket owner; omit if the tracker has none>",
   "domainPath": "<domain-path>",
   "workspaceRoot": "<workspace-root>",
   "isComplex": null,
