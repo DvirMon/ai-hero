@@ -1,0 +1,10 @@
+{"data":{"repository":{"viewerPermission":"WRITE","pullRequest":{
+  "id":"PR_1","number":7,"isDraft":false,"body":"Closes #42","headRefName":"feat/42-x","headRefOid":"abc123","baseRefName":"main",
+  "isCrossRepository":false,"maintainerCanModify":true,"author":{"login":"dvir"},
+  "reviewThreads":{"pageInfo":{"hasNextPage":true,"endCursor":"T1"},"nodes":[
+    {"id":"PRRT_a","isResolved":false,"isOutdated":false,"path":"src/a.ts","line":10,"originalLine":10,"subjectType":"LINE",
+     "comments":{"pageInfo":{"hasNextPage":true,"endCursor":"C1"},"nodes":[
+       {"id":"PRRC_1","fullDatabaseId":"1001","body":"nit: typo in comment","createdAt":"2026-10-01T10:00:00Z","url":"https://github.com/o/r/pull/7#discussion_r1001","author":{"__typename":"User","login":"alice"}}]}},
+    {"id":"PRRT_done","isResolved":true,"isOutdated":false,"path":"src/z.ts","line":1,"originalLine":1,"subjectType":"LINE",
+     "comments":{"pageInfo":{"hasNextPage":false,"endCursor":null},"nodes":[
+       {"id":"PRRC_9","fullDatabaseId":"1009","body":"fine","createdAt":"2026-10-01T10:00:00Z","url":"u","author":{"__typename":"User","login":"alice"}}]}}]}}}}}

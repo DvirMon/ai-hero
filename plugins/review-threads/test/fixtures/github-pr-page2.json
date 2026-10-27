@@ -1,0 +1,7 @@
+{"data":{"repository":{"viewerPermission":"WRITE","pullRequest":{
+  "id":"PR_1","number":7,"isDraft":false,"body":"Closes #42","headRefName":"feat/42-x","headRefOid":"abc123","baseRefName":"main",
+  "isCrossRepository":false,"maintainerCanModify":true,"author":{"login":"dvir"},
+  "reviewThreads":{"pageInfo":{"hasNextPage":false,"endCursor":null},"nodes":[
+    {"id":"PRRT_b","isResolved":false,"isOutdated":true,"path":"src/b.ts","line":null,"originalLine":5,"subjectType":"LINE",
+     "comments":{"pageInfo":{"hasNextPage":false,"endCursor":null},"nodes":[
+       {"id":"PRRC_2","fullDatabaseId":"1002","body":"issue (blocking): this leaks","createdAt":"2026-10-01T11:00:00Z","url":"u2","author":{"__typename":"Bot","login":"coderabbitai"}}]}}]}}}}}
