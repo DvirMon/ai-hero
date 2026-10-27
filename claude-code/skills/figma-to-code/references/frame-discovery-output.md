@@ -83,7 +83,7 @@ Rows here feed grill's batched questions (audit §3). Do **not** ask the user fr
 
 ### Icons
 
-| Glyph / description | In `@org/icons` or `org-icon-*`? | Notes |
+| Glyph / description | In the project's icon set (`config.icons`)? | Notes |
 |---|---|---|
 
 Route probable misses to `config.icons.missing`.
