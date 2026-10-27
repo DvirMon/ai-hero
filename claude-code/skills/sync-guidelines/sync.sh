@@ -34,10 +34,22 @@ sync_dir() {
 # --- Repo-level .claude/{skills,agents}: project-scoped on purpose (e.g. org's ds-*), ---
 # --- kept out of ~/.claude so they don't leak into unrelated projects' context. ---
 # --- Stored under claude-code/project/, NOT in the symlinked live dirs. ---
+# --- Repos named in ~/.config/ai-hero/sync-exclude (one folder name per line, local only) ---
+# --- are skipped: their .claude/ holds org setup that must stay on this machine. ---
 GIT_ROOT="$HOME/git"
+EXCLUDE_FILE="${SYNC_EXCLUDE_FILE:-$HOME/.config/ai-hero/sync-exclude}"
+is_excluded_repo() {
+  [ -f "$EXCLUDE_FILE" ] || return 1
+  tr -d '\r' < "$EXCLUDE_FILE" | grep -vE '^[[:space:]]*(#|$)' | grep -qxF "$1"
+}
 if [ -d "$GIT_ROOT" ]; then
   for repo_claude in "$GIT_ROOT"/*/.claude; do
     [ -d "$repo_claude" ] || continue
+    repo_name="$(basename "$(dirname "$repo_claude")")"
+    if is_excluded_repo "$repo_name"; then
+      echo "skipped $repo_name (sync-exclude)"
+      continue
+    fi
     for sub in skills agents; do
       [ -d "$repo_claude/$sub" ] || continue
       mkdir -p "$REPO_DIR/claude-code/project/$sub"

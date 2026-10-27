@@ -107,4 +107,8 @@ case "$HARNESS" in
   *) echo "unknown harness: $HARNESS (expected claude-code, cursor, or all)" >&2; exit 1 ;;
 esac
 
+# Pre-commit denylist check (.githooks/pre-commit) for this clone.
+git -C "$REPO_DIR" config core.hooksPath .githooks
+echo "enabled .githooks (org-content pre-commit check)"
+
 echo "Done."

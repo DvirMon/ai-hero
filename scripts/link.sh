@@ -63,3 +63,7 @@ else:
 PY
 }
 install_pull_hook
+
+# Pre-commit denylist check (.githooks/pre-commit) for this clone.
+git -C "$REPO" config core.hooksPath .githooks
+echo "enabled .githooks (org-content pre-commit check)"

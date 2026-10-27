@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Block a commit whose staged content holds an org-internal term.
+# Enabled per clone by scripts/link.sh and scripts/install.sh
+# (git config core.hooksPath .githooks).
+exec bash "$(git rev-parse --show-toplevel)/scripts/check-denylist.sh" --staged
