@@ -68,13 +68,15 @@ Only after the outline is approved — an outline change makes a test plan stale
 
 For every `code` step, dispatch the `sdlc:tdd-planner` agent, all steps in parallel, passing
 `stepOutline` (that step's approved outline), `stepNumber`, `stepSlug`, `testSkills` (the step's
-project `skills.test`), and
-`specPath`/`architecturePath` if set. It is read-only: it returns the test plan as text and
-writes nothing.
+project `skills.test`), `issueCriteria` (the issue's acceptance criteria, verbatim, when it has
+them), and `specPath`/`architecturePath` if set. It is read-only: it returns the test plan as
+text and writes nothing.
 
 Then present each returned plan to the user, one step at a time, and iterate until approved.
 This review is the point of the stage — the user sees *why* each seam gets its test before any
 test exists. Raise the plan's **Open questions** here; don't carry them to `/implementation`.
+A behaviour the plan's **Behaviour coverage** table leaves untested is a gap to settle now:
+add a seam, accept it as Not tested, or move it to the step that owns it.
 
 A planner that returns `Seams: none` gets no test plan. That step keeps test-after-code: if it
 still needs tests, it keeps its own `type: test` step.
