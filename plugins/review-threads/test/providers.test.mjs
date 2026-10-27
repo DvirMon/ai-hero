@@ -25,7 +25,7 @@ function ghRunner(calls = []) {
       if (query.includes('states: [PENDING]')) return JSON.stringify({ data: { repository: { pullRequest: { reviews: { totalCount: 1 } } } } });
     }
     if (args[1]?.startsWith('repos/o/r/collaborators/'))
-      return JSON.stringify({ permission: 'write', role_name: args[1].includes('/maint/') ? 'maintain' : args[1].includes('/rd/') ? 'read' : 'write' });
+      return JSON.stringify({ permission: args[1].includes('/rd/') ? 'read' : 'write', role_name: args[1].includes('/maint/') ? 'maintain' : args[1].includes('/rd/') ? 'read' : 'write' });
     if (args[1] === 'user') return JSON.stringify({ login: 'dvir' });
     if (args[1]?.endsWith('/replies')) return JSON.stringify({ id: 5, html_url: 'https://x/r5' });
     throw new Error(`unexpected gh call ${args.join(' ')}`);
@@ -78,7 +78,7 @@ function glRunner(discussionPages) {
     if (p === 'user') return JSON.stringify({ id: 1, username: 'dvir' });
     if (p.includes('/members/all/')) return JSON.stringify({ access_level: p.endsWith('/2') ? 20 : 30 });
     if (p.includes('/draft_notes')) return '[]';
-    if (p.includes('/discussions?')) return JSON.stringify(discussionPages(Number(p.match(/page=(\d+)/)[1])));
+    if (p.includes('/discussions?')) return JSON.stringify(discussionPages(Number(p.match(/[?&]page=(\d+)/)[1])));
     if (/merge_requests\/5$/.test(p)) return fx('gitlab-mr.json');
     throw new Error(`unexpected glab call ${args.join(' ')}`);
   };

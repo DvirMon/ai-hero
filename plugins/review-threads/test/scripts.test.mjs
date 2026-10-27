@@ -12,6 +12,8 @@ import { saveReview, loadReview, saveThreads, writeJson } from '../lib/state.mjs
 import { buildMarker } from '../lib/markers.mjs';
 import { git as realGit } from '../lib/exec.mjs';
 
+// Windows checkouts may restore CRLF; compare content, not line endings.
+const rd = (f) => readFileSync(f, 'utf8').replaceAll('\r\n', '\n');
 const OK_VERIFY = `node -e "process.exit(0)" {files}`;
 const BAD_VERIFY = `node -e "process.exit(1)" {files}`;
 
@@ -67,7 +69,7 @@ test('apply: a shape mismatch reverts the edit and moves the thread to gated', a
   const res = await run(root, dir);
   assert.equal(res.status, 'reverted');
   assert.equal(res.stage, 'shape');
-  assert.equal(readFileSync(path.join(root, 'src/a.js'), 'utf8'), '// helo\nconst x = 1;\n');
+  assert.equal(rd(path.join(root, 'src/a.js')), '// helo\nconst x = 1;\n');
   assert.equal(loadReview(dir).threads.t1.gate, 'gated');
   assert.equal(g(['rev-list', '--count', 'HEAD']).trim(), '1');
 });
@@ -78,7 +80,7 @@ test('apply: a verify failure reverts; auto without a verify command is refused'
   writeFileSync(path.join(root, 'src/a.js'), '// hello\nconst x = 1;\n');
   const bad = await run(root, dir);
   assert.equal(bad.stage, 'verify');
-  assert.equal(readFileSync(path.join(root, 'src/a.js'), 'utf8'), '// helo\nconst x = 1;\n');
+  assert.equal(rd(path.join(root, 'src/a.js')), '// helo\nconst x = 1;\n');
 
   ({ root } = repo());
   dir = state(root, { verify: null });
@@ -93,13 +95,13 @@ test('apply: a protected path in the diff reverts, even for the gated lane', asy
   writeFileSync(path.join(root, 'infra/x.js'), 'b\n');
   const res = await run(root, dir, 'gated');
   assert.equal(res.stage, 'protected-path');
-  assert.equal(readFileSync(path.join(root, 'infra/x.js'), 'utf8'), 'a\n');
+  assert.equal(rd(path.join(root, 'infra/x.js')), 'a\n');
 });
 
 test('apply: a commit-hook rejection reverts and flags a possible trailer rejection', async () => {
   const { root, g } = repo();
   const dir = state(root);
-  const hooks = path.join(root, 'hooks');
+  const hooks = `${root}-hooks`;
   mkdirSync(hooks);
   writeFileSync(path.join(hooks, 'commit-msg'), '#!/bin/sh\necho "footer not allowed: Review-Thread" >&2\nexit 1\n', { mode: 0o755 });
   g(['config', 'core.hooksPath', hooks]);
@@ -107,7 +109,7 @@ test('apply: a commit-hook rejection reverts and flags a possible trailer reject
   const res = await run(root, dir);
   assert.equal(res.stage, 'commit');
   assert.equal(res.hint, 'hook-may-reject-trailer');
-  assert.equal(readFileSync(path.join(root, 'src/a.js'), 'utf8'), '// helo\nconst x = 1;\n');
+  assert.equal(rd(path.join(root, 'src/a.js')), '// helo\nconst x = 1;\n');
 });
 
 test('apply: the auto lane refuses a thread that is not auto', async () => {
