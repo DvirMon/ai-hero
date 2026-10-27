@@ -1,0 +1,5 @@
+{
+  "name": "review-threads",
+  "description": "Pull review threads from a GitHub PR or GitLab MR, auto-fix trusted trivial ones, gate the rest behind your approval, then commit, push once, reply and resolve.",
+  "author": { "name": "DvirMon" }
+}

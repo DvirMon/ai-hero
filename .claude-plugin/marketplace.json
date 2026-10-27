@@ -11,6 +11,11 @@
       "description": "Impact-ranked code review: one orchestrator, thin reviewer agents, per-repo config."
     },
     {
+      "name": "review-threads",
+      "source": "./plugins/review-threads",
+      "description": "Triage PR/MR review threads: auto-fix trusted trivial ones, gate the rest, then push once, reply and resolve."
+    },
+    {
       "name": "sdlc",
       "source": "./plugins/sdlc",
       "description": "Ticket-to-PR pipeline: intake, ticket, grill, spec, issues, tasks, implementation, review, ship."
