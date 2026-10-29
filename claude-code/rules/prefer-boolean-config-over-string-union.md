@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.{ts,tsx}"
+---
+
 # Binary branch → boolean flag, not a string union
 
 For a configuration option that branches between exactly two

@@ -1,6 +1,13 @@
+---
+paths:
+  - "**/*.{ts,tsx,html,css,scss}"
+---
+
 # File organization: one concern per file
 
-Split generated/edited code by concern instead of putting everything in one file. Naming pattern: `<feature>.<concern>.ts`, not a bare generic name — this avoids collisions when multiple features live in sibling folders and keeps imports self-describing.
+Split code by concern. Name files `<feature>.<concern>.ts`, not a bare
+generic name — avoids collisions between sibling feature folders and
+keeps imports self-describing.
 
 | Concern | File | Contents |
 |---|---|---|
@@ -12,63 +19,52 @@ Split generated/edited code by concern instead of putting everything in one file
 | Feature plugin | `with-<capability>.ts` | one file per opt-in feature (e.g. `with-sorting.ts`), matching its own `.spec.ts` |
 
 Rules:
-- Don't inline an interface/type inside a component or store file — put it in `<feature>.types.ts` and import it.
-- Don't inline mock/sample data in a component (e.g. a `-demo` component) — put it in `<feature>.mock.ts` and import it.
-- A folder's `index.ts` is a barrel: re-export the public API only, don't define logic there.
-- Keep each file scoped to its single concern — if a `.store.ts` file starts accumulating helper functions or type definitions, split them out rather than growing the file.
+- No interface/type inline in a component or store file — put it in `<feature>.types.ts`.
+- No mock/sample data inline in a component (e.g. a `-demo`) — put it in `<feature>.mock.ts`.
+- A folder's `index.ts` is a barrel: re-export the public API only, no logic.
+- Keep each file to one concern; when a `.store.ts` accumulates helpers or types, split them out.
 
-This does not require rewriting existing single-file components; apply it to new features and when a file grows past one concern.
-
-For when to extract a step into a *named function* within the same file (before it's worth a separate file), see [declarative-naming.md](declarative-naming.md).
+Apply to new features and when a file grows past one concern; no
+need to rewrite existing single-file components. For pulling a step
+into a *named function* in the same file, see
+[declarative-naming.md](declarative-naming.md).
 
 ## Where code goes: three levels, promote on evidence
 
-Splitting is a ladder. Climb one rung only when the current one stops holding.
+1. **Named function, same file** — the default.
+2. **Sibling file, one concern** — `<feature>.<concern>.ts`. Correct
+   for most domains, permanently.
+3. **Folder** — only once a domain outgrows flat (~15 source files).
 
-1. **Named function, same file** — the default. See declarative-naming.md.
-2. **Sibling file, one concern** — `<feature>.<concern>.ts`, as above. Correct for most domains, permanently.
-3. **Folder** — only once a domain has outgrown flat (order of ~15 source files). Not before.
-
-**Promote on evidence, never on anticipation.** Give something a folder because it already
-outgrew a file, not because it might. A 150-line feature pre-split into five files is harder to
-read than the one file, and the split ossifies a shape you haven't validated.
+Promote on evidence, never anticipation: a 150-line feature
+pre-split into five files reads worse than one file and ossifies an
+unvalidated shape.
 
 ## Choosing the folder axis
 
-The real decision isn't *flat vs. nested* — it's **what the folders are named after**. Prefer the
-highest that applies:
+Name folders after the highest of these that applies:
 
-1. **Contract boundary** — what a consumer touches vs. what's internal. Always the first cut, because it's the only split a reader can rely on: "not listed in the public barrel" is an enforceable statement.
-2. **Lifecycle phase** — *when* code runs, e.g. declare → compile → run, or input → transform → present. Works because a change usually lands in one phase, and the seam between phases is a real handoff with a defined shape.
-3. **Feature/entity** — one folder per independent unit. Fine when the units genuinely don't know about each other and each is big enough to fill a folder.
-4. **Technical kind** — `types/`, `utils/`, `hooks/`, `helpers/`. **Avoid.** These aren't boundaries; nothing is enforced by them, and almost every change touches all of them at once, so the folders only add path depth.
+1. **Contract boundary** — what a consumer touches vs. internal. Always the first cut; "not in the public barrel" is enforceable.
+2. **Lifecycle phase** — *when* code runs (declare → compile → run, input → transform → present). A change usually lands in one phase.
+3. **Feature/entity** — one folder per independent unit, when units don't know each other and each fills a folder.
+4. **Technical kind** (`types/`, `utils/`, `hooks/`) — **avoid.** Nothing is enforced by them and most changes touch all of them.
 
-The same concept may legitimately span folders under axes 1–2 — declared in one, executed in
-another. That's the axis working, not a violation of one-concern-per-file.
+One concept may span folders under axes 1–2 (declared in one, run in
+another); that is the axis working.
 
 ## Invariants once nested
 
-- **The folder supplies the domain** — drop the now-redundant prefix inside it (`engine/pipeline.ts`, not `engine/table.pipeline.ts`).
-- **One barrel per domain, not per folder.** Exactly one file defines the public surface; anything not listed there is internal. Per-folder barrels are usually dead code, and two files defining the surface is how a surface drifts.
-- **Splitting must not duplicate a declaration.** If moving code apart makes you keep two lists in sync (an ordered constant plus a matching interface, a registry plus its union), derive one from the other. Two hand-maintained copies of the same fact is a silent-drift bug the compiler won't catch.
-- **Concept is portable; layout is project-specific.** Which phases exist, and what the folders are called, comes from the domain — don't import another project's folder names.
+- **The folder supplies the domain** — drop the redundant prefix (`engine/pipeline.ts`, not `engine/table.pipeline.ts`).
+- **One barrel per domain, not per folder.** One file defines the public surface; anything unlisted is internal.
+- **Splitting must not duplicate a declaration.** If two lists must be kept in sync (ordered constant + matching interface, registry + union), derive one from the other.
+- **Concept is portable; layout is project-specific.** Folder names come from the domain.
 
 ## Domain-scoped docs, colocated
 
-A **domain** = a public API boundary (a component, feature, package, or app). A domain owns everything needed to understand and implement it, including its own docs — don't gather docs centrally.
+A **domain** = a public API boundary (component, feature, package,
+app). It owns its docs, colocated (e.g. a sibling `docs/`), not a
+repo-wide dump.
 
-Example shape (illustrative, not prescriptive — filenames/structure are project-specific):
-
-```
-src/domain/Thing/
-├── Thing.ts
-├── Thing.module.css
-└── docs/
-    └── ...             ← this domain's own docs, whatever files the project uses
-```
-
-Rules:
-- Each domain gets its own docs colocated with its source (e.g. a sibling `docs/` folder) — not a repo-wide docs dump. Exact filenames/structure are project-specific; the concept is what's portable, not the layout.
-- Inner helpers/sub-components are documented as part of the parent domain's docs, not given their own separate doc set.
-- Cross-domain decisions (glossary, architecture-wide ADRs) stay centralized — one shared location, not duplicated per domain.
-- Scales with the codebase: finding a domain's docs means finding the domain's code, no separate lookup path to maintain.
+- Inner helpers/sub-components are documented in the parent domain's docs.
+- Cross-domain decisions (glossary, architecture-wide ADRs) stay in one shared location.
+- Finding a domain's docs means finding its code.

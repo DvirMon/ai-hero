@@ -1,19 +1,25 @@
+---
+paths:
+  - "**/*.{ts,tsx,html}"
+---
+
 # Declarative naming and decomposition
 
-Names should say *what a thing means in the workflow*, not what it contains or how it's wired. Applies to event handlers, booleans, and function extraction.
+Names say *what a thing means in the workflow*, not what it contains
+or how it's wired.
 
 ## Event handlers
 
-Name for the domain action the handler triggers, not the DOM event.
+Name for the domain action, not the DOM event.
 
 - `onSelectCustomerRow`, `onSubmitInvoice` — not `onClick`, `handleClick`.
-- Caller-facing prop name matches: `<Table onSelectCustomerRow={selectCustomerRow} />`, not `<Table onRowClick={handleClick} />`.
+- Caller-facing prop matches: `<Table onSelectCustomerRow={selectCustomerRow} />`.
 
 ## Booleans
 
-- Never inline a boolean condition in `if`/`&&`/ternary. Extract to a named `const` first.
-- Name for workflow intent, not raw state: `shouldSendPostRequest`, `canContinue` — not `isValid`, `isTrue`, `flag`.
-- Complex condition (3+ sub-conditions) — give each sub-condition its own named `const`, then combine them in a final named boolean.
+- Never inline a boolean condition in `if`/`&&`/ternary; extract a named `const` first.
+- Name for workflow intent, not raw state: `shouldSendPostRequest`, `canContinue` — not `isValid`, `flag`.
+- 3+ sub-conditions: name each, then combine in a final named boolean.
 
 ```ts
 // not this
@@ -29,32 +35,25 @@ if (canManageBilling) { ... }
 
 ## Boolean-returning functions
 
-Any function whose return value is a boolean guard/predicate
-takes an `is*` / `has*` / `can*` prefix: `isEqual(a, b)`,
-`isInRange(v, r)`, `hasAnyOf(list, wanted)`. A bare verb
-(`equals`, `contains`) is reserved for functions that *do*
-something — e.g. a declaration rule that registers a filter.
-
-**Why:** raised as an already-established convention when a
-filter matcher and a filter rule were both named `equals`. The
-prefix is what makes the two forms distinguishable at a
-glance, and it resolves the name collision structurally
-instead of by namespacing.
-
-Same instinct as the boolean-`const` section above, applied to
-the function's name rather than the variable's.
+A boolean guard/predicate takes an `is*` / `has*` / `can*` prefix:
+`isEqual(a, b)`, `isInRange(v, r)`, `hasAnyOf(list, wanted)`. A bare
+verb (`equals`, `contains`) is reserved for functions that *do*
+something, e.g. a declaration rule that registers a filter. The
+prefix keeps the two forms apart (a matcher and a rule were both
+`equals`).
 
 ## Function decomposition
 
-Reason about whether a step inside a larger function deserves its own named pure function — even if it's used exactly once and never reused elsewhere. The payoff is clarity and self-documenting structure, not reuse.
+Ask whether a step deserves its own named pure function even if used
+once. The payoff is clarity, not reuse.
 
 Extract when:
-- Inline object/shape construction mid-function — pull into a named `createX`/`toX` helper, single-use is fine.
-- The function mixes multiple workflow steps (e.g. fetch → transform → dispatch) — give each step its own named function so the outer function reads like a table of contents.
-- You'd otherwise need a comment to explain what a block does — the comment belongs in the function's name instead.
+- Inline object/shape construction mid-function — a named `createX`/`toX` helper.
+- The function mixes workflow steps (fetch → transform → dispatch) — one named function per step so the outer reads like a table of contents.
+- You'd need a comment to explain a block — the name replaces it.
 
 Don't extract:
-- A single expression or trivial one-line transform with no independent meaning (over-extraction produces a maze of one-line indirections).
-- Logic that would need most of the caller's local state passed back in (no real seam exists yet).
+- A single expression or trivial one-line transform (a maze of indirections).
+- Logic needing most of the caller's local state passed back (no real seam).
 
-Once extracted helpers accumulate in a file, split by concern — see [file-organization.md](file-organization.md).
+Once helpers accumulate, split by concern — see [file-organization.md](file-organization.md).

@@ -1,65 +1,36 @@
 # Decompose before acting: map the dependency graph first
 
-For any feature with multiple sub-features/steps/nodes: don't
-process all of them before mapping the graph. This is the
-shared mechanism — callers (grilling, task planning, anything
-else that decomposes work into nodes) apply it, then act on
-the ranking in whatever way fits their own concern.
+For any feature with multiple sub-features/steps/nodes, map the graph
+before processing them. Callers (grilling, task planning, anything
+decomposing work) apply this, then act on the ranking their own way.
 
 1. List the nodes only — no processing yet.
-2. Map dependency edges **between nodes** (not against
-   existing code): does B need a decision/output/artifact
-   from A?
-3. Rank: **core** (others depend on it, resolve it first),
-   **independent/leaf** (nothing depends on it, nothing it
-   depends on — act on it now, in parallel), **dependent**
-   (needs core/another node resolved first — sequenced, not
-   parked).
-4. Process nodes in graph order. Core/independent nodes: fully
-   resolve now. Dependent nodes: resolve only after their
-   upstream settles.
+2. Map dependency edges **between nodes** (not against existing code): does B need a decision/output/artifact from A?
+3. Rank: **core** (others depend on it; resolve first), **independent/leaf** (no edges; act now, in parallel), **dependent** (needs upstream resolved first — sequenced, not parked).
+4. Process in graph order. Core/independent: resolve fully now. Dependent: only after upstream settles.
 
-Processing a node already in progress stays exhaustive — this
-only decides *which node next*, not how thoroughly. Don't skip
-step 2 to save time; an unmapped edge just surfaces later as
-rework instead of being caught now. An uncertain edge counts
-as real until proven otherwise — never independent by default.
+A node already in progress stays exhaustive — this decides *which
+node next*, not how thoroughly. Don't skip step 2: an unmapped edge
+surfaces later as rework. An uncertain edge counts as real until
+proven otherwise.
 
-**Accepted risk:** a node marked independent may turn out
-coupled once more is known. That's the trade for not
-waterfalling everything upfront — fix the edge and absorb
-rework on that node, don't re-litigate the whole graph next
-time.
+**Accepted risk:** a node marked independent may turn out coupled.
+Fix the edge and absorb that node's rework; don't re-litigate the
+whole graph.
 
 ## Execution grain: a step graph an agent will run
 
 Specialization for skills emitting steps an **agent** executes
-(`/to-tasks`, `/to-issues`; `ds-plan` in the `design-system`
-plugin) — vs. grilling, which orders a conversation.
+(`/to-tasks`, `/to-issues`; `ds-plan` in `design-system`), vs.
+grilling, which orders a conversation.
 
-Discussion-independent ≠ execution-independent. A shared
-file/schema/type can still couple two steps whose *decisions*
-were independent to discuss. Re-map edges at execution grain;
-don't reuse a grilling ranking.
+Discussion-independent ≠ execution-independent: a shared
+file/schema/type can couple steps whose *decisions* were independent.
+Re-map edges at execution grain; don't reuse a grilling ranking.
 
-1. Map real edges (B fails to compile/run/review without A's
-   artifact) → core/independent/dependent.
-2. Presentation order (file layout, a phase heuristic,
-   numbering) is **not** a dependency — don't let step order
-   imply an edge the graph doesn't show.
-3. Emit per step only the hard edge: `depends_on: [N]`
-   (empty when none). No per-step `Parallel-safe with:` —
-   parallelism is read off the graph, not restated per step.
-4. Work the **frontier** — any step whose blockers are done —
-   as the execution unit.
-5. Render the graph **once**, in the plan's progress file
-   (`progress.md` for `/to-tasks`), not per step: a diagram
-   (Mermaid in `progress.md`, ASCII where the caller's
-   template says so — nodes + arrows), plus a
-   one-line summary (`Parallel-safe: [D,E,G] after B` /
-   `Dependency: A → B → F`).
-   All three views (per-step `depends_on`, diagram, summary)
-   derive from the same ranking — if they disagree, the
-   ranking is wrong. Fix that, not one view.
-6. The executor schedules from that graph; it does not
-   re-derive parallelism on its own.
+1. Map real edges (B fails to compile/run/review without A's artifact) → core/independent/dependent.
+2. Presentation order (file layout, numbering) is **not** a dependency.
+3. Emit per step only the hard edge: `depends_on: [N]` (empty when none). No per-step `Parallel-safe with:` — read parallelism off the graph.
+4. Work the **frontier** — any step whose blockers are done.
+5. Render the graph **once**, in the plan's progress file (`progress.md` for `/to-tasks`): a diagram (Mermaid in `progress.md`, ASCII where the caller's template says so) plus a one-line summary (`Parallel-safe: [D,E,G] after B` / `Dependency: A → B → F`). Per-step `depends_on`, diagram and summary derive from one ranking; if they disagree, fix the ranking.
+6. The executor schedules from that graph; it doesn't re-derive parallelism.

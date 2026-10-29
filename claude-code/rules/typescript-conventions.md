@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.{ts,tsx}"
+---
+
 # TypeScript conventions
 
 Framework-agnostic TypeScript rules. For Angular-specific reactivity/DI/component patterns, see the `angular-developer` skill instead — don't duplicate those here.

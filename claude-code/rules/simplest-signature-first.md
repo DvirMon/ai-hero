@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.{ts,tsx}"
+---
+
 # Simplest type signature first
 
 When designing a generic API signature, stop at the simplest
