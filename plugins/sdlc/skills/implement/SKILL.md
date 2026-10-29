@@ -1,10 +1,10 @@
 ---
-name: implementation
+name: implement
 description: "Execute a ticket's task plan by dispatching each step to an executor agent, with the skills the step's project names in .claude/workflow.json."
 disable-model-invocation: true
 ---
 
-# Implementation
+# Implement
 
 You are a **dispatcher**, not an implementer. Skills hold conventions, agents execute: you read
 the plan, send each step to its executor with its project's skills, commit each step as it lands,
@@ -13,7 +13,7 @@ then typecheck and close out. You write no feature code yourself.
 ## 1. Gather
 
 1. Resolve the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md` § Reading it.
-2. **Load the wired skills.** Invoke each skill in `stages.implementation.skills` with the Skill
+2. **Load the wired skills.** Invoke each skill in `stages.implement.skills` with the Skill
    tool, now, before any other work — reading its file is not loading it. Contract:
    `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
 3. Find `state.json` (`<domain-path>/docs/work/<slug>/`) and validate it per
@@ -51,7 +51,7 @@ Pass `stepFilePath`, the project's `typecheck` / `test`, and `specPath` / `archi
 `designPath` when set.
 
 **Wired skills extend routing.** A step type or frontmatter key not in this table belongs to the
-wired skill that defines it — e.g. `figma:implementation` adds the project's `skills.ui` and a
+wired skill that defines it — e.g. `figma:implement` adds the project's `skills.ui` and a
 node-ID brief to `figma:` steps, and runs `verify-ui` steps inline. No wired skill claims it →
 plan defect: stop and name the step.
 

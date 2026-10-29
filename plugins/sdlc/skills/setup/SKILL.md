@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Configure this repo for the engineering skills — write its workflow config (`.claude/workflow.json`), set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/implementation` → `/review` → `/ship`. Model-invoked only by `/to-ticket` when the repo has no workflow config; otherwise run it when the user asks.
+description: Configure this repo for the engineering skills — write its workflow config (`.claude/workflow.json`), set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/implement` → `/review` → `/ship`. Model-invoked only by `/to-ticket` when the repo has no workflow config; otherwise run it when the user asks.
 ---
 
 # Setup
@@ -48,7 +48,7 @@ Lead each section with the recommended answer so the user can accept it in a wor
 
 **Section A — Issue tracker.**
 
-> Explainer: The "issue tracker" is where engineering issues live for this repo. Skills like `to-issues`, `triage`, `implementation`, and `ship` read from and write to it — `docs/agents/issue-tracker.md` tells them how to fetch an item, create a child, record readiness, and reference an item from a commit or PR. Pick the place you actually track work for this repo.
+> Explainer: The "issue tracker" is where engineering issues live for this repo. Skills like `to-issues`, `triage`, `implement`, and `ship` read from and write to it — `docs/agents/issue-tracker.md` tells them how to fetch an item, create a child, record readiness, and reference an item from a commit or PR. Pick the place you actually track work for this repo.
 
 Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
 
@@ -117,7 +117,7 @@ Show the full list — every file diff and every `gh api` command — and apply 
    for a frontend with Figma (the `figma` plugin installed, a Figma MCP server connected, or
    `.claude/figma-project.json`), propose the six `figma:*` skills on that project's `stages`,
    plus `skills.ui` (the repo's Figma implementation skills) and `devUrl`. For TypeScript source,
-   propose `source-docs` on `stages.implementation.skills`. Propose any other installed skill the
+   propose `source-docs` on `stages.implement.skills`. Propose any other installed skill the
    user names for a stage — that is the point of the slot. A single-project repo gets one entry with `"path": "**"`. List more specific
    paths first. Ask once for the whole table, not per key; the user edits rows.
 2. **Per-project docs.** `docs.prdWriter` — `to-ticket` for apps and services; `story:discovery`

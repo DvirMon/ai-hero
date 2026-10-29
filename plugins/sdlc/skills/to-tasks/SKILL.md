@@ -1,12 +1,12 @@
 ---
 name: to-tasks
-description: Generate a step-by-step implementation task plan for a single issue, from its spec and architecture doc — the last stop before /implementation.
+description: Generate a step-by-step implementation task plan for a single issue, from its spec and architecture doc — the last stop before /implement.
 disable-model-invocation: true
 ---
 
 # To Tasks
 
-Turn one issue's slice of work into an ordered, step-by-step implementation plan — fine enough grain that `/implementation` can follow it directly, without re-deriving the design.
+Turn one issue's slice of work into an ordered, step-by-step implementation plan — fine enough grain that `/implement` can follow it directly, without re-deriving the design.
 
 ## Process
 
@@ -50,7 +50,7 @@ An ordered list of concrete steps — which files to create or edit, in what ord
 
 - Follow the architecture doc's file-layout table when one exists; don't invent a different structure.
 - **One project per step.** Each step's files fall inside one project from the workflow config
-  (§ Projects) — `/implementation` loads that project's skills for it. Work that crosses projects (an API
+  (§ Projects) — `/implement` loads that project's skills for it. Work that crosses projects (an API
   change and the screen that calls it) is two steps with an edge between them.
 - Before numbering, apply `decompose-by-dependency-graph` § Execution grain: list the candidate steps, map real edges, rank core/independent/dependent.
 - Order steps so each one leaves the codebase in a working, testable state — the same discipline `/to-issues` applies to slicing, one level down. This numbering is presentation order, not proof of a dependency — two adjacent steps with no real edge are parallel-safe.
@@ -74,7 +74,7 @@ text and writes nothing.
 
 Then present each returned plan to the user, one step at a time, and iterate until approved.
 This review is the point of the stage — the user sees *why* each seam gets its test before any
-test exists. Raise the plan's **Open questions** here; don't carry them to `/implementation`.
+test exists. Raise the plan's **Open questions** here; don't carry them to `/implement`.
 A behaviour the plan's **Behaviour coverage** table leaves untested is a gap to settle now:
 add a seam, accept it as Not tested, or move it to the step that owns it.
 
@@ -82,14 +82,14 @@ A planner that returns `Seams: none` gets no test plan. That step keeps test-aft
 still needs tests, it keeps its own `type: test` step.
 
 A step whose test plan is approved **absorbs** its test step: drop the separate `type: test`
-step for that code from the outline, and renumber. `/implementation` runs red, green and types
+step for that code from the outline, and renumber. `/implement` runs red, green and types
 inside the code step.
 
 ### 5. Write the plan
 
 If the ticket workspace's `state.json` does not exist, ask the user whether to create it (with `specPath`, `architecturePath` if known) before writing the plan — unless the issue's Pipeline block says `workspace: null` (see **Tasks root** below). Always write the plan as files — never present it inline only.
 
-**Tasks root** — where this issue's plan lives. `/implementation`, `/review` and `/ship` resolve it the same way:
+**Tasks root** — where this issue's plan lives. `/implement`, `/review` and `/ship` resolve it the same way:
 
 | Case | `<tasks-root>` |
 |------|----------------|
@@ -115,7 +115,7 @@ One `step-N-<slug>.plan.md` per step — one graph node each:
 ---
 step: 1
 type: code            # code · test · story · docs · chore, plus types wired skills add
-commit: feat          # the commit type /implementation uses
+commit: feat          # the commit type /implement uses
 depends_on: []
 files:
   - libs/table/with-sorting/schema.ts (new)
@@ -139,7 +139,7 @@ Short, plain sentences, one idea each. An API or shape change carries a short us
 
 - No "why", history or rejected alternatives — the `Decisions:` line links them.
 - Don't restate conventions the executor already loads (project skills, CLAUDE.md, rules).
-- No skills or agent per step — `/implementation` derives them from `type` and the step's project.
+- No skills or agent per step — `/implement` derives them from `type` and the step's project.
 - Link steps with relative paths (`./step-2-foo.plan.md`).
 
 #### Test plan files
@@ -148,7 +148,7 @@ One `step-N-<slug>.test-plan.md` per step with an approved test plan, beside its
 `step-N-<slug>.plan.md` — written verbatim from the approved `sdlc:tdd-planner` output (format in
 `${CLAUDE_PLUGIN_ROOT}/agents/tdd-planner.md`). The writing rules above do not apply to it: its "why" and
 "order reason" lines are the content the user reviewed. No navigation links. Its presence is
-what makes `/implementation` run the step test-first, so never write one that wasn't approved in
+what makes `/implement` run the step test-first, so never write one that wasn't approved in
 §4b.
 
 #### Progress file
@@ -156,7 +156,7 @@ what makes `/implementation` run the step test-first, so never write one that wa
 `<tasks-root>/progress.md`: a header (`**Issue:**`, `**Branch:**`, `**Worktree:**`), the
 dependency graph as a Mermaid `graph LR` (edges `S<A> --> S<B>`) with a one-line
 parallel-safety summary, and `| Step | Title | Status |` with `⬚ pending`, `▶ in progress`,
-`✅ done`, `🧪 awaiting CI`, `⏭ skipped`. `/implementation` updates the status.
+`✅ done`, `🧪 awaiting CI`, `⏭ skipped`. `/implement` updates the status.
 
 #### State update
 
@@ -194,5 +194,5 @@ commit per `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`, subject
 End your final message with a one-line pointer, as the very last line — nothing after it:
 
 ```
-Next: /implementation <issue-#-or-slug>
+Next: /implement <issue-#-or-slug>
 ```

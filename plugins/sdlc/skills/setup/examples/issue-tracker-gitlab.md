@@ -14,7 +14,7 @@ of its description. Return the issue number.
 ## Readiness
 
 The rung and its dated `assessed:` reason live in the issue description's `## Pipeline` block — see
-`to-issues/references/pipeline-block.md`. `/implementation` reads it there. That block is the one description
+`to-issues/references/pipeline-block.md`. `/implement` reads it there. That block is the one description
 section a stage updates.
 
 ## Issue references

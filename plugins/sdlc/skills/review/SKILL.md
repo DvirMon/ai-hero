@@ -1,12 +1,12 @@
 ---
 name: review
-description: "Review a finished feature branch through the repo's configured reviewer (stages.review.reviewer, default code-review:review), commit the reviewer's fixes as review commits, record the outcome in review.md next to progress.md, and name the next stage. Use after /implementation reports done, before /ship."
+description: "Review a finished feature branch through the repo's configured reviewer (stages.review.reviewer, default code-review:review), commit the reviewer's fixes as review commits, record the outcome in review.md next to progress.md, and name the next stage. Use after /implement reports done, before /ship."
 disable-model-invocation: true
 ---
 
 # Review
 
-The stage between `/implementation` and `/ship`. It owns the pipeline side of a review — which reviewer
+The stage between `/implement` and `/ship`. It owns the pipeline side of a review — which reviewer
 runs, what gets committed, what is recorded, what comes next. The reviewer owns the review
 itself, per `${CLAUDE_PLUGIN_ROOT}/contracts/review-stage.md`, and knows nothing about the
 pipeline.
@@ -19,11 +19,11 @@ pipeline.
 2. **Reviewer** = `stages.review.reviewer`, default `code-review:review`. Not installed →
    stop, name the key and the skill (a construction error, per the contract).
 3. **Branch** — run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`.
-4. **Tasks root** — as `/implementation` resolves it (`<workspaceRoot>/tasks/issue-<N>/`, or
+4. **Tasks root** — as `/implement` resolves it (`<workspaceRoot>/tasks/issue-<N>/`, or
    `.pipeline/issue-<N>/` with no workspace). A planning or no-issue branch has none: use
    `.pipeline/<branch, / → ->/`.
 5. **Clean tree.** `git status --porcelain` empty — the reviewer's edits must be the only
-   changes the stage commits. Leftovers → stop; they belong to `/implementation`.
+   changes the stage commits. Leftovers → stop; they belong to `/implement`.
 
 ## 2. Run the reviewer
 
@@ -45,7 +45,7 @@ issue = its ref per `commit.md` (none on a branch with no issue) and stage `revi
 `git add -A`.
 
 A decision made while fixing goes to the decisions file, phase `review`
-(`${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`), through the same writer `/implementation` uses.
+(`${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`), through the same writer `/implement` uses.
 
 ## 4. Record
 
@@ -80,7 +80,7 @@ Name the next stage. The stage does not start it.
 | Outcome | Next |
 |---|---|
 | `no blocking findings` | `/ship` |
-| blocking, all `fix-side: code` or impact findings | fix them (`/implementation` or by hand, as new commits), then `/review` again |
+| blocking, all `fix-side: code` or impact findings | fix them (`/implement` or by hand, as new commits), then `/review` again |
 | blocking `fix-side: docs` on a decision record, or a finding that changes a decided design | `/grill-with-docs` to revisit the decision |
 | `failed` | fix the cause, `/review` again — or `/ship`, where the gate shows the failure |
 

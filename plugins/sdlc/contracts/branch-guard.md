@@ -1,6 +1,6 @@
 # Branch guard
 
-Which branch a stage is on, and whether it may commit there. Cited by `/implementation`, `/review` and
+Which branch a stage is on, and whether it may commit there. Cited by `/implement`, `/review` and
 `/ship`. Run it before touching git.
 
 ## Classify

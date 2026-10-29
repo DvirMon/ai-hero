@@ -28,7 +28,7 @@ has to decide:
 When unsure, use `sonnet`. A run whose writes span both kinds goes to one `sonnet` writer —
 don't split one run's files across two agents to save cost.
 
-**Exception — `/implementation`'s `docs`/`chore` steps stay on a fork.** Those write from a step
+**Exception — `/implement`'s `docs`/`chore` steps stay on a fork.** Those write from a step
 file and need the earlier steps' diffs, which only an inherited context carries.
 
 ## The brief must be self-contained

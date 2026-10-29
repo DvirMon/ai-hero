@@ -21,7 +21,7 @@ Create a GitHub issue (`gh issue create`, see Conventions), then link it to the 
 ## Readiness
 
 The rung and its dated `assessed:` reason live in the issue body's `## Pipeline` block — see
-`to-issues/references/pipeline-block.md`. `/implementation` reads it there. That block is the one body
+`to-issues/references/pipeline-block.md`. `/implement` reads it there. That block is the one body
 section a stage updates.
 
 ## Issue references
@@ -36,7 +36,7 @@ Every change reaches the default branch through a PR, rebase-merged (see
   completes, `Refs #N` for one it only partly delivers. Planning PRs
   (`docs/<slug>`) use `Refs #<epic>` and close nothing.
 
-`/implementation`, `/ship` and `code-review` read these rules.
+`/implement`, `/ship` and `code-review` read these rules.
 
 ## Conventions
 

@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: "Executes one /to-tasks step file — code, story, docs or chore. Loads the skills the project's config names for the step's type, writes only what the step covers, typechecks, and reports. Dispatched by /implementation. Not for test steps (test-implementer)."
+description: "Executes one /to-tasks step file — code, story, docs or chore. Loads the skills the project's config names for the step's type, writes only what the step covers, typechecks, and reports. Dispatched by /implement. Not for test steps (test-implementer)."
 model: sonnet
 ---
 

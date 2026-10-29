@@ -96,10 +96,10 @@ sdlc owns a **review stage contract**, and any reviewer must conform to it:
 - **Input:** a fixed point or a file set, plus spec sources.
 - **Output:** findings ranked P0–P3 in one format, written to `state.json`.
 
-- **Why:** `/implementation`, `/ship`, the feedback loop (handoff 03) and the PR-thread handler
+- **Why:** `/implement`, `/ship`, the feedback loop (handoff 03) and the PR-thread handler
   (handoff 05) read one shape regardless of which reviewer ran; review → implementation / review → grill
-  become explicit stage transitions instead of logic hidden inside `/implementation`.
-- **Rejected:** keeping review as a step inside `/implementation` (org reviewer only configurable inside
+  become explicit stage transitions instead of logic hidden inside `/implement`.
+- **Rejected:** keeping review as a step inside `/implement` (org reviewer only configurable inside
   implementation; loop stays implicit).
 - The stage contract is a D2 shared file; the future `ds` plugin gets the same
   `stages.review` slot and a synced copy.
@@ -110,7 +110,7 @@ Delete `claude-code/skills/code-review/` (loaded every session through the `~/.c
 symlink). sdlc and `ds-review` call `code-review:review` explicitly, never bare `/code-review`.
 The `cursor/skills/code-review/` mirror stays — Cursor has no plugins.
 
-- **Why:** `/implementation` (`SKILL.md:316`) and `/ship` call bare `/code-review`, which resolves to the
+- **Why:** `/implement` (`SKILL.md:316`) and `/ship` call bare `/code-review`, which resolves to the
   legacy loose skill, not the plugin's `code-review:review` — the pipeline has not been running
   the maintained plugin. Resolves O1.
 
@@ -241,7 +241,7 @@ with generic stages: `story:setup`, `story:discovery`, `story:plan`, `story:crea
 
 ### D12 — sdlc executor slot per step type
 
-`/implementation` § Route reads `projects.<p>.executors.<type>` from `workflow.json`;
+`/implement` § Route reads `projects.<p>.executors.<type>` from `workflow.json`;
 unset, the step goes to `sdlc:implementer`. Story repos set
 `"executors": { "story": "story:implementer" }`; the stack is read from `story.json`, never
 repeated in `workflow.json`. `docs.prdWriter` repoints to `story:discovery`.

@@ -36,7 +36,7 @@ Then run `/story:setup` once.
 
 ## With sdlc
 
-`story` does not depend on `sdlc`. To have `/implementation` run `type: story` steps through
+`story` does not depend on `sdlc`. To have `/implement` run `type: story` steps through
 the story implementer, set the executor slot in `.claude/workflow.json`:
 
 ```json

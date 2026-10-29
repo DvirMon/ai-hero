@@ -10,7 +10,7 @@ metadata:
 # Angular Developer Guidelines
 
 > **Role in the pipeline:** this skill is the *knowledge* SSOT for Angular conventions — it
-> does not own execution. When `/implementation` works a task plan, it dispatches each step to
+> does not own execution. When `/implement` works a task plan, it dispatches each step to
 > the sdlc **`implementer` agent** with the skills the step's project names in
 > `.claude/workflow.json` — this one, for an Angular project. Read this skill directly for ad-hoc
 > Angular guidance; go through the agent for planned work. The agent suppresses rule 3's

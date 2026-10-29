@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Ship
 
-One issue = one branch = one PR. `/implementation` leaves a feature branch with one commit per step;
+One issue = one branch = one PR. `/implement` leaves a feature branch with one commit per step;
 `/review` adds its fix commits and `review.md`.
 This skill turns that branch into a PR that GitHub merges on its own once required checks pass.
 
@@ -42,8 +42,8 @@ Check in order, before touching git. Any failure stops here — say which one an
      `⬚ pending` → stop. Do not ship unfinished steps.
    - **None** (the issue body was the step): the branch's `N` already matched in check 1. Read
      the issue's "Acceptance criteria" boxes (read through `docs/agents/issue-tracker.md` `## Fetch`). All ticked →
-     ship with `Closes #N`. Some unticked → ship only if `/implementation` reported the issue as
-     partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/implementation` hasn't closed
+     ship with `Closes #N`. Some unticked → ship only if `/implement` reported the issue as
+     partially satisfied, with `Refs #N` (§5a). None ticked → stop: `/implement` hasn't closed
      out.
 5. **Something to ship.** `git log --oneline origin/main..HEAD` is non-empty.
 6. **Code host.** `git remote get-url origin`: a GitHub host → `gh`; a GitLab host → `glab`
@@ -60,7 +60,7 @@ Check in order, before touching git. Any failure stops here — say which one an
 
 ## 2. Gate — the developer approves the story
 
-This is the pipeline's human gate (`/implementation` commits per step without asking). Show:
+This is the pipeline's human gate (`/implement` commits per step without asking). Show:
 
 - `git log --reverse --format='%h %s' origin/main..HEAD` — the commit story, oldest first.
 - The review record, `review.md` in the tasks root (`/review` § 4): its reviewer, verdict and
@@ -143,7 +143,7 @@ Closes #<N>
 
 The closing line follows the repo's `issue-tracker.md` `## Issue references`. Jira: the ticket
 key and its URL, no keyword — closing is a Jira transition, not this skill's job. GitHub/GitLab:
-exactly one `Closes #<N>` — this issue only. Exception: if `/implementation` reported acceptance
+exactly one `Closes #<N>` — this issue only. Exception: if `/implement` reported acceptance
 criteria left unchecked on the issue (partially satisfied), write `Refs #<N>` instead and say so
 in the Summary — the issue stays open. `Closes` is what closes the issue on merge; a bare
 `#N` only links. Commits carry `Refs: #N`, never a closing keyword.

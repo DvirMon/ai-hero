@@ -6,7 +6,7 @@ implements the operations in two files of its own, written by `setup`:
 | File | Holds | Read by |
 |---|---|---|
 | `docs/agents/ticket-tracker.md` | the intake item — the ask that starts the pipeline | `/to-intake`, `/to-ticket`, `grill-with-docs`, `/to-spec` |
-| `docs/agents/issue-tracker.md` | the work items under it, and how commits and PRs reference them | `/to-issues`, `/implementation`, `/ship`, the commit renderer ([`commit.md`](commit.md)), `code-review` |
+| `docs/agents/issue-tracker.md` | the work items under it, and how commits and PRs reference them | `/to-issues`, `/implement`, `/ship`, the commit renderer ([`commit.md`](commit.md)), `code-review` |
 
 Both files may name the same tool. A stage reads the file, follows the section, and never
 branches on a tracker name.
@@ -37,7 +37,7 @@ Never edit an item's description — product owns it. Anything new goes in a com
 |---|---|---|
 | `## Fetch` | a ref | title, body, state, labels |
 | `## Create a child` | the parent ref, title, body | the new ref |
-| `## Readiness` | a ref, rung, dated reason | — ; also where `/implementation` reads the rung |
+| `## Readiness` | a ref, rung, dated reason | — ; also where `/implement` reads the rung |
 | `## Issue references` | — | how a commit and a PR body reference an item, and how it closes |
 
 A section the tracker cannot do says `Not supported` and what the stage does instead. A

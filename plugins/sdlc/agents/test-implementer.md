@@ -1,6 +1,6 @@
 ---
 name: test-implementer
-description: "Executes one test step from a /to-tasks step file. Loads the project's test and code skills, writes the spec files, runs just those tests, and reports. Dispatched by /implementation for steps with `type: test` (code must already exist), and for the red and types phases of a `code` step that has an approved `step-N.test-plan.md` (tests first)."
+description: "Executes one test step from a /to-tasks step file. Loads the project's test and code skills, writes the spec files, runs just those tests, and reports. Dispatched by /implement for steps with `type: test` (code must already exist), and for the red and types phases of a `code` step that has an approved `step-N.test-plan.md` (tests first)."
 model: sonnet
 ---
 
@@ -57,7 +57,7 @@ Steps 1, 3, 6 and 8 below apply in both phases.
    mid-step; report a slow run as a follow-up.
 7. Run **only the spec files this step produced** — `test` with `{files}` when given, else the
    project's runner on those paths (e.g. `vitest run <path>`). Not the full suite — the dispatcher runs that once at the end.
-8. Do **not** commit. `/implementation` commits after your step is verified.
+8. Do **not** commit. `/implement` commits after your step is verified.
 
 ## Output
 

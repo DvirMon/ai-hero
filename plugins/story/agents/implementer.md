@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: "Writes the story code for one story spec (or an sdlc `type: story` step file) — host, `.stories.*`, `.mdx`, fixtures and mocks. Loads the stack skills `.claude/story.json` names under `skills.implement`, writes only what the spec covers, typechecks, and reports. Dispatched by /story:create, by sdlc /implementation when `executors.story` names it, and by design-system's Storybook phase."
+description: "Writes the story code for one story spec (or an sdlc `type: story` step file) — host, `.stories.*`, `.mdx`, fixtures and mocks. Loads the stack skills `.claude/story.json` names under `skills.implement`, writes only what the spec covers, typechecks, and reports. Dispatched by /story:create, by sdlc /implement when `executors.story` names it, and by design-system's Storybook phase."
 model: sonnet
 ---
 

@@ -3,7 +3,7 @@
 The ticket-to-PR pipeline, as a plugin in the `ai-hero` marketplace.
 
 ```
-/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /implementation → /review → /ship
+/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /implement → /review → /ship
 ```
 
 Each stage is its own skill. You start each one yourself; the plugin only packages
@@ -24,7 +24,7 @@ In a repo's `.claude/settings.json`:
 ```
 
 Installing `sdlc` also installs and enables `code-review` from the same marketplace — it is
-a declared dependency (`.claude-plugin/plugin.json`), which `/implementation` and `/ship` call as
+a declared dependency (`.claude-plugin/plugin.json`), which `/implement` and `/ship` call as
 `code-review:review`.
 
 Then run `/sdlc:setup` once (or `/to-ticket`, which runs it when the repo has no
@@ -36,7 +36,7 @@ framework; the project config does.
 Any stage can also load your own skills without being replaced: `stages.<stage>.skills`
 ([`contracts/stage-skills.md`](contracts/stage-skills.md)). Figma support ships that way, as the
 `figma` plugin in this marketplace — one skill per stage (`figma:capture`, `figma:design-check`,
-`figma:design-reference`, `figma:slicing`, `figma:steps`, `figma:implementation`), wired only in
+`figma:design-reference`, `figma:slicing`, `figma:steps`, `figma:implement`), wired only in
 the projects that have designs.
 
 ## Local development

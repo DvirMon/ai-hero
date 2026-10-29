@@ -1,6 +1,6 @@
 {
   "name": "sdlc",
-  "description": "Ticket-to-PR pipeline: /to-intake, /to-ticket, /grill-with-docs, /to-spec, /to-issues, /to-tasks, /implementation, /review, /ship, configured per repo by /sdlc:setup.",
+  "description": "Ticket-to-PR pipeline: /to-intake, /to-ticket, /grill-with-docs, /to-spec, /to-issues, /to-tasks, /implement, /review, /ship, configured per repo by /sdlc:setup.",
   "author": { "name": "DvirMon" },
   "dependencies": ["code-review"]
 }

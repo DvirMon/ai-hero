@@ -8,7 +8,7 @@ description: "sdlc stage extension for /to-tasks. Bind Figma node IDs to UI code
 
 # Figma-aware task plans
 
-Bind Figma context at plan time so `/implementation` does not re-derive node IDs or token decisions.
+Bind Figma context at plan time so `/implement` does not re-derive node IDs or token decisions.
 
 ## Inputs
 
@@ -43,7 +43,7 @@ Rules:
 - In **Watch out**, point at the rows in `design.md` this step consumes (component map, token
   map, copy keys) — link `designPath`, do not copy tables.
 
-Resolve `fileKey` at `/implementation` time from `figma[]` by matching `nodeId`.
+Resolve `fileKey` at `/implement` time from `figma[]` by matching `nodeId`.
 
 ## Final step — visual verify
 
@@ -65,7 +65,7 @@ Compare rendered UI on the developer's running app to Figma for this slice's fra
 
 ## Do
 
-Follow `figma:implementation` § `verify-ui` steps. Route and states come from the issue
+Follow `figma:implement` § `verify-ui` steps. Route and states come from the issue
 acceptance criteria and the preceding code steps.
 
 ## Done when
@@ -76,7 +76,7 @@ acceptance criteria and the preceding code steps.
 
 - One `verify-ui` step per issue slice (not per frame), unless frames land in separate issues.
 - `files: []` — verify may touch only screenshots/checklist markdown under the tasks folder if
-  the plan asks to persist evidence; default is report-only in `/implementation` final summary.
+  the plan asks to persist evidence; default is report-only in `/implement` final summary.
 
 ## Writer brief
 

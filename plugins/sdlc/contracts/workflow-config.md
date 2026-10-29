@@ -39,7 +39,7 @@ parsed as JSON when it parses, otherwise it is a string.
       "docs": { "prdWriter": "story:discovery" }
     }
   },
-  "stages": { "implementation": { "skills": ["source-docs"] } }
+  "stages": { "implement": { "skills": ["source-docs"] } }
 }
 ```
 
@@ -52,7 +52,7 @@ parsed as JSON when it parses, otherwise it is a string.
   "capabilities": { "commit": { "skill": "org-commit" } },
   "stages": {
     "review": { "reviewer": "org-review" },
-    "implementation": { "skills": ["source-docs"] }
+    "implement": { "skills": ["source-docs"] }
   },
   "projects": {
     "ui": {
@@ -76,7 +76,7 @@ parsed as JSON when it parses, otherwise it is a string.
         "to-spec": { "skills": ["figma:design-reference"] },
         "to-issues": { "skills": ["figma:slicing"] },
         "to-tasks": { "skills": ["figma:steps"] },
-        "implementation": { "skills": ["figma:implementation"] }
+        "implement": { "skills": ["figma:implement"] }
       }
     },
     "api": {
@@ -109,7 +109,7 @@ A teammate's `workflow.local.json` changes only what differs:
 | `stages.review.reviewer` | skill name | `code-review:review` |
 | `capabilities.commit.skill` | skill name | — (stages commit plain conventional) |
 
-`<stage>`: `to-intake` · `to-ticket` · `grill` · `to-spec` · `to-issues` · `to-tasks` · `implementation` · `review` ·
+`<stage>`: `to-intake` · `to-ticket` · `grill` · `to-spec` · `to-issues` · `to-tasks` · `implement` · `review` ·
 `ship`.
 
 - **`intake.epic`** — what `/to-intake` does with the new item's parent epic: link an existing
@@ -130,8 +130,8 @@ A teammate's `workflow.local.json` changes only what differs:
 |---|---|---|
 | `path` | glob, or array of globs, relative to the repo root | required |
 | `skills.<type>` | array of skill names, loaded by the step's executor | `[]` |
-| `skills.<other>` | extra skill lists a wired stage skill reads, e.g. `skills.ui` for `figma:implementation` | — |
-| `executors.<type>` | agent name that executes steps of that type | `/implementation` § Route's built-in executor |
+| `skills.<other>` | extra skill lists a wired stage skill reads, e.g. `skills.ui` for `figma:implement` | — |
+| `executors.<type>` | agent name that executes steps of that type | `/implement` § Route's built-in executor |
 | `typecheck` | command | — (what the project's code skills say; none → skipped and reported) |
 | `test` | command, `{files}` = the spec files to run | — (what the project's test skills say) |
 | `devUrl` | URL of the developer's running dev server, for wired skills that check the UI | — |
@@ -148,7 +148,7 @@ A teammate's `workflow.local.json` changes only what differs:
 - **A ticket's project** is the one its `domainPath` matches. It picks the ticket's `docs.*`
   and `stages` overrides.
 - **`skills`** are conventions, not executors: the stage's executor agent loads them before it
-  writes anything. `/implementation` § Route has the executor for each type.
+  writes anything. `/implement` § Route has the executor for each type.
 - **`executors.<type>`** — swaps the agent for one step type, e.g.
   `"story": "story:implementer"` from the `story` plugin. The named agent receives the same
   inputs as the built-in one and resolves its own conventions (the story implementer reads

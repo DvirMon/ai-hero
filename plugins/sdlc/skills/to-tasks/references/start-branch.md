@@ -26,7 +26,7 @@ its blocker's PR is merged.
 |---|---|
 | `/to-ticket`, `prUnit: sub-issue` (epic planning docs) | `docs/<epic-slug>` |
 | `/to-ticket`, `prUnit: ticket` (the ticket's one branch) | `<type>/<key>-<slug>` |
-| `/to-tasks`, `/implementation` fallback (one issue) | `<type>/<issue#>-<slice-slug>` |
+| `/to-tasks`, `/implement` fallback (one issue) | `<type>/<issue#>-<slice-slug>` |
 | epic archive chore | `chore/<epic-slug>-archive` |
 
 - `<slice-slug>` — the slug in the issue body's `<!-- slice: <epic-ref>/<slice-slug> -->`

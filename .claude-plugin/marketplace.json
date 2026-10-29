@@ -18,7 +18,7 @@
     {
       "name": "sdlc",
       "source": "./plugins/sdlc",
-      "description": "Ticket-to-PR pipeline: intake, ticket, grill, spec, issues, tasks, implementation, review, ship."
+      "description": "Ticket-to-PR pipeline: intake, ticket, grill, spec, issues, tasks, implement, review, ship."
     },
     {
       "name": "design-system",

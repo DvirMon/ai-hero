@@ -14,7 +14,7 @@ numbered after the last one. Its first line is `Parent: <parent path or slug>`. 
 ## Readiness
 
 The rung and its dated `assessed:` reason live in the file's `## Pipeline` block — see
-`to-issues/references/pipeline-block.md`. `/implementation` reads it there.
+`to-issues/references/pipeline-block.md`. `/implement` reads it there.
 
 ## Issue references
 

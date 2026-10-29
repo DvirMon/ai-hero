@@ -8,7 +8,7 @@ description: Implement a product feature UI from a Figma design in any project �
 Build a feature from a Figma node using the project's existing design system. Every
 project-specific value below (`config.*`) comes from `.claude/figma-project.json` — see
 [project-config.md](../figma-to-code/references/project-config.md). Loaded through
-`figma-to-code`, or directly by `/implementation` on a UI step.
+`figma-to-code`, or directly by `/implement` on a UI step.
 
 ## Step 0 — Load context
 

@@ -29,7 +29,7 @@ It may:
 - add reads to the stage's gather step;
 - add fields it owns to `state.json` (the schema lists the owner), sections to a document the
   stage writes, or frontmatter keys and step types to step files;
-- add skills or a brief to an `/implementation` dispatch, or handle a step type itself;
+- add skills or a brief to an `/implement` dispatch, or handle a step type itself;
 - add checks to the stage's verify step, and lines to its report.
 
 It may not:
