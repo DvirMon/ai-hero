@@ -71,7 +71,8 @@ function update(dir, review, file) {
       rec.decision = p.decision;
     }
     if (p.replyKind !== undefined) {
-      if (!REPLY_KINDS.includes(p.replyKind)) throw new Error(`replyKind: ${REPLY_KINDS.join('|')}`);
+      // null clears the reply kind; any other value must be one of REPLY_KINDS.
+      if (p.replyKind !== null && !REPLY_KINDS.includes(p.replyKind)) throw new Error(`replyKind: null or ${REPLY_KINDS.join('|')}`);
       rec.replyKind = p.replyKind;
     }
     if (p.replyDraft !== undefined) rec.replyDraft = String(p.replyDraft);
