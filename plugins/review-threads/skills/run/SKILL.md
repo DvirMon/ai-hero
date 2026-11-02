@@ -98,6 +98,7 @@ Threads with `gate: auto`. One at a time, never two fixers at once (they share t
    ```
 3. `status: committed`: continue. `status: reverted`: the thread is now `gated` with the
    error; it joins the final gate round. If `hint` is `hook-may-reject-trailer`, mention it in the report.
+   The fixer must return `"status": "fixed"` exactly; any other value is reverted.
 4. Next thread.
 
 Start the auto lane, then go straight to step 5 while it runs. Do not wait on it to ask questions.
@@ -132,6 +133,12 @@ Only after the auto lane is finished. For each thread with `decision: approved` 
 one at a time: dispatch `fixer` (`mode: approved`, with the user's note), then
 `rt-apply … --lane gated`. A `reverted` result becomes `pending` with an error: tell the
 user why and offer decline / defer / worktree.
+
+`status: commit-failed` (`retryable: true`): the edit and approval are kept. Fix the cause the
+`message` names (often a pre-commit hook), then re-run the same `rt-apply … --lane gated` command.
+
+Commits made by hand: `rt-apply … --existing-commit <sha>` records one that is already on HEAD
+(the thread must be approved). Use it instead of re-running the fixer.
 
 ## 7. Push
 

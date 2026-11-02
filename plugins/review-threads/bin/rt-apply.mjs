@@ -41,15 +41,17 @@ export async function main(argv, deps = {}) {
     thread: { type: 'string' },
     lane: { type: 'string' },
     'fix-file': { type: 'string' },
+    'existing-commit': { type: 'string' },
   });
   const dir = a['state-dir'];
   const review = loadReview(dir);
   const rec = review?.threads?.[a.thread];
   if (!rec) return { ok: false, error: `unknown thread ${a.thread}` };
   const cfg = review.run.config;
+  const root = git(['rev-parse', '--show-toplevel']).trim();
+  if (a['existing-commit']) return recordExisting(git, root, dir, rec, a.thread, a['existing-commit']);
   const thread = loadThreads(dir).threads[a.thread];
   const fix = JSON.parse(readFileSync(a['fix-file'], 'utf8'));
-  const root = git(['rev-parse', '--show-toplevel']).trim();
   const lane = a.lane;
 
   if (lane === 'auto' && !(rec.gate === 'auto' && rec.category)) return { ok: false, error: 'thread is not in the auto lane' };
@@ -67,7 +69,12 @@ export async function main(argv, deps = {}) {
     return { ok: true, status: 'reverted', stage, message: String(message).slice(0, 600), ...extra };
   };
 
-  if (fix.status !== 'fixed') return fail('fixer', fix.reason || 'fixer reported cannot-fix');
+  if (fix.status !== 'fixed') {
+    const why = fix.status === 'cannot-fix' || !fix.status
+      ? fix.reason || 'fixer reported cannot-fix'
+      : `fixer status "${fix.status}", expected "fixed"`;
+    return fail('fixer', why);
+  }
   if (!files.length) return fail('fixer', 'fixer made no change');
   const paths = files.map((f) => f.path);
   if (!fix.commitMessage?.trim()) return fail('fixer', 'fixer gave no commit message');
@@ -103,18 +110,46 @@ export async function main(argv, deps = {}) {
     const msg = git(['interpret-trailers', '--trailer', `Review-Thread: ${a.thread}`], { input: `${fix.commitMessage.trim()}\n` });
     git(['-C', root, 'commit', '-F', '-'], { input: msg });
   } catch (e) {
+    // Keep the edit and the approval: a hook failure is retryable, not a rejected fix.
+    // Re-run the same command after the hook problem is fixed.
     const hint = /trailer|footer|Review-Thread/i.test(e.stderr || e.message) ? 'hook-may-reject-trailer' : undefined;
-    return fail('commit', e.stderr || e.message, hint ? { hint } : {});
+    const message = String(e.stderr || e.message).slice(0, 2000);
+    updateThread(dir, a.thread, {
+      gate: 'gated',
+      decision: 'approved',
+      error: { stage: 'commit', message, retryable: true, ...(hint ? { hint } : {}) },
+    });
+    return { ok: true, status: 'commit-failed', stage: 'commit', retryable: true, message: message.slice(0, 600), ...(hint ? { hint } : {}) };
   }
   const sha = git(['-C', root, 'rev-parse', 'HEAD']).trim();
   updateThread(dir, a.thread, {
-    commit: { sha, pushed: false },
+    commit: { sha, pushed: false, subject: fix.commitMessage.trim().split('\n')[0] },
     decision: 'approved',
     replyKind: 'fixed',
     replyDraft: fix.replyDraft ?? rec.replyDraft ?? '',
     error: null,
   });
   return { ok: true, status: 'committed', sha, files: paths };
+}
+
+// Records a commit made outside rt-apply (no Review-Thread trailer).
+// The commit must be on HEAD and the thread must be approved by the user.
+function recordExisting(git, root, dir, rec, threadId, ref) {
+  if (rec.decision !== 'approved') return { ok: false, error: 'thread is not approved' };
+  let sha;
+  try {
+    sha = git(['-C', root, 'rev-parse', '--verify', `${ref}^{commit}`]).trim();
+    git(['-C', root, 'merge-base', '--is-ancestor', sha, 'HEAD']);
+  } catch {
+    return { ok: false, error: `${ref} is not a commit on HEAD` };
+  }
+  const subject = git(['-C', root, 'log', '-1', '--format=%s', sha]).trim();
+  updateThread(dir, threadId, {
+    commit: { sha, pushed: false, subject },
+    replyKind: 'fixed',
+    error: null,
+  });
+  return { ok: true, status: 'recorded', sha, subject };
 }
 
 runIfMain(import.meta.url, main);

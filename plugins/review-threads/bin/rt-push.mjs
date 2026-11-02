@@ -26,24 +26,53 @@ export async function main(argv, deps = {}) {
     }
   }
 
-  // Thread -> SHA map from the Review-Thread trailer (survives the rebase).
+  // Commits on HEAD not yet upstream, oldest first.
   const shas = git(['rev-list', '--reverse', `${upstream}..HEAD`]).split(/\s+/).filter(Boolean);
+  // Thread -> SHA map. Trailer first (rt-apply commits); then the subject
+  // recorded by --existing-commit (survives the rebase, which rewrites SHAs).
   const map = {};
+  const subjectOf = {};
   for (const sha of shas) {
+    subjectOf[sha] = git(['log', '-1', '--format=%s', sha]).trim();
     const id = git(['log', '-1', '--format=%(trailers:key=Review-Thread,valueonly)', sha]).trim();
     if (id) map[id] = sha;
   }
-  for (const [id, sha] of Object.entries(map)) if (review.threads[id]) review.threads[id].commit = { sha, pushed: false };
+  for (const [id, rec] of Object.entries(review.threads)) {
+    if (map[id] || !rec.commit?.subject) continue;
+    const match = shas.find((sha) => subjectOf[sha] === rec.commit.subject);
+    if (match) map[id] = match;
+  }
+  for (const [id, sha] of Object.entries(map)) {
+    if (!review.threads[id]) continue;
+    const prev = review.threads[id].commit ?? {};
+    review.threads[id].commit = { ...prev, sha, pushed: false };
+  }
   saveReview(dir, review);
 
-  if (!shas.length) return { ok: true, pushed: 0, rebased, map };
+  const markPushed = () => {
+    // A recorded commit is pushed when the remote branch already contains it.
+    for (const rec of Object.values(review.threads)) {
+      if (!rec.commit?.sha) continue;
+      try {
+        git(['merge-base', '--is-ancestor', rec.commit.sha, upstream]);
+        rec.commit.pushed = true;
+      } catch {
+        rec.commit.pushed = false;
+      }
+    }
+    saveReview(dir, review);
+  };
+
+  if (!shas.length) {
+    markPushed();
+    return { ok: true, pushed: 0, rebased, map };
+  }
   try {
     git(['push', remote, `HEAD:refs/heads/${headRef}`]);
   } catch (e) {
     return { ok: false, error: 'push rejected; nothing was posted', detail: e.stderr?.slice(-800), map };
   }
-  for (const id of Object.keys(map)) if (review.threads[id]) review.threads[id].commit.pushed = true;
-  saveReview(dir, review);
+  markPushed();
   return { ok: true, pushed: shas.length, rebased, map };
 }
 
