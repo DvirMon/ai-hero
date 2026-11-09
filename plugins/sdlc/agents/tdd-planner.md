@@ -78,20 +78,20 @@ reached the outline gets no test, and nothing reports the gap.
    likelihood, and move the tail to **Not tested** as
    `over budget — damage <d>, likelihood <l>`. The user sees what
    was cut and can bring it back during review.
-9. **Map every behaviour.** Each id from step 2 points to the
-   seams that test it, or to its **Not tested** line. A behaviour
-   with neither is a gap: list it under **Open questions**.
+9. **Map every behaviour.** Each id from step 2 gets one **Coverage**
+   row: the seams that test it, or the reason it is untested. A
+   behaviour with neither is a gap: list it under **Open**.
 10. **Order them.** Base case first, then each seam that builds on
     an earlier one. The order is what the code agent follows in
-    the green phase, so every "Order reason" names the seam it
-    depends on or says it is independent.
+    the green phase. State it once in the heading line; name a
+    dependency only when it is not simply "after the previous seam".
 11. **Stubs.** List every symbol the logic tests import that the
     step creates. Real signature, taken from the outline or the
     architecture doc. If a signature is not decidable from those,
-    say so under Open questions rather than inventing one.
+    say so under Open rather than inventing one.
 12. **Types phase.** Only when the step creates or changes a
-    public generic signature or an inferred type. Otherwise write
-    `None — no public type surface in this step.`
+    public generic signature or an inferred type. Otherwise omit
+    the section.
 13. **No seam at all** (pure wiring, config, re-export): return
     `Seams: none` with the reason. `/to-tasks` then keeps the old
     test-after-code ordering for this step.
@@ -103,38 +103,38 @@ Return exactly this document, nothing before or after it:
 ````markdown
 # Step <N> test plan — <title>
 
-Step: [step-<N>-<slug>.plan.md](step-<N>-<slug>.plan.md)
-Spec file: `<path to the spec file the tests go in>`
+Step: [step-<N>-<slug>.plan.md](step-<N>-<slug>.plan.md) · Spec: `<path to the spec file the tests go in>`
 
-## Behaviour coverage
-| Id | Behaviour | Source | Tested by |
-|---|---|---|---|
-| <F1> | <one line> | <spec § / issue AC / Done when> | <A, B — or "Not tested"> |
+## Harness
+- <trap a fresh agent would hit: fixtures, providers, what must not be mocked>
+
+## Coverage
+| Id | Behaviour | Seam, or why untested |
+|---|---|---|
+| <F1> | <one line> | <A, B — or the reason, with the source: spec § / issue AC / Done when> |
 
 ## Stubs (red phase)
 - `<signature>` — throws `not implemented`
 
-## Seams — in red-green order
-### A. <seam, stated as input → observable result>
-- Test: `it('<name>')`
-- Asserts: <the exact expectation>
-- Covers: <behaviour ids>
-- Risk: damage <high|low>, likelihood <high|low>
-- Why this seam: <the bug this catches>
-- Order reason: <what it builds on, or "independent">
-
-### B. ...
+## Seams (red→green order; <ordering note if not simply A, B, C…>)
+| | Input → result | `it('<name>')` | Risk dmg/lik | Catches |
+|---|---|---|---|---|
+| A | <input → observable result> | <name> | <high|low>/<high|low> | <the bug this catches, and whether it is green at red> |
 
 ## Types phase (after green)
 - `<expectTypeOf check>` — <what inference it pins>
 
 ## Not tested
-- <item> — <reason: unit-test's skip list, `covered by …`, or `over budget …`>
+- <logic item> — <unit-test's skip list, `covered by …`, or `over budget …`>
 
-## Open questions
-- <unmapped behaviour, or anything the outline left undecidable; omit the heading if none>
+## Open
+- <unmapped behaviour, or anything the outline left undecidable>
 ````
 
 Do not ask the user directly — you have no channel to them. An
-open question goes in the document; `/to-tasks` raises it during
-review.
+open item goes in the document; `/to-tasks` raises it during
+review. Omit any section that would be empty.
+
+Write for a reader who sees only this document: no restating the
+outline, no "approve this plan" item, no open item the outline
+already answers.
