@@ -54,6 +54,7 @@ An ordered list of concrete steps — which files to create or edit, in what ord
   change and the screen that calls it) is two steps with an edge between them.
 - Before numbering, apply `decompose-by-dependency-graph` § Execution grain: list the candidate steps, map real edges, rank core/independent/dependent.
 - Order steps so each one leaves the codebase in a working, testable state — the same discipline `/to-issues` applies to slicing, one level down. This numbering is presentation order, not proof of a dependency — two adjacent steps with no real edge are parallel-safe.
+- **Right-size.** Fold setup, config, docs and chores into the step whose deliverable needs them. Split only where a reviewer could reject one step and approve its neighbour. Every step carries fixed overhead (frontmatter, sections, a graph node), so a step that is only a toast, a URL param or a doc pass is a candidate to fold.
 - Call out where tests should land, using the spec's Testing Decisions.
 - Wired skills may add frontmatter keys and step types — e.g. `figma:steps` binds `figma:` node
   IDs on UI `code` steps and adds a terminal `verify-ui` step.
@@ -74,9 +75,11 @@ text and writes nothing.
 
 Then present each returned plan to the user, one step at a time, and iterate until approved.
 This review is the point of the stage — the user sees *why* each seam gets its test before any
-test exists. Raise the plan's **Open questions** here; don't carry them to `/implement`.
-A behaviour the plan's **Behaviour coverage** table leaves untested is a gap to settle now:
-add a seam, accept it as Not tested, or move it to the step that owns it.
+test exists. Raise the plan's **Open** items here; don't carry them to `/implement`.
+A behaviour the plan's **Coverage** table leaves untested is a gap to settle now:
+add a seam, accept it as untested, or move it to the step that owns it.
+Approving a test plan is this review's gate, not a `Decide` item: never write "approve the test
+plan" into a step file or `progress.md`.
 
 A planner that returns `Seams: none` gets no test plan. That step keeps test-after-code: if it
 still needs tests, it keeps its own `type: test` step.
@@ -84,6 +87,15 @@ still needs tests, it keeps its own `type: test` step.
 A step whose test plan is approved **absorbs** its test step: drop the separate `type: test`
 step for that code from the outline, and renumber. `/implement` runs red, green and types
 inside the code step.
+
+### 4c. Self-review
+
+Before writing, check the approved plan yourself (no subagent). Report only the gaps, and fix them in the outline:
+
+1. **Spec coverage.** Every spec requirement and issue acceptance criterion has an owning step. One with none gets a step or goes to `progress.md` § AC → step as deliberately unowned.
+2. **Names.** Types, functions and keys a later step consumes match what the earlier step produces, spelled the same.
+3. **Review focus.** Name up to five inputs or failure modes the spec implies but no step's test exercises, most likely to bite first. Each gets a test in the step that owns the code, or goes to the user as an open item.
+4. **Proportion.** The step files plus `progress.md` should stay within a few times the spec's word count. Far more means steps restate the spec or each other: cut, per the rules in §5. Test plans are the exception — their reasoning is the product.
 
 ### 5. Write the plan
 
@@ -116,29 +128,55 @@ One `step-N-<slug>.plan.md` per step — one graph node each:
 step: 1
 type: code            # code · test · story · docs · chore, plus types wired skills add
 commit: feat          # the commit type /implement uses
+subject: add sorting schema   # the commit subject; /implement composes the message per contracts/commit.md
+project: frontend
 depends_on: []
+base: libs/table      # shared path prefix for files:
 files:
-  - libs/table/with-sorting/schema.ts (new)
+  - with-sorting/schema.ts (new)
 ---
 # Step 1 — Sorting schema module
 
-Two lines: what this step does, and what it leaves for later steps.
-
 Decisions: D3, D7
+
+## Interfaces
+
+- Consumes: exact names, and the step that produces each.
+- Produces: exact signatures and shared types, written once.
 
 ## Do
 
-Short, plain sentences, one idea each. An API or shape change carries a short usage snippet.
+- [ ] One action, at most two lines. An API or shape change carries a short usage snippet.
 
 ## Watch out
+
+## Decide
 
 ## Out of scope
 
 ## Done when
+
+- [ ] `<exact command>` → `<expected output>`
 ````
 
+The title says what the step does; no intro paragraph. Omit a section that would be empty or only
+repeat the title (`Interfaces`, `Watch out`, `Decide`, `Out of scope`). Hard caps: a step file is
+at most 60 lines, a `Do` bullet at most 2 lines, a `Decide` at most 3.
+
+A step is done when the executor can write exactly one reasonable thing from it. Two failures:
+a line that decides nothing ("handle edge cases", "TBD"), and a body the signature and the tests
+already determine. Give the exact signature, the file, and the values the spec pins; the executor
+writes the body.
+
 - No "why", history or rejected alternatives — the `Decisions:` line links them.
-- Don't restate conventions the executor already loads (project skills, CLAUDE.md, rules).
+- Don't restate conventions the executor already loads (project skills, `AGENTS.md`, `CLAUDE.md`, rules).
+- **`Decide`** holds only what the user has not settled: the question, the recommendation, and what
+  settles it, in three lines. Once settled, write `Decided <date>: …` or move the answer into
+  `Interfaces`/`Do` and delete the line. A recommendation the test plan already answers is not open.
+  Never write "approve the test plan".
+- A fact that holds for several steps (branch baseline, shared constraints) goes once in
+  `progress.md`, not in each step.
+- `Done when` is the command and its expected output, not a restatement of the test plan's seams.
 - No skills or agent per step — `/implement` derives them from `type` and the step's project.
 - Link steps with relative paths (`./step-2-foo.plan.md`).
 
@@ -146,17 +184,25 @@ Short, plain sentences, one idea each. An API or shape change carries a short us
 
 One `step-N-<slug>.test-plan.md` per step with an approved test plan, beside its
 `step-N-<slug>.plan.md` — written verbatim from the approved `sdlc:tdd-planner` output (format in
-`${CLAUDE_PLUGIN_ROOT}/agents/tdd-planner.md`). The writing rules above do not apply to it: its "why" and
-"order reason" lines are the content the user reviewed. No navigation links. Its presence is
+`${CLAUDE_PLUGIN_ROOT}/agents/tdd-planner.md`). The step-file writing rules above do not apply to it: its "Catches"
+column is the content the user reviewed. No navigation links. Its presence is
 what makes `/implement` run the step test-first, so never write one that wasn't approved in
 §4b.
 
 #### Progress file
 
-`<tasks-root>/progress.md`: a header (`**Issue:**`, `**Branch:**`, `**Worktree:**`), the
-dependency graph as a Mermaid `graph LR` (edges `S<A> --> S<B>`) with a one-line
-parallel-safety summary, and `| Step | Title | Status |` with `⬚ pending`, `▶ in progress`,
-`✅ done`, `🧪 awaiting CI`, `⏭ skipped`. `/implement` updates the status.
+`<tasks-root>/progress.md`, in this order:
+
+- Header: `**Issue:**`, `**Branch:**`, `**Worktree:**`.
+- `## Graph`: Mermaid `graph LR`, edges written with `&` (`S1 --> S3 & S4`), and a one-line parallel-safety summary.
+- `## Status`: `| Step | Title | Open Decide | Status |` with `⬚ pending`, `▶ in progress`, `✅ done`, `🧪 awaiting CI`, `⏭ skipped`. `Open Decide` is a count; the text lives only in the step file, never copied here. `/implement` updates the status.
+- `## Release blockers`: open decisions that block shipping, with owner. Omit if none.
+- `## Branch baseline`: facts about the branch every step shares, written once.
+- `## Global constraints`: rules every step inherits that no loaded skill or `AGENTS.md` states.
+- `## Review focus`: the §4c list, each line naming the step whose test pins it.
+- `## AC → step`: only acceptance criteria no test plan covers.
+
+Omit a section with nothing to say.
 
 #### State update
 
