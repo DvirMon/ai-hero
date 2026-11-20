@@ -6,6 +6,9 @@ The ticket-to-PR pipeline, as a plugin in the `ai-hero` marketplace.
 /to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /implement → /review → /ship
 ```
 
+`/to-ticket` sizes the change first: a small one takes the fast path straight to
+`/implement`, and one too big for a session goes to `/wayfinder` instead of the grill.
+
 Each stage is its own skill. You start each one yourself; the plugin only packages
 them. Skills run as `/sdlc:<name>`, and the bare `/<name>` works when nothing else
 uses that name.
@@ -58,6 +61,8 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
   `story-doc` is vendored from the `story` plugin (`contracts/story-doc.md`)
 - **Optional:** the `story` plugin, for `executors.story: "story:implementer"` and
   `docs.prdWriter: "story:discovery"`
+- **Optional:** the `wayfinder` skill, for work too big for one session (`/to-ticket`
+  § 3b, `/grill-with-docs` step 0)
 - **Agents:** doc-compressor, adr-writer
 - **Optional:** a skill that implements a tracker operation, e.g. `jira-grill-comment`
   for `## Post a comment` on Jira

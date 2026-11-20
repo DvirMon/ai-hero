@@ -114,6 +114,23 @@ that ref; don't create the item yourself.
 description, acceptance criteria, URL. Never edit the item's description; product owns it
 (`${CLAUDE_PLUGIN_ROOT}/contracts/tracker.md`).
 
+### 3b. Route by size
+
+Size the diff the ticket asks for before opening a workspace. A workspace, PRD and grill cost
+more than a small change is worth; one session cannot hold a change that is too big. Pick one
+route, state it with its evidence, and wait for the user to confirm or change it:
+
+| Route | When | What happens |
+|---|---|---|
+| **Fast path** | One obvious change, a few files, no open question, concrete acceptance criteria | No workspace. Record readiness through `docs/agents/issue-tracker.md` `## Readiness` with `workspace: null`, the rung set per `${CLAUDE_PLUGIN_ROOT}/skills/to-issues/references/pipeline-block.md` § Assessing readiness. Stop; the pointer is that rung's stage (`ready-for-agent` → `/implement`) |
+| **Grill** (default) | Anything else that one session can settle | Continue with step 4 |
+| **Wayfinder** | More than one session: several capabilities, no clear destination, or decisions that depend on investigation nobody has done | No workspace. Stop with `Next: /wayfinder <ticketRef>`. The ticket is the idea the map starts from |
+
+The assessed rung decides between fast path and grill: if § Assessing readiness lands on any
+`needs:*` rung, the fast path is wrong — take the grill. When unsure between grill and
+Wayfinder, take the grill: `/grill-with-docs` can still move to Wayfinder (its step 0), and a
+grill that turns out small has cost nothing extra.
+
 ### 4. Initialize the ticket workspace
 
 Every effort in this pipeline has a workspace directory, where `<slug>` is a short kebab-case name derived from the ticket title. The workspace root is always `<domain-path>/docs/work/<slug>/` — domain-colocated. There is no repo-root default; `<domain-path>` must be resolved first.

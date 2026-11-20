@@ -40,6 +40,13 @@ If no `state.json` exists, grill without a workspace — never create one; only 
    nodes fully now; dependent nodes only after their upstream settles. Record the ranking in
    `1-decisions.md`'s `## Ranking` section (`${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`).
 
+   **Move to Wayfinder when it outgrows one session.** If the ranking shows more core nodes
+   than one session can settle (a rough guide: more than ~5), or a core node depends on
+   investigation nobody has done yet, stop and offer `/wayfinder` with the ticket as its idea.
+   Do the same later, at any point the grill clearly will not finish in this session. Decisions
+   already settled stay in `1-decisions.md`; the map links to them instead of re-deciding them.
+   The user decides — continuing the grill is a valid answer.
+
 0b. **Grill per handoff aspect, not as one spec** (rule `lock-by-aspect-for-handoff`). Split the
    ticket by what one team consumes, e.g. backend contract (model + missing endpoints), FE
    behavior requirements, FE design check, email/content, audit events. Put an `## Aspects` table
