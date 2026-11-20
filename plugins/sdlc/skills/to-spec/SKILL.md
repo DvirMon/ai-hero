@@ -12,6 +12,8 @@ This skill takes the current conversation context and codebase understanding —
 **Branch guard, next.** The spec is committed on the epic's planning branch, `docs/<slug>`
 (the `slug` in `state.json`), in its worktree. On the default branch or an issue branch, stop
 and point the user to `/to-ticket`, which starts it via `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks/references/start-branch.md`.
+An explicit user override follows `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md` § Override —
+then write the spec on the current branch and do not start another.
 
 If a ticket workspace's `state.json` exists, validate it per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md` before reading it.
 
@@ -93,9 +95,15 @@ them.
 
 ## Checklist
 
-A numbered list of what the agent must make true, each item derived from a decision or a PRD
-requirement and carrying its source tag (`[Dn]` or `[<ticketRef> · MM-DD]`). One checkable
-behavior or edge case per item.
+Markdown task list — one `- [ ]` line per requirement; use `- [x]` when the item is already
+ satisfied. Prefix each line with its number (`1.`, `2.`, …; sub-items `2a.`, `2b.` when needed).
+ Each item is derived from a decision or a PRD requirement and ends with its source tag
+ (`[Dn]` or `[<ticketRef> · MM-DD]`). One checkable behavior or edge case per line.
+
+Example:
+
+- [ ] 1. … [D4] [PROJ-456 · 11-04]
+- [x] 2. … [D11]
 
 ## Implementation Decisions
 
