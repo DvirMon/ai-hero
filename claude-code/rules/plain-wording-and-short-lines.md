@@ -26,6 +26,28 @@ hoisting and cost two round-trips. A term with a well-known meaning
 elsewhere in the language is disqualified even when standard in the
 niche sense. Identifiers, type names and ADR numbers stay verbatim.
 
+## Never a bare label: say what it is
+
+A short label made up inside a document or a run (an AC number like
+`A11`, a decision `D17`, a step number, a line ref `:43`, a sub-task
+key) never stands alone in chat. Say what the thing *is* in plain
+words first; the label goes after it in brackets, or not at all.
+
+- Not "A11 out of scope" but "Trial plan rows (A11): out of scope,
+  trials aren't built yet."
+- Not "step 12 `:43` ticked" but "the domain-docs check that the
+  docs name no code is now ticked."
+
+**Why:** after an audit the user asked "how come we have all this
+A11, C3, A9? This is gibberish for me." The labels mean something
+only to whoever read the source file; the user hadn't.
+
+**How to apply:** before sending, scan for any code-like label
+with no plain description next to it, in prose, tables and
+`AskUserQuestion` options. Files the user will read (reports,
+summaries) follow the same rule. Real code identifiers and paths
+stay verbatim; this is about labels, not code.
+
 ## Short lines, ~60-70 chars
 
 Keep lines roughly 60 characters, never past ~80, in shell commands
