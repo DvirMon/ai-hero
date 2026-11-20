@@ -20,6 +20,8 @@ never on the default branch.
 - On `docs/<slug>` (the `slug` in `state.json`), in its worktree → proceed.
 - On the default branch, or on an issue branch (`<type>/<N>-<slug>`) → stop. Point the user
   to `/to-ticket`, which starts `docs/<slug>` via `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks/references/start-branch.md`.
+  An explicit user override follows `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md` § Override —
+  then grill on the current branch and do not start another.
 - **Exception — a scoped grill on a sub** (`needs:grill` on one slice, after the planning PR
   merged): start `docs/<slug>-<N>` via `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks/references/start-branch.md` and grill there.
   It ships as its own small docs PR before `/to-tasks #N`.

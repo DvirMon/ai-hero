@@ -4,9 +4,11 @@
 # Start a branch (in its own worktree, by default)
 
 One PR unit = one branch = one PR; what a unit is follows `prUnit` in
-`${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md`. Work never starts on the default branch. Every
-branch starts from fresh `origin/<default>` — no stacked branches; a blocked issue waits until
-its blocker's PR is merged.
+`${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md`. Work never starts on the default branch.
+Skip this procedure when the user overrode the branch guard
+(`${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md` § Override) and said to stay on the current
+branch. Otherwise every branch starts from fresh `origin/<default>` — no stacked branches; a
+blocked issue waits until its blocker's PR is merged.
 
 `isolation` (same config) picks the shape:
 - `worktree` (default) — the branch gets its own worktree; the calling skill enters it with

@@ -26,7 +26,7 @@ Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md
 
 Check in order, before touching git. Any failure stops here — say which one and why.
 
-1. **On a feature branch.** Run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`. A planning
+1. **On a feature branch.** Run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`, including § Override. An override does not let this skill push or merge the default branch. A planning
    branch ships per step 5b; a no-issue branch skips checks 3–4 and ships per step 5d.
 2. **Clean tree.** `git status --porcelain` is empty. Leftover changes → stop and suggest
    committing them first (`capabilities.commit.skill` when set).

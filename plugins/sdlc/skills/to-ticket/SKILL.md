@@ -127,8 +127,10 @@ Every effort in this pipeline has a workspace directory, where `<slug>` is a sho
 3. If a derivation was made in step 2, **confirm it with the user** before writing anything — state the derived path and ask them to confirm or correct it. Do not proceed on an unconfirmed guess.
 4. If neither 1 nor 2 resolves cleanly, ask the user directly for the domain path.
 
-**Start the branch before writing anything.** Work never happens on the default branch. Which
-branch follows `prUnit` (`${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md`):
+**Start the branch before writing anything.** Work never happens on the default branch, unless
+the user overrides per `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md` § Override — then keep
+the current branch and do not start another. Which branch follows `prUnit`
+(`${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md`):
 
 | `prUnit` | Branch | `units[]` |
 |---|---|---|

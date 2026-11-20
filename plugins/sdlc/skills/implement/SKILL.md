@@ -27,7 +27,7 @@ then typecheck and close out. You write no feature code yourself.
 6. **No plan** (the directory is missing or has no step files) → apply
    `${CLAUDE_PLUGIN_ROOT}/skills/to-issues/references/pipeline-block.md` § The implementation
    gate. Never fall through to implementing.
-7. Run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`. An issue with no branch yet (a
+7. Run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`, including § Override. An issue with no branch yet (a
    `ready-for-agent` issue with no plan) → run `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks/references/start-branch.md`
    with `<type>/<N>-<slice-slug>` first.
 
