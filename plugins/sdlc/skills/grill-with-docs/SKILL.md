@@ -115,6 +115,18 @@ If no `state.json` exists, grill without a workspace — never create one; only 
    **That log is read before the first question** (step 1a). It is what stops the interview re-deciding something already settled, or reversing it without noticing.
 4. Before finishing, verify failure modes are exhausted. Don't use a fixed question list — first reason about what kind of system this is (UI component, form field, API endpoint, background job, state machine, webhook, etc.), then derive what can go wrong *for that specific domain*. A button has different failure surfaces than a file uploader, a Node.js job, or a multi-step wizard. Pull each failure thread until nothing is left fuzzy, then record the answers in `1-decisions.md`, one entry each, phase `grill`.
 
+4b. **Before finishing, check the names.** The grill is not done while the feature is still
+   described in loose words. List every noun the feature introduces or changes (an entity, a
+   state, an action a user takes). Each one ends in exactly one of:
+   - a glossary entry, written through `/domain-modeling`;
+   - an explicit "reuses `<term>`", naming an existing glossary entry.
+
+   Challenge each proposed term against the existing definitions before accepting it. A term
+   whose definition conflicts with one already in the glossary (same word, other meaning; or
+   a new word for an existing concept) is a question for the user, not a rename you make
+   alone. The user may accept a term as provisional: log it under `## Open` in
+   `1-decisions.md`.
+
 5. Before finishing, decide complexity: does implementing this safely need more than a PRD — new types/interfaces, a non-obvious file layout, a design that needs grounding against existing source before anyone builds it? If yes, set `isComplex: true`; otherwise `false`. This is about implementation risk, not ticket size — a small-sounding change to a shared abstraction can still need an architecture doc.
 6. If the ticket workspace's `state.json` exists, validate it per
    `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`, then update it (version 4 only): set `isComplex`,

@@ -84,7 +84,7 @@ Check with the user that these seams match their expectations.
    enumerates the whole edit and rates it low, then sits at `needs:tasks`, is that
    contradiction.
 
-4. If the ticket workspace's `state.json` exists and `isComplex` is `true`, also write `<workspaceRoot>/3-architecture.md`: the decisions that are settled and not open for relitigation, grounded against the actual current source (cite real file paths, not assumptions), the types/interfaces/contracts involved, a file-layout table for the implementation session, and open questions still unresolved. Unlike the spec template below — which bans file paths and code snippets because a spec can sit unimplemented for a while — the architecture doc **may** include exact paths, types, and snippets: it's consumed immediately by `/to-tasks`, not left to go stale. Update `state.json`'s `architecturePath`.
+4. If the ticket workspace's `state.json` exists and `isComplex` is `true`, also write `<workspaceRoot>/3-architecture.md`: the decisions that are settled and not open for relitigation, grounded against the actual current source (cite real file paths, not assumptions), the types/interfaces/contracts involved, a term-to-model table (each new or changed glossary term → the table, type or module that implements it, with its path), a file-layout table for the implementation session, and open questions still unresolved. Unlike the spec template below — which bans file paths and code snippets because a spec can sit unimplemented for a while — the architecture doc **may** include exact paths, types, and snippets: it's consumed immediately by `/to-tasks`, not left to go stale. Update `state.json`'s `architecturePath`.
 
 <spec-template>
 
@@ -116,6 +116,8 @@ A list of implementation decisions that were made. This can include:
 - Schema changes
 - API contracts
 - Specific interactions
+- **Domain terms → model:** each glossary term the grill added or changed, and what it becomes
+  (an entity or table, a module, a type, a state). A term that maps to nothing is a gap: say so.
 
 Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
 
