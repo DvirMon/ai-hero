@@ -63,6 +63,17 @@ If no `state.json` exists, grill without a workspace — never create one; only 
    adds the FE design check when the ticket has frames). Run it like any other aspect.
 
 1. Read the starting material fully before asking anything — don't make the user repeat what they've already told you.
+
+1b. **Research in the background while you ask.** Facts go to agents; only decisions and
+   preferences go to the user. Before the first question, list the facts your questions depend
+   on that the code or prior art can answer (how a module behaves today, what already exists,
+   how others solved it). Dispatch them in the background: the `Explore` agent for the
+   codebase, the `discovery` agent for prior art (only when the ticket needs it, `outputPath`
+   under the workspace's `discovery/<topic>.md`). Then ask your first question without waiting.
+
+   When a result returns, revise the questions you have not asked yet: drop one the result
+   answers, sharpen one it changes, add one it raises. Tell the user in one line which questions
+   changed and why. Never ask the user a fact that a dispatched agent is still looking up.
 2. Ask one question at a time. Prefer questions that expose an edge case, a scenario the starting material didn't cover, or a decision that was left implicit. Keep going until you can't find another fuzzy edge — don't stop early just because the obvious questions are exhausted.
 3. The moment an answer settles something, write it down — don't wait until the end to reconstruct it from memory:
    - If it's project-wide (a term, a naming convention, an architectural stance that outlives this ticket) → invoke `/domain-modeling` to record it in the glossary or an ADR.
