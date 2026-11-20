@@ -64,6 +64,20 @@ If no `state.json` exists, grill without a workspace — never create one; only 
 
 1. Read the starting material fully before asking anything — don't make the user repeat what they've already told you.
 
+1a. **Read what was already decided, before the first question.** Three sources:
+   - the capability's decisions log (`state.json`'s `capabilityLogPath`, step 3);
+   - the glossary: `CONTEXT.md`, or the one `CONTEXT-MAP.md` points to for this area
+     (layout per `/domain-modeling`);
+   - the ADRs that touch the area (`docs/adr/`, system-wide and context-level).
+
+   Ask in the glossary's words. A missing source is a finding: say so ("no glossary for this
+   area yet") rather than treating absence as "nothing was decided".
+
+   **Know why a fence stands before moving it.** Before proposing to change, merge or replace
+   an existing concept, cite the ADR or glossary entry that set it up, and say what the change
+   would break. If no record explains it, ask the user why it exists before asking whether to
+   change it.
+
 1b. **Research in the background while you ask.** Facts go to agents; only decisions and
    preferences go to the user. Before the first question, list the facts your questions depend
    on that the code or prior art can answer (how a module behaves today, what already exists,
@@ -98,7 +112,7 @@ If no `state.json` exists, grill without a workspace — never create one; only 
    the next question straight away — don't wait on the write. Join the writer before step 6's
    readiness update, step 7's commit and the final message. `/domain-modeling` keeps its own writers.
 
-   **Before opening the first question, read that log.** It is what stops the interview re-deciding something already settled, or reversing it without noticing. If the capability has no log yet, say so rather than treating its absence as "nothing was decided before".
+   **That log is read before the first question** (step 1a). It is what stops the interview re-deciding something already settled, or reversing it without noticing.
 4. Before finishing, verify failure modes are exhausted. Don't use a fixed question list — first reason about what kind of system this is (UI component, form field, API endpoint, background job, state machine, webhook, etc.), then derive what can go wrong *for that specific domain*. A button has different failure surfaces than a file uploader, a Node.js job, or a multi-step wizard. Pull each failure thread until nothing is left fuzzy, then record the answers in `1-decisions.md`, one entry each, phase `grill`.
 
 5. Before finishing, decide complexity: does implementing this safely need more than a PRD — new types/interfaces, a non-obvious file layout, a design that needs grounding against existing source before anyone builds it? If yes, set `isComplex: true`; otherwise `false`. This is about implementation risk, not ticket size — a small-sounding change to a shared abstraction can still need an architecture doc.
