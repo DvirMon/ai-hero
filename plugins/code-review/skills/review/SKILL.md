@@ -160,7 +160,12 @@ with the list, the contract path and this section; use its verdicts.
 - **Dedupe** — same file, lines within ±3, same root cause → one
   finding; keep the higher severity; list every reviewer that raised it.
 - **Rank** — impact findings P0 → P3, then by routing.md §5 order.
-- **Report** — review-contract.md §9, in this order:
+- **Report** — review-contract.md §9. **The report goes to a file, never
+  to chat** (locally; CI posts it as the summary comment). Write it per
+  review-contract.md §9 "Report file", then tell the user only the
+  verdict line, the file path and the single worst finding. Never paste
+  findings, tables or P3 lists into the reply. The file has this layout,
+  in this order:
 
 ```
 config: defaults — …           ← only when running on defaults
@@ -175,8 +180,9 @@ Spec:      pass | fail (N) | no spec available
 ## Not reviewed                ← disabled reviewers, missing skills, no spec
 ```
 
-Close with the single worst finding, one line. Any P0/P1 security
-finding → also suggest the built-in `/security-review`.
+Chat reply, in full: the verdict line, the report path, and the single
+worst finding in one line. Any P0/P1 security finding → also suggest the
+built-in `/security-review`.
 
 ## 8. Hand-off
 

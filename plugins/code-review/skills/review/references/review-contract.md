@@ -157,6 +157,32 @@ P3 findings are not verified.
   `high`/`max` effort.
 - **Manual checks** and **Not reviewed** — listed when non-empty.
 
+### Report file
+
+The report is a Markdown file, not chat output.
+
+- **Location**, first that applies; create the folder when missing:
+  1. The reviewed issue's task folder (the issue's `tasks:` path, e.g.
+     `<workspaceRoot>/tasks/issue-03-<slug>/`): `<that folder>/reviews/`.
+  2. The ticket's local workspace (the folder holding `state.json`),
+     when the review spans several issues or none:
+     `<workspaceRoot>/reviews/`.
+  3. No workspace: `docs/reviews/` in the reviewed repo.
+- **Name.** `<NN>-<YYYYMMDD-HHMM>.md`; in location 2 or 3 append
+  `-<scope>` (a short slug: `branch-<name>`, `files-<dir>`). `NN` is a
+  two-digit running number: highest existing `NN` in that folder + 1,
+  starting at `01`. The timestamp is local time from
+  `date '+%Y%m%d-%H%M'`. Never overwrite or renumber an earlier report.
+- **Header.** Title, date, base and head SHAs, scope, config state
+  (`config` or `defaults`), reviewers that ran, spec sources.
+- **Body.** The §7 layout of SKILL.md: verdict, findings, conformance,
+  P3, manual checks, not reviewed. Every verified finding keeps its
+  `confidence`. Add a **Triage** section only when the user later
+  classifies findings (relevant / not relevant to the work).
+- **Status.** Not tracked in the file. Fixes happen in commits and plan
+  steps; later reports record what changed.
+- **CI.** Post the report as the summary comment instead; no file.
+
 ## 10. Hand-off to the implementing agent
 
 | Finding | Action |
