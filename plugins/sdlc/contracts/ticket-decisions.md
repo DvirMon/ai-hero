@@ -22,7 +22,7 @@ It holds the outcome, never the conversation, and never the full design.
 | High-level architecture — types, contracts, file layout | `3-architecture.md` |
 | UI / visual design | `design.md` — written in `/to-spec` by a wired design skill (e.g. `figma:design-reference`) |
 | Behavior and edge-case rules | `2-spec.md` |
-| Proof — benchmarks, research, comparisons | `research-*.md` / discovery files |
+| Proof — benchmarks, discovery, comparisons | `discovery/<topic>.md` |
 | Domain terms | `CONTEXT.md` |
 
 **The test:** did the conversation settle or change it? Then it is an entry. A detail that
