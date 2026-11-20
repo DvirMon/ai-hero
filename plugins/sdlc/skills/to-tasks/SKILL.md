@@ -13,7 +13,9 @@ Turn one issue's slice of work into an ordered, step-by-step implementation plan
 ### 0. Start the issue branch
 
 `/to-tasks` is where work on one issue begins, so it is where the issue's branch begins. Nothing
-in this skill writes to the default branch.
+in this skill writes to the default branch, unless the user overrides per
+`${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md` § Override — then plan on the current branch
+and skip step 3.
 
 1. **Blockers merged.** Read the issue's blocked-by links (`gh issue view <n>`, plus the
    tracker's dependency relation). Any blocker still open → stop: `Next: /to-tasks <#blocker>`
@@ -40,13 +42,26 @@ Read the target issue in full (body + comments), via the issue tracker conventio
 
 If no `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket). If `state.json` already exists, validate it per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`.
 
-### 2. Explore the codebase (optional)
+### 2. Explore the codebase
 
-If you have not already explored the codebase, do so at the exact seams the issue touches.
+Explore the exact seams the issue touches, unless you already have.
 
 ### 3. Draft the plan
 
-An ordered list of concrete steps — which files to create or edit, in what order, and what "done" looks like for each step.
+Write the whole plan as one file, `<tasks-root>/plan.draft.md` (**Tasks root** is defined in §5).
+Writing it down is the reasoning: commit to file names, interfaces and order, and contradictions
+show up. It is a draft: not split into step files, not committed, and deleted in §5.
+
+Content, at medium detail — what will be built and how, not function bodies:
+
+1. **Goal** (one sentence) and **Approach** (2–4 sentences: how the work is shaped, and why).
+2. **File map** — files to create or change, one line of responsibility each, grouped by project.
+3. **Steps** — per step: what it does, its files, what it hands to later steps (interfaces, props,
+   routes, types), `depends_on`, and what "done" looks like. A few lines each.
+4. **Global constraints** — spec/architecture rules every step honours, values copied verbatim.
+5. **Open decisions** — each with your recommendation.
+
+Rules for the steps:
 
 - Follow the architecture doc's file-layout table when one exists; don't invent a different structure.
 - **One project per step.** Each step's files fall inside one project from the workflow config
@@ -59,16 +74,27 @@ An ordered list of concrete steps — which files to create or edit, in what ord
 - Wired skills may add frontmatter keys and step types — e.g. `figma:steps` binds `figma:` node
   IDs on UI `code` steps and adds a terminal `verify-ui` step.
 
-### 4. Quiz the user
+**Self-review before the user sees it.** Fix what you find, inline:
 
-Present the plan as a numbered list of steps. Ask whether the ordering and grain feel right — too coarse, too fine, or missing a step. Iterate until approved.
+- Spec coverage: every spec requirement maps to a step.
+- Step scan: each step lets the implementer write exactly one reasonable thing. A line that decides
+  nothing ("handle edge cases") is a gap; a function body the signature already determines is a
+  transcript.
+- Name consistency: types, signatures and props used in two steps match.
+- Proportion: the plan is not several times longer than the spec, nor longer than the code it describes.
 
-### 4b. Design the tests (review round 2)
+### 4. Review the draft with the user
 
-Only after the outline is approved — an outline change makes a test plan stale.
+Link `plan.draft.md` and ask the user to review it: are the approach, the structure and choices,
+and the step grain right? Apply their changes to the draft, then ask again. Repeat until approved.
+Do not write step files, `progress.md` or test plans before approval.
+
+### 4b. Design the tests (second review)
+
+Only after the draft is approved — a plan change makes a test plan stale.
 
 For every `code` step, dispatch the `sdlc:tdd-planner` agent, all steps in parallel, passing
-`stepOutline` (that step's approved outline), `stepNumber`, `stepSlug`, `testSkills` (the step's
+`stepOutline` (that step's section of the approved draft), `stepNumber`, `stepSlug`, `testSkills` (the step's
 project `skills.test`), `issueCriteria` (the issue's acceptance criteria, verbatim, when it has
 them), and `specPath`/`architecturePath` if set. It is read-only: it returns the test plan as
 text and writes nothing.
@@ -85,7 +111,7 @@ A planner that returns `Seams: none` gets no test plan. That step keeps test-aft
 still needs tests, it keeps its own `type: test` step.
 
 A step whose test plan is approved **absorbs** its test step: drop the separate `type: test`
-step for that code from the outline, and renumber. `/implement` runs red, green and types
+step for that code from `plan.draft.md`, and renumber. `/implement` runs red, green and types
 inside the code step.
 
 ### 4c. Self-review
@@ -113,8 +139,8 @@ as a protected path and blocks the writes. `.pipeline/` not gitignored → stop 
 `/sdlc:setup`, which adds it.
 
 **Dispatch every write in this step — step files, test plans, `progress.md`, the `state.json`
-update — to one `sonnet` writer**, per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/file-writes.md`. It renders step
-files from the approved outline into the template below, so the brief carries the full approved
+update — to one `sonnet` writer**, per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/file-writes.md`. It splits the approved `plan.draft.md` into step
+files using the template below, then deletes the draft. The brief carries the full approved
 plan, the approved test plans verbatim, and this section's format rules. **Wait for its report before the
 Pipeline-block update below:** promoting to `ready-for-agent` claims the plan is on disk, so
 it rests on what the writer actually wrote.
