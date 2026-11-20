@@ -94,7 +94,7 @@ Product owns the AC. `/to-spec` stops while any `⚠` is open. It clears one of 
 
 - **Covered by** names the story and what to do in it. It does not explain the mechanism.
 - **Design status** is one line. Competitor-issue citations, peer comparisons and
-  "no decision covers this" arguments live in `work/**/research-*.md` and are linked.
+  "no decision covers this" arguments live in `work/**/discovery/<topic>.md` and are linked.
 - The coverage-mark legend, ownership note and layer-free disclaimer exist once, in
   `README.md` or one owning doc. The others link.
 - A resolved item is deleted, not struck through. History is in git and `work/`.
