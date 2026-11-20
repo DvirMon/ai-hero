@@ -1,7 +1,8 @@
 # Branch guard
 
-Which branch a stage is on, and whether it may commit there. Cited by `/implement`, `/review` and
-`/ship`. Run it before touching git.
+Which branch a stage is on, and whether it may commit there. Cited by `/to-ticket`,
+`/grill-with-docs`, `/to-spec`, `/to-issues`, `/to-tasks`, `/implement`, `/review`, `/ship`,
+and `/setup`. Run it before touching git.
 
 ## Classify
 
@@ -24,4 +25,17 @@ On an issue branch, also stop when:
   worktree exists, enter it (`EnterWorktree` with `path`) and re-check instead of stopping.
 - There is no `progress.md` and the branch's `N` isn't this issue's.
 
-Say which check fired, and stop — never "just this once" on the default branch.
+Say which check fired, and stop — unless the user overrides, per § Override.
+
+## Override
+
+The guard stops by default. Do not infer a waiver, and do not grant yourself "just this once".
+
+The user waives **this run** by saying so in the invoking message, or in the reply after a
+stop: "override the branch guard", "work on this branch", or "proceed here".
+
+Then name the check waived and the current branch, and continue the stage on that branch.
+Do not start a different one. The next invocation stops again unless the user overrides again.
+
+The waiver covers only the checks in this file (kind, `progress.md` branch, worktree). It does
+not waive other preconditions, and it does not let `/ship` push or merge the default branch.

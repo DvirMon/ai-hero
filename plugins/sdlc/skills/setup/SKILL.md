@@ -161,7 +161,7 @@ Show the user a draft of:
 
 Let them edit before writing.
 
-These edits are themselves a change to the repo: make them on a branch (`chore/sdlc-setup`), never on the default branch, and ship them with `/ship`. The `gh api` server calls run after that PR merges.
+These edits are themselves a change to the repo: make them on a branch (`chore/sdlc-setup`), never on the default branch, and ship them with `/ship`. An explicit user override follows `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md` § Override — then make them on the current branch. The `gh api` server calls run after that PR merges.
 
 ### 4. Write
 

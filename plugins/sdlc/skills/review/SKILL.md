@@ -18,7 +18,7 @@ pipeline.
    `stages.review.skills` per `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`.
 2. **Reviewer** = `stages.review.reviewer`, default `code-review:review`. Not installed →
    stop, name the key and the skill (a construction error, per the contract).
-3. **Branch** — run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`.
+3. **Branch** — run `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md`, including § Override.
 4. **Tasks root** — as `/implement` resolves it (`<workspaceRoot>/tasks/issue-<N>/`, or
    `.pipeline/issue-<N>/` with no workspace). A planning or no-issue branch has none: use
    `.pipeline/<branch, / → ->/`.

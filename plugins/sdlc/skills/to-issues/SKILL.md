@@ -24,6 +24,8 @@ Read the workflow config per `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md
 The issue graph and `state.json` update are committed on the epic's planning branch,
 `docs/<slug>`, in its worktree. On the default branch or an issue branch, stop and point the
 user to `/to-ticket`, which starts it via `${CLAUDE_PLUGIN_ROOT}/skills/to-tasks/references/start-branch.md`.
+An explicit user override follows `${CLAUDE_PLUGIN_ROOT}/contracts/branch-guard.md` § Override —
+then write on the current branch and do not start another.
 
 ### 1. Gather context
 
