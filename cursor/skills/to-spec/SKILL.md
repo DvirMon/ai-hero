@@ -1,16 +1,46 @@
 ---
 name: to-spec
-description: Turn the current conversation (and, when one exists, a ticket workspace's decisions) into a spec — plus an architecture doc when the work is complex — and publish it to the project issue tracker. No interview, just synthesis of what's already been decided.
+description: Turn the current conversation (and, when one exists, a ticket workspace's decisions) into a spec checklist — plus an architecture doc when the work is complex, and any document a wired skill adds (e.g. a design reference). The spec stays local; it is never published to a tracker. No interview, just synthesis of what's already been decided.
 disable-model-invocation: true
-portedFrom: f855039ba82b
-portedSelf: 1d247e75d94b
+portedFrom: 1648b41ae622
+portedSelf: 6c7627cf70df
 ---
 
-This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`) and the ticket it was grilled from — and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
+This skill takes the current conversation context and codebase understanding — plus, if a ticket workspace exists, its `decisions.md` (path from `state.json`'s `decisionsPath`, format `references/ticket-decisions.md` — a settled entry is never re-asked) and the ticket it was grilled from — and produces a spec: a checklist for the agent, derived from the decisions. User stories live in the PRD (`prdPath`, `references/prd.md`), never in the spec. Do NOT interview the user — just synthesize what's already been decided. If nothing's been decided yet and a ticket workspace exists, run `/grill-with-docs` first.
 
-If no ticket workspace's `state.json` exists yet, don't skip workspace tracking — create it now per `/to-ticket`'s `state.json` format and workspace-root rule, asking the user for whatever required fields you can't derive yourself (at minimum `slug`; `ticketRef`/`ticketUrl` can stay `null` if there's no tracked ticket).
+**Config and wired skills, first.** Read `<repo>/.claude/workflow.json` per `references/workflow-config.md` § Reading it. Then load `stages.to-spec.skills` per `references/stage-skills.md` — on Cursor, read each listed skill's `SKILL.md` and apply what it adds to this stage before step 1.
 
-The issue tracker and triage label vocabulary should have been provided to you — run `/setup-skills` if not.
+**Branch guard, next.** The spec is committed on the epic's planning branch, `docs/<slug>`
+(the `slug` in `state.json`), in its worktree. On the default branch or an issue branch, stop
+and point the user to `/to-ticket`, which starts it via `to-tasks/references/start-branch.md`.
+An explicit user override follows `references/branch-guard.md` § Override — then write the spec
+on the current branch and do not start another.
+
+If a ticket workspace's `state.json` exists, validate it per `to-ticket/references/state-schema.md` before reading it.
+
+If it carries a non-null `capabilityLogPath`, **read that log too.** It holds what earlier efforts on the same capability already settled, superseded or left open — which this workspace's own decisions file does not, and which a spec is worse than useless for contradicting. Any decision the spec makes that binds the capability beyond this ticket gets a row in that log, per `references/decisions-log.md`.
+
+If no ticket workspace's `state.json` exists, stop and point to `/to-ticket`. It is the only stage that creates a workspace.
+
+The repo's `docs/agents/ticket-tracker.md` and `docs/agents/issue-tracker.md` (operations per `references/tracker.md`) should have been provided to you — run `/setup` if not.
+
+**PRD gate, before step 1.** When `prdPath` is set:
+
+1. **Re-fetch the remote ACs once**, through `ticket-tracker.md` `## Fetch` for `ticketRef`.
+   Compare each against its `[<ticketRef> · MM-DD]` line in `prd.md`. A changed AC gets its new
+   text and today's pull date; list every changed line to the user before building the
+   checklist. A new remote AC is added with its tag; a removed one is listed, not deleted.
+   **`library` / `design-system`:** the capability PRD holds no ticket ACs. Read them straight
+   from the fetch as checklist input, each tagged `[<ticketRef> · MM-DD]`.
+2. **Stop on an open `⚠ Dn`.** Any line still marked `⚠` blocks the spec — product owns the AC.
+   On a library / DS ticket, check the `⚠ <KEY> AC` entries in `decisionsPath` instead.
+   It clears only per `references/prd.md` § Conflict marker: the re-fetch above shows product
+   updated the ticket, or `decisionsPath` holds an override entry `Dm` naming `Dn` (then rewrite
+   the line to the decision, tag `[Dm]`, drop the marker). Otherwise name the open lines and
+   stop.
+
+`prdPath` null (no PRD): ask the user for the path or confirm there is none,
+then skip the gate.
 
 ## Process
 
@@ -20,39 +50,60 @@ The issue tracker and triage label vocabulary should have been provided to you �
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below. If the ticket workspace's `state.json` exists, also write it to `<workspaceRoot>/spec.md` (using `state.json`'s `workspaceRoot`) and update `state.json`'s `specPath` and `checklist.spec = true`.
+3. Write the spec using the checklist template below. If the ticket workspace's `state.json` exists, also write it to `<workspaceRoot>/2-spec.md` (using `state.json`'s `workspaceRoot`) and update `state.json`'s `specPath` and `updatedAt`.
 
-4. If the ticket workspace's `state.json` exists and `isComplex` is `true`, also write `<workspaceRoot>/architecture.md`: the decisions that are settled and not open for relitigation, grounded against the actual current source (cite real file paths, not assumptions), the types/interfaces/contracts involved, a file-layout table for the implementation session, and open questions still unresolved. Unlike the spec template below — which bans file paths and code snippets because a spec can sit unimplemented for a while — the architecture doc **may** include exact paths, types, and snippets: it's consumed immediately by `/to-tasks`, not left to go stale. Update `state.json`'s `architecturePath`.
+   **Documents from wired skills.** A wired skill may write a document beside the spec and set the
+   `state.json` field it owns — e.g. `figma:design-reference` writes `design.md` and sets `designPath`
+   when that skill is installed and wired. When `designPath` is set, `2-spec.md` gets a **Design reference** section that links to it
+   only. See `references/design-reference.md` when you write `design.md` without a wired skill.
 
-5. Publish the spec to the project issue tracker, and apply the `ready-for-agent` triage label - no need for additional triage.
+   A decision settled while writing the spec is appended to `decisionsPath` as an entry per
+   `references/ticket-decisions.md`, phase `spec`.
 
-   Update the source issue's `## Pipeline` block (format: `to-issues`, "The Pipeline block"): set
-   `workspace` to the workspace root, drop the `grill`/`spec` lines now that `state.json`'s
-   `checklist` owns them, and move `readiness` to `needs:issues` — or `needs:tasks` if the spec
-   describes work small enough to need no slicing. Re-sync the rung label in the same turn.
- If `architecture.md` was written, link it from the issue body rather than inlining it.
+   **File writes.** Compose every file's full text in this session, then write each path yourself in
+   sequence (mechanical — no subagent dispatch on Cursor). Which files and fields:
+   `to-ticket/references/file-writes.md`.
+
+   Record the stage through `issue-tracker.md` `## Readiness` (contract:
+   `to-issues/references/pipeline-block.md`): `workspace` = the workspace root,
+   `grill: done: <decisionsPath>`, `spec: done: <specPath>`, and `readiness` per `to-issues`'s
+   ladder, with the `assessed:` line. You set every rung yourself, `ready-for-agent` included.
+
+   Rate the work's **difficulty**, not its breadth, and let that set the rung. Full trigger
+   list and the breadth-vs-difficulty rule: `to-issues/references/pipeline-block.md`. Applied
+   to a spec, it comes out as:
+
+   - **3+ modules or >~6 acceptance criteria** → `needs:issues`. The spec needs slicing.
+   - Otherwise **high** difficulty — a new seam, an interaction between existing mechanisms,
+     an open question → `needs:tasks`.
+   - Otherwise **low or moderate** — a deletion, a mechanical edit the spec already
+     enumerates, a few files with one named trap → **propose `ready-for-agent`**.
+     `/to-tasks` would only re-list the spec body.
+
+   Never leave a rung standing that its own `assessed:` line contradicts. A spec that
+   enumerates the whole edit and rates it low, then sits at `needs:tasks`, is that
+   contradiction.
+
+4. If the ticket workspace's `state.json` exists and `isComplex` is `true`, also write `<workspaceRoot>/3-architecture.md`: the decisions that are settled and not open for relitigation, grounded against the actual current source (cite real file paths, not assumptions), the types/interfaces/contracts involved, a file-layout table for the implementation session, and open questions still unresolved. Unlike the spec template below — which bans file paths and code snippets because a spec can sit unimplemented for a while — the architecture doc **may** include exact paths, types, and snippets: it's consumed immediately by `/to-tasks`, not left to go stale. Update `state.json`'s `architecturePath`.
 
 <spec-template>
 
-## Problem Statement
+## Goal
 
-The problem that the user is facing, from the user's perspective.
+One line, linking the PRD (`prdPath`) for the problem and the user stories. Do not restate
+them.
 
-## Solution
+## Checklist
 
-The solution to the problem, from the user's perspective.
+Markdown task list — one `- [ ]` line per requirement; use `- [x]` when the item is already
+ satisfied. Prefix each line with its number (`1.`, `2.`, …; sub-items `2a.`, `2b.` when needed).
+ Each item is derived from a decision or a PRD requirement and ends with its source tag
+ (`[Dn]` or `[<ticketRef> · MM-DD]`). One checkable behavior or edge case per line.
 
-## User Stories
+Example:
 
-A LONG, numbered list of user stories. Each user story should be in the format of:
-
-1. As an <actor>, I want a <feature>, so that <benefit>
-
-<user-story-example>
-1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
-</user-story-example>
-
-This list of user stories should be extremely extensive and cover all aspects of the feature.
+- [ ] 1. … [D4] [PROJ-456 · 11-04]
+- [x] 2. … [D11]
 
 ## Implementation Decisions
 
@@ -86,7 +137,17 @@ A description of the things that are out of scope for this spec.
 
 Any further notes about the feature.
 
+## Design reference
+
+(Omit when `designPath` is null.) Link only — e.g. `See [design.md](./design.md)`. Do not restate its tables here.
+
 </spec-template>
+
+5. **Commit.** After all writes, make one commit on `docs/<slug>`, staged by path:
+   `2-spec.md`, `design.md` (if written), `3-architecture.md` (if written), `prd.md` (if the gate
+   changed it), `state.json`, any capability-log row. Never `-A`. Commit per
+   `references/commit.md`: type `docs`, subject `spec <slug>`, issue =
+   `ticketRef`. Do not push — `/ship` does, after `/to-issues`.
 
 End your final message with a one-line pointer, as the very last line — nothing after it:
 
