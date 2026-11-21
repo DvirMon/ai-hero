@@ -93,6 +93,23 @@ Omit a section entirely rather than leaving it filled with a placeholder — a m
 
 Follow `docs/agents/ticket-tracker.md`'s "When a skill says 'create an intake ticket'" convention.
 
+### 3b. Route by size
+
+Size the diff the ticket asks for before opening a workspace. A workspace and a grill cost
+more than a small change is worth; one session cannot hold a change that is too big. Pick one
+route, state it with its evidence, and wait for the user to confirm or change it:
+
+| Route | When | What happens |
+|---|---|---|
+| **Fast path** | One obvious change, a few files, no open question, concrete acceptance criteria | No workspace. Write the ticket's `## Pipeline` block (`to-issues`, "The Pipeline block") with `workspace: null`, `grill: skipped: <reason>`, `spec: skipped: <reason>` and `readiness: ready-for-agent`, with its dated reason. Stop; the pointer is `Next: /implement <ticket-id>` |
+| **Grill** (default) | Anything else that one session can settle | Continue with step 4 |
+| **Wayfinder** | More than one session: several capabilities, no clear destination, or decisions that depend on investigation nobody has done | No workspace. Stop with `Next: /wayfinder <ticket-id>`. The ticket is the idea the map starts from |
+
+Any open question, or an acceptance criterion you cannot check, means the fast path is wrong —
+take the grill. When unsure between grill and Wayfinder, take the grill: `/grill-with-docs`
+can still move to Wayfinder (its step 0), and a grill that turns out small has cost nothing
+extra.
+
 ### 4. Initialize the ticket workspace
 
 Every effort in this pipeline has a workspace directory, where `<slug>` is a short kebab-case name derived from the ticket title. Decide the workspace **root**:
@@ -128,7 +145,8 @@ belongs to the whole ticket — per-step routing lives in the step files `/to-ta
 
 ### 5. Hand off
 
-Tell the user the ticket reference/URL and the workspace path. Then end your final message with a one-line pointer, as the very last line — nothing after it:
+Tell the user the ticket reference/URL and the workspace path. On the fast path or the
+Wayfinder route (step 3b), there is no workspace: end with that route's pointer instead. Otherwise end your final message with a one-line pointer, as the very last line — nothing after it:
 
 ```
 Next: /grill-with-docs <ticket-id-or-slug>
