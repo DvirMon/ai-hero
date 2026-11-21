@@ -100,6 +100,7 @@ finding because the cause is in a style file.
 | `performance.md` → `correctness-reviewer` | A changed file matches config `performance.hot-paths` |
 | `security.md` → `security-reviewer` | Always |
 | `smells.md` → `standards-reviewer` | Always |
+| `module-design.md` → `standards-reviewer` | Always |
 | `extra-references` entry → its `for:` reviewer | Always (no `for:` → every reviewer) |
 | Skills | `knowledge.skills` + the skills of every context the reviewer's files fall in |
 
