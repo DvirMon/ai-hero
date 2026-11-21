@@ -118,6 +118,10 @@ A list of implementation decisions that were made. This can include:
 - Specific interactions
 - **Domain terms → model:** each glossary term the grill added or changed, and what it becomes
   (an entity or table, a module, a type, a state). A term that maps to nothing is a gap: say so.
+- **Long-term impact:** which module this change makes deeper or simpler, and what it makes
+  harder later (a special case, a second owner for one decision, a new pass-through). "None"
+  is a valid answer, but write it. `/review` checks the diff against it
+  (`code-review` module-design baseline).
 
 Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
 
