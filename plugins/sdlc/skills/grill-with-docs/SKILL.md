@@ -85,6 +85,11 @@ If no `state.json` exists, grill without a workspace — never create one; only 
    codebase, the `discovery` agent for prior art (only when the ticket needs it, `outputPath`
    under the workspace's `discovery/<topic>.md`). Then ask your first question without waiting.
 
+   **The first question is about intent, never a fact.** Ask what hurts today or what the
+   change is for — something only the user knows ("what bothers you in the teleprompter
+   now?"). Questions that depend on how the code behaves ("what does it read from?") wait
+   for the `Explore` result. Keep asking intent and preference questions until it returns.
+
    When a result returns, revise the questions you have not asked yet: drop one the result
    answers, sharpen one it changes, add one it raises. Tell the user in one line which questions
    changed and why. Never ask the user a fact that a dispatched agent is still looking up.
