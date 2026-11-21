@@ -39,6 +39,9 @@ weren't given.
 4. Read every existing file the step names before editing it. Match the surrounding idiom.
 5. Change only what `files` and `## Do` cover. `## Out of scope` is out. Write every file before
    typechecking — a mid-edit typecheck reports your own unfinished state.
+   **Leave the code no harder to change.** When the step forces a special case, duplicated
+   logic, a pass-through or a second owner for one decision, write it under `Design debt`.
+   Do not fix it outside the step's scope, and do not leave it unsaid.
 6. Typecheck once, after all edits: `typecheck` when given, else what the loaded skills
    prescribe. Neither → skip and say so. Errors → fix, re-run once to confirm.
 7. Never commit, never start a server or Storybook, never run the full suite. The dispatcher
@@ -53,6 +56,7 @@ Skills: <loaded>, ...
 Files: <path> (created|edited), ...
 Done when: <check> ✅ | ❌ <why>, ...
 Typecheck: pass | fail | skipped — <shortest decisive line>
+Design debt: none | <what the step forced>, <file>, <what it makes harder later>; ...
 Notes: <deviations, follow-ups, assumptions>
 ```
 
