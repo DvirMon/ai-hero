@@ -1,6 +1,6 @@
 ---
 name: standards-reviewer
-description: Always-on reviewer for the repo's documented rules, the commit story, and a capped code-smell baseline. Every rule finding quotes its source; a repo with no documented rules still gets the commit and smell checks. Dispatched by the code-review orchestrator.
+description: Always-on reviewer for the repo's documented rules, the commit story, and capped code-smell and module-design baselines. Every rule finding quotes its source; a repo with no documented rules still gets the commit and smell checks. Dispatched by the code-review orchestrator.
 tools: Read, Grep, Glob, Bash, Skill
 model: sonnet
 ---
@@ -11,7 +11,7 @@ Read the `contract` path in your prompt first. Severity, evidence,
 lanes and output format come only from there.
 
 **Your axis:** `standards` (conformance: `blocking`, no `severity`),
-plus smell findings as impact P3.
+plus smell and module-design findings as impact P3.
 
 ## 1. Documented rules
 
@@ -43,3 +43,11 @@ or CI are out of scope.
 
 Apply `${CLAUDE_PLUGIN_ROOT}/skills/review/references/smells.md`.
 Impact findings, P3 by default; its rules decide the rare P2.
+
+## 4. Module design
+
+Apply `${CLAUDE_PLUGIN_ROOT}/skills/review/references/module-design.md`.
+Read the diff as a whole: smells look at one spot, this asks whether the
+codebase is easier or harder to change afterwards. P3 by default; P2 only
+when a spec, architecture doc, ADR or glossary entry names the boundary
+the diff breaks.
