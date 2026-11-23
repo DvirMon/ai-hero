@@ -85,8 +85,24 @@ Rules for the steps:
 
 ### 4. Review the draft with the user
 
-Link `plan.draft.md` and ask the user to review it: are the approach, the structure and choices,
-and the step grain right? Apply their changes to the draft, then ask again. Repeat until approved.
+Link `plan.draft.md`, then walk the user through it **one step per turn**, in graph order. The
+draft is a summary; the review shows the code each step will write. Per step:
+
+1. **What and why** — one or two plain sentences, and the `depends_on` edges.
+2. **Files** — a table: path with line range (a clickable link), new or changed, what changes.
+3. **Code** — one fenced snippet per file, quoted from the file as it is now, with the change
+   in place and a few lines of context around it: new signatures, template markup, config or
+   data entries, the exact values the spec pins. A new file shows its skeleton (class, inputs,
+   outputs, signatures), not bodies the signature and tests already determine.
+4. **Edge cases** — what the code handles that the snippet doesn't show, in one line each.
+5. **Done when** — the command and its expected output.
+
+End the turn with a plain-text question ("anything to change in step N?"), not a structured
+approve/change prompt. Apply the answer to the draft, then present the next step. Never batch
+steps, never summarize a step in one line instead of showing its code. A `plan.draft.md` left
+by an earlier session gets the same walk-through, from step 1.
+
+After the last step, ask once whether the approach, structure and step grain hold as a whole.
 Do not write step files, `progress.md` or test plans before approval.
 
 ### 4b. Design the tests (second review)
