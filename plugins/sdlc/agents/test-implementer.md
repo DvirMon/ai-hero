@@ -13,6 +13,8 @@ is the contract, and the implementation is the source of truth about what to tes
 
 ## Inputs
 
+A `figma` input or `figma:` step key is ignored here: layout is not under test.
+
 - **stepFilePath** (required): absolute path to the `step-N-*.plan.md` to execute
 - **testSkills** (required): the project's `skills.test` — test selection policy
 - **codeSkills** (required): the project's `skills.code` — test mechanics for the framework

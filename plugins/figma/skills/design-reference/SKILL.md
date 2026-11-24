@@ -32,6 +32,7 @@ If `figma[]` is empty and there is no design-check aspect, **skip** `design.md` 
 # Design reference — {ticketRef or slug}
 
 Traceability: Figma node IDs live here and in MR descriptions, never in product code comments.
+Node IDs and URLs here are **fetch targets**: `/implement` fetches every one a step consumes.
 
 ## Frames
 
@@ -85,7 +86,10 @@ flagged in Figma.
 ## Open items
 
 Numbered list of anything still blocking `/implement` UI steps (unmapped token, missing frame). Empty
-when clean.
+when clean. An item that says a frame is "clipped" or "confirm in verify" must name the child
+node ID to fetch instead.
+
+Every Frames row needs a `fileKey`: a node with none cannot be fetched.
 ```
 
 ## Merge rules

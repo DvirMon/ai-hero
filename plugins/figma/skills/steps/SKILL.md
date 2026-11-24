@@ -31,6 +31,7 @@ depends_on: [3]
 figma:
   - "4275:4279"
   - "4283:12603"
+figma_file: UuULlLPwxrsFLPnmxHyF4P
 files:
   - app/.../active-sessions-section.component.ts
 ---
@@ -43,7 +44,11 @@ Rules:
 - In **Watch out**, point at the rows in `design.md` this step consumes (component map, token
   map, copy keys) — link `designPath`, do not copy tables.
 
-Resolve `fileKey` at `/implement` time from `figma[]` by matching `nodeId`.
+- `figma_file` is the Figma `fileKey` for every node in that step. Write it on every step that has
+  `figma:`. `/implement` resolves it from `figma_file`, then `figma[]`, then `design.md` § Frames;
+  a node that resolves nowhere is a plan defect.
+- Every listed node is a **fetch target**: `/implement` fetches each one from Figma before
+  writing UI.
 
 ## Final step — visual verify
 

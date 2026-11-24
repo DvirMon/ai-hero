@@ -26,27 +26,34 @@ the step's `files` include UI templates/styles under the frontend app).
 
 ### Before dispatching the implementer
 
-1. Skills: the project's `skills.code` plus `skills.ui` (e.g.
-   `figma-feature-implementation`, `css-styling`), passed to the implementer.
+1. Skills: the project's `skills.code` plus `skills.ui` (conventions only, e.g.
+   `css-styling`), passed to the implementer. The Figma fetch does **not** depend on
+   `skills.ui`: it always runs for these steps.
+   Resolve each node's `fileKey` in this order: the step's `figma_file`, then `state.json`
+   `figma[]` (match `nodeId`), then `design.md` § Frames. None resolves → stop.
 2. Area rules from `figma-project.json` → `rules[]` (e.g. `frontend/AGENTS.md`).
 3. Brief the implementer with:
    - `designPath` — mappings are authoritative
    - Step `figma` node IDs and matching `fileKey` from `figma[]`
-   - Instruction: implement the frames with the `skills.ui` skills' design-to-code workflow,
-     up to but not including its visual-verify step. That step runs after the step lands,
-     unless a `verify-ui` step follows (then it belongs to verify).
+   - Pass `figma: [{ fileKey, nodeId }, ...]` as the structured `figma` input (not prose).
+     The implementer's Figma gate fetches every frame (`create_session`, `get_screenshot`,
+     `get_metadata`, `get_design_context`) and diffs its markup against it.
+   - Instruction: build up to but not including the browser visual-verify step. That step
+     runs after the step lands, unless a `verify-ui` step follows (then it belongs to verify).
 
 ### Implementer dispatch
 
 Pass the usual `stepFilePath`, `workspaceRoot`, `specPath`, `architecturePath`, plus the brief
-above. Do not batch Figma fetch for multiple steps.
+above. On a test-first step pass `figma` on the **green** dispatch (the red phase ignores it). Do not batch Figma fetch for multiple steps.
 
 ### After implementer returns
 
-If there is **no** `verify-ui` step later in the plan, run **Visual verify** (below) for this
-step's `figma` nodes before marking the step done. If a `verify-ui` step exists, defer full
-comparison to it — only ensure `design.md` mappings were applied (no obvious i18n/token leaks in
-diff review).
+Check the report first: no `Figma: fetched …` line, or `layout drift` unlisted → the step is
+**not done**; send it back. Then, if there is **no** `verify-ui` step later in the plan, run
+**Visual verify** (below) for this step's `figma` nodes before marking the step done. If a
+`verify-ui` step exists, defer the browser comparison to it, but still review the diff against
+the implementer's metadata diff (structure, order, spacing) and `design.md` mappings (no
+i18n/token leaks).
 
 ## `verify-ui` steps
 
@@ -72,6 +79,9 @@ source.
 | Condition | Action |
 |---|---|
 | Missing `designPath` but step has `figma:` | Stop — run `/to-spec` |
+| Step has `figma:` and no `fileKey` resolves (`figma_file`, `figma[]`, `design.md` § Frames) | Stop — fix the plan |
+| Figma MCP tools unavailable to the implementer (`Figma: blocked`) | Stop — never build from `design.md` text alone |
+| Implementer returns without a `Figma: fetched` line | Not done — send the step back |
 | Token in Figma not in `design.md` | Stop — spec gap |
 | `figma-project.json` missing in repo | Stop — config error |
 | Dev server not running at verify | Degrade to checklist (runtime) |

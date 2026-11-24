@@ -24,7 +24,10 @@ weren't given.
   skill's `references/test-first.md` — work the plan's seams in order, running only that seam's
   test after each. Replace every stub. Never edit, skip or weaken a test; a test that looks
   wrong → `Status: blocked`, naming the seam.
-- **brief** (optional): extra instructions from the dispatcher (e.g. Figma node IDs)
+- **figma** (optional): list of `{ fileKey, nodeId }` or `figma.com` URLs the step renders.
+  Non-empty, or the step frontmatter has `figma:`, or `## Do` / `designPath` name a
+  `figma.com/` URL or a frame node ID → the **Figma gate** (Process 2b) is mandatory.
+- **brief** (optional): extra instructions from the dispatcher
 
 ## Process
 
@@ -34,6 +37,25 @@ weren't given.
    `~/.claude/conventions/doc-contracts/jsdoc.md`.
 2. Read the step file in full: frontmatter `files`, `## Do`, `## Watch out`, `## Out of scope`,
    `## Done when`.
+2b. **Figma gate** (only when `figma` applies, see Inputs). `designPath` is required reading
+   here. Never build from `design.md` text alone: its tables decide components, tokens and
+   copy, but the frame decides structure, order, spacing and alignment.
+   a. Load the Figma MCP tools with ToolSearch (`select:mcp__figma__create_session,
+      mcp__figma__get_screenshot,mcp__figma__get_metadata,mcp__figma__get_design_context`).
+      Missing → `Status: blocked — Figma MCP tools unavailable`. Never fall back to text.
+   b. `create_session` once with the `fileKey` and a one-line task; pass its `sessionId` on
+      every later Figma call.
+   c. `get_screenshot` and `get_metadata` for every node, in one parallel batch. View the
+      screenshot; read the metadata tree for order, sizes and gaps.
+   d. Load the `figma-design-to-code` guidance (Skill; else the MCP resource
+      `skill://figma/figma-design-to-code/SKILL.md`), then `get_design_context` per node.
+      Pass `skillNames: "resource:figma-design-to-code"` (drop `resource:` if loaded as a plugin
+      skill) on each `get_design_context` call.
+      Its output is a reference to adapt: `design.md` mappings and the repo's own
+      components win over its generated markup.
+   e. Before typecheck, diff your markup against the `get_metadata` tree: structure,
+      order, spacing, alignment. Fix drift, or list it under `Notes`.
+   No resolvable `fileKey` → `Status: blocked`, naming the node.
 3. A step that writes *about* existing code (a story, a doc) needs that code on disk. Missing →
    `Status: blocked`.
 4. Read every existing file the step names before editing it. Match the surrounding idiom.
@@ -55,6 +77,7 @@ Status: done | blocked
 Skills: <loaded>, ...
 Files: <path> (created|edited), ...
 Done when: <check> ✅ | ❌ <why>, ...
+Figma: n/a | fetched <nodeIds> (screenshot, metadata, context), layout drift: none | <list> | blocked — <why>
 Typecheck: pass | fail | skipped — <shortest decisive line>
 Design debt: none | <what the step forced>, <file>, <what it makes harder later>; ...
 Notes: <deviations, follow-ups, assumptions>

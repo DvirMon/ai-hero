@@ -130,7 +130,7 @@ A teammate's `workflow.local.json` changes only what differs:
 |---|---|---|
 | `path` | glob, or array of globs, relative to the repo root | required |
 | `skills.<type>` | array of skill names, loaded by the step's executor | `[]` |
-| `skills.<other>` | extra skill lists a wired stage skill reads, e.g. `skills.ui` for `figma:implement` | — |
+| `skills.<other>` | extra skill lists a wired stage skill reads, e.g. `skills.ui` for `figma:implement` (conventions only: the Figma fetch runs without it) | — |
 | `executors.<type>` | agent name that executes steps of that type | `/implement` § Route's built-in executor |
 | `typecheck` | command | — (what the project's code skills say; none → skipped and reported) |
 | `test` | command, `{files}` = the spec files to run | — (what the project's test skills say) |
