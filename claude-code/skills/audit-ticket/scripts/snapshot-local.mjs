@@ -21,8 +21,8 @@ if (!ws) { out({ error: `no workspace found for ${target}`, searched: `${repoRoo
 const checks = [];
 const check = (id, severity, msg, file, line) => checks.push({ id, severity, msg, file: file && path.relative(repoRoot, file), line });
 
-const ROOT_ALLOWED = /^(state\.json|prd\.md|decisions\.md|spec\.md|3-architecture\.md|design\.md|issue-graph\.md|discovery\/[\w.-]+\.md|e2e-[A-Z][A-Z0-9]+-\d+\/.+|audit\/.+)$/;
-const TASK_ALLOWED = /^tasks\/issue-[^/]+\/(step-\d+-[\w.-]+\.(plan|test-plan)\.md|progress\.md|review\.md)$/;
+const ROOT_ALLOWED = /^(state\.json|prd\.md|index\.md|decisions\.md|spec\.md|3-architecture\.md|design\.md|issue-graph\.md|discovery\/[\w.-]+\.md|e2e-[A-Z][A-Z0-9]+-\d+\/.+|audit\/.+)$/;
+const TASK_ALLOWED = /^tasks\/(issue-[^/]+\/)?(step-\d+-[\w.-]+\.(plan|test-plan)\.md|progress\.md|review\.md)$/;
 const ASSET = /\.(png|jpe?g|gif|svg|webp|html)$/i;
 
 // Epic layout (D18): slice folders t<N>-<slug>/ with their own state.json are

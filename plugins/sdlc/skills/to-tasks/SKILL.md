@@ -141,7 +141,9 @@ as a protected path and blocks the writes. `.pipeline/` not gitignored → stop 
 **Dispatch every write in this step — step files, test plans, `progress.md`, the `state.json`
 update — to one `sonnet` writer**, per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/file-writes.md`. It splits the approved `plan.draft.md` into step
 files using the template below, then deletes the draft. The brief carries the full approved
-plan, the approved test plans verbatim, and this section's format rules. **Wait for its report before the
+plan, the approved test plans verbatim, and this section's format rules. The brief's last step is `workspace-links.mjs <workspaceRoot> --write`, then `--check` (`${CLAUDE_PLUGIN_ROOT}/contracts/workspace-links.md`):
+every step plan links its test plan, its `depends_on` steps and the `D<n>` / `ac-N` it cites, and
+`progress.md` links every step and test plan. **Wait for its report before the
 Pipeline-block update below:** promoting to `ready-for-agent` claims the plan is on disk, so
 it rests on what the writer actually wrote.
 

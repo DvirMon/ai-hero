@@ -31,6 +31,9 @@ holds the result, and the entry is enough.
 
 ## Shape
 
+Every decision line starts with its anchor `<a id="d<n>"></a>`; any `D<n>` elsewhere is a link
+to it. Rules: `${CLAUDE_PLUGIN_ROOT}/contracts/workspace-links.md`.
+
     # <slug> — decisions
 
     Ticket: <link>. Capability log: <link>.
@@ -50,9 +53,9 @@ holds the result, and the entry is enough.
 
     ## Decisions
 
-    - **D1** `MM-DD · grill` — <X> over <Y>: <why, one clause>. [proof](link) → TR12
-    - **D2** `MM-DD · grill` — <how it is done>: <why, one clause>.
-    - **D3** `MM-DD · review` — <what changed> after <the challenge>: <why, one clause>.
+    - <a id="d1"></a>**D1** `MM-DD · grill` — <X> over <Y>: <why, one clause>. [proof](link) → TR12
+    - <a id="d2"></a>**D2** `MM-DD · grill` — <how it is done>: <why, one clause>.
+    - <a id="d3"></a>**D3** `MM-DD · review` — <what changed> after <the challenge>: <why, one clause>.
 
     ## Open
 

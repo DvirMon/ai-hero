@@ -21,6 +21,7 @@ One fact, one file. Every other copy is drift to migrate or delete.
 | `tasks/issue-<N>/progress.md` | step status (`⬚ ▶ ✅ 🧪 ⏭`), AC → step coverage table | tracker sync lines |
 | `tasks/issue-<N>/review.md` | review outcome | — |
 | `e2e-<KEY>/` (e.g. `e2e-PROJ-123/`) | every e2e / verify-ui artifact of the ticket: `config.json`, `report.md`, `test-data.md`, `manifest.json`, screenshots. Written by the repo's e2e harness, not a plugin | status beyond the check results |
+| `index.md` | generated start page: links every file. Nav lines, `d<n>` / `ac-N` anchors: sdlc `contracts/workspace-links.md` | hand edits |
 | `audit/` | this skill's snapshots, verdicts, `applied.jsonl`, reports | — |
 
 Assets (`.png`, `.html` twins, captures) are ignored by the layout check.

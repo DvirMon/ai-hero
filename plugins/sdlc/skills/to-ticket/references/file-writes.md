@@ -64,6 +64,13 @@ as the edit, the brief is still required — the edit stays off the main session
    - the final message, when it names files as written. Report what the writer says it wrote,
      not what you asked it to write.
 
+## Links
+
+Every write to a workspace `.md` ends with
+`node ${CLAUDE_PLUGIN_ROOT}/scripts/workspace-links.mjs <workspaceRoot> --write`
+(nav lines, anchors, `D<n>` links, `index.md`; rules in `${CLAUDE_PLUGIN_ROOT}/contracts/workspace-links.md`). Put it in the writer's
+brief as its last step, and stage `index.md` with the files. Never hand-write a nav line.
+
 ## What stays in the main session
 
 - **Reads and existence checks** — validating `state.json`, `/to-ticket`'s "does the

@@ -37,6 +37,8 @@ paths the branch changed). Record `HEAD` now as `reviewedHead`.
 
 ## 3. Commit the fixes
 
+First run `workspace-links.mjs <workspaceRoot> --check` (`${CLAUDE_PLUGIN_ROOT}/contracts/workspace-links.md`); a problem is a blocking finding.
+
 Anything the reviewer changed is a review fix. Commit it as one or more atomic commits, never
 folded into a step's commit, never `--amend`:
 

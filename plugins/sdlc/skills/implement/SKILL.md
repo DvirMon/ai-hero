@@ -117,6 +117,9 @@ After the last step:
 3. **Join.** A red typecheck is fixed first, as a new `fix` or `ref` commit (per `commit.md`) —
    never folded into a step's commit.
 
+4. **Links.** Run `workspace-links.mjs <workspaceRoot> --write`, then `--check` (`${CLAUDE_PLUGIN_ROOT}/contracts/workspace-links.md`). A problem is
+   fixed first, in the `docs` commit; a step plan missing its test-plan or `progress.md` link is a blocker.
+
 Say plainly that tests haven't run locally: the work is green in CI or not green at all.
 
 ## 5. Close out

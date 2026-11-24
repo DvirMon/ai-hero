@@ -35,6 +35,8 @@ Check in order, before touching git. Any failure stops here — say which one an
    current branch, else whose `remoteRef` is `#N`.
    **No workspace** — issue `#N`'s Pipeline block says `workspace: null`: skip this check; there
    is no spec and no `units[]`, only issue `#N`.
+   **Links:** when a workspace resolves, `workspace-links.mjs <workspaceRoot> --check` (`${CLAUDE_PLUGIN_ROOT}/contracts/workspace-links.md`)
+   must exit 0. A problem stops here.
 4. **Issue branch only — work is finished.** Find `progress.md` in the tasks root
    (`/to-tasks` § 5).
    - **Found:** every row is `✅ done`,

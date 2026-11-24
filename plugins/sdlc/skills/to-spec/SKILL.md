@@ -149,8 +149,9 @@ Any further notes about the feature.
 
 </spec-template>
 
-5. **Commit.** Join the writer, then make one commit on `docs/<slug>`, staged by path:
-   `spec.md`, `design.md` (if written), `3-architecture.md` (if written), `prd.md` (if the gate
+5. **Commit.** Join the writer, then run `workspace-links.mjs <workspaceRoot> --write` and `--check`
+   (`${CLAUDE_PLUGIN_ROOT}/contracts/workspace-links.md`; the acceptance criteria in `prd.md` get their `ac-N` anchors here), then make one commit on `docs/<slug>`, staged by path:
+   `spec.md`, `index.md`, `design.md` (if written), `3-architecture.md` (if written), `prd.md` (if the gate
    changed it), `state.json`, any capability-log row. Never `-A`. Commit per
    `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`, subject `spec <slug>`, issue =
    `ticketRef`. Do not push — `/ship` does, after `/to-issues`.

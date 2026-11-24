@@ -69,6 +69,12 @@ A=<workspace>/audit          # every artifact of this run lives here
 
 ## Phase 1 — Normalize (migrate to D6)
 
+**Links.** Run `node <sdlc-plugin>/scripts/workspace-links.mjs <workspace> --check` (rules:
+sdlc `contracts/workspace-links.md`). Each problem is a `fix` item. Applying `--write` is
+evidence-backed (D17): run it, log it in `applied.jsonl`, re-snapshot. A broken link that
+`--write` cannot fix (wrong target, missing relation) is one question. Old names
+`1-decisions.md` / `2-spec.md` migrate by rename, links rewritten.
+
 `node $S/view.mjs checks $A/snapshot.json --severity migrate`
 
 **Epic layout (D18).** When the root has `t<N>-…/` slice folders, they are

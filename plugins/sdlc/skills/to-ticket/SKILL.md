@@ -179,8 +179,9 @@ there) or pick a different slug for a new workspace. Never silently overwrite an
 
 Once the check passes, dispatch the writes to a writer per `references/file-writes.md` —
 never inline. `haiku` when the brief holds the full JSON below and the full `prd.md` text,
-filled in; `sonnet` if the writer must fit the PRD into an existing file. Join it before step
-5's commit, which needs the files on disk.
+filled in; `sonnet` if the writer must fit the PRD into an existing file. The writer's last
+step is `workspace-links.mjs <workspaceRoot> --write` (`${CLAUDE_PLUGIN_ROOT}/contracts/workspace-links.md`): `index.md`, nav lines and
+`ac-N` anchors. Join it before step 5's commit, which needs the files on disk.
 
 **PRD.** Resolve `prdPath` from the ticket's project `docs.prd` (`{domainDir}` =
 `<domain-path>`), per `workflow-config.md` § Projects.
