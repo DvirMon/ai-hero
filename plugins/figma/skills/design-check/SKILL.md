@@ -14,14 +14,14 @@ ticket has a UI surface and at least one Figma frame to inspect.
 
 **Hand off to:** FE / design.
 
-**Produces:** `1-decisions.md` section (frames table, gaps closed, handoff summary); factual
+**Produces:** `decisions.md` section (frames table, gaps closed, handoff summary); factual
 fragments under `{workspaceRoot}/design.draft/`; numbered **open gaps** consumed by the one-question
 loop. **Does not** write final `design.md` — `/to-spec` promotes the draft after this aspect locks
 (see `figma:design-reference`).
 
 ## When this aspect exists
 
-Add a row to `## Aspects` in `1-decisions.md`:
+Add a row to `## Aspects` in `decisions.md`:
 
 | # | Aspect | Hand off to | Status |
 |---|--------|-------------|--------|
@@ -77,7 +77,7 @@ Do not edit product source from this aspect.
 2. Build a **master gap list** (numbered): union of each fragment's **Open gaps**, **State gap
    checklist** rows marked missing, **Related frames** not in `figma[]`, and **Model impact**
    lines that are not "none".
-3. Build a **frames vs model** table for `1-decisions.md` (one row per frame: label, node ID,
+3. Build a **frames vs model** table for `decisions.md` (one row per frame: label, node ID,
    model impact summary — observation only until gaps are closed).
 4. Dedupe token rows across frames; keep per-frame copy tables in fragments until `/to-spec`
    merges.

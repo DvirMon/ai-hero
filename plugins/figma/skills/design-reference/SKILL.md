@@ -9,7 +9,7 @@ description: "sdlc stage extension for /to-spec. Write the locked design referen
 # `design.md` — design reference artifact
 
 Locked CSS/UI context for the epic. **`/to-spec` writes it**; `/to-issues`, `/to-tasks`, and
-`/implement` read it via `state.json` → `designPath`. **`2-spec.md` links here** — do not duplicate
+`/implement` read it via `state.json` → `designPath`. **`spec.md` links here** — do not duplicate
 these tables in the spec body.
 
 Path: `<workspaceRoot>/design.md` (recorded in `designPath`).

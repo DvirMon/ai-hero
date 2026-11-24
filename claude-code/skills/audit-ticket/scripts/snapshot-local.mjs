@@ -21,14 +21,14 @@ if (!ws) { out({ error: `no workspace found for ${target}`, searched: `${repoRoo
 const checks = [];
 const check = (id, severity, msg, file, line) => checks.push({ id, severity, msg, file: file && path.relative(repoRoot, file), line });
 
-const ROOT_ALLOWED = /^(state\.json|prd\.md|1-decisions\.md|2-spec\.md|3-architecture\.md|design\.md|issue-graph\.md|discovery\/[\w.-]+\.md|e2e-[A-Z][A-Z0-9]+-\d+\/.+|audit\/.+)$/;
+const ROOT_ALLOWED = /^(state\.json|prd\.md|decisions\.md|spec\.md|3-architecture\.md|design\.md|issue-graph\.md|discovery\/[\w.-]+\.md|e2e-[A-Z][A-Z0-9]+-\d+\/.+|audit\/.+)$/;
 const TASK_ALLOWED = /^tasks\/issue-[^/]+\/(step-\d+-[\w.-]+\.(plan|test-plan)\.md|progress\.md|review\.md)$/;
 const ASSET = /\.(png|jpe?g|gif|svg|webp|html)$/i;
 
 // Epic layout (D18): slice folders t<N>-<slug>/ with their own state.json are
 // accepted. Root-level run: files under a slice folder are audited when the
 // slice is run as its own workspace. Slice-level run: tasks/ has no issue-<N>/
-// level, and prd.md / 1-decisions.md are inherited from the epic root.
+// level, and prd.md / decisions.md are inherited from the epic root.
 const SLICE_DIR = /^t\d+-[^/]+$/;
 const isSlice = SLICE_DIR.test(path.basename(ws)) && fs.existsSync(path.join(path.dirname(ws), 'state.json'));
 const SLICE_TASK_ALLOWED = /^tasks\/(step-\d+-[\w.-]+\.(plan|test-plan)\.md|progress\.md|review\.md)$/;
@@ -138,10 +138,10 @@ const prd = prdText ? checkboxes(prdText).concat(
 ).map((a) => ({ line: a.line, text: a.text, tag: /\[([A-Z][A-Z0-9]+-\d+) · (\d\d-\d\d)\]/.exec(a.text)?.slice(1) ?? null })) : null;
 if (!prdText && !isSlice) check('prd.missing', 'migrate', 'no prd.md (local copy of the tracker ACs)', path.join(ws, 'prd.md'));
 
-const decisionsFile = path.join(ws, '1-decisions.md');
+const decisionsFile = path.join(ws, 'decisions.md');
 const decText = read(decisionsFile);
 if (!decText && isSlice) { /* inherited from the epic root */ }
-else if (!decText) check('decisions.missing', 'migrate', 'no 1-decisions.md', decisionsFile);
+else if (!decText) check('decisions.missing', 'migrate', 'no decisions.md', decisionsFile);
 else {
   const lines = decText.split('\n');
   for (const [i, l] of lines.entries()) {

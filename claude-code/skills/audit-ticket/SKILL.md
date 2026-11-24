@@ -1,6 +1,6 @@
 ---
 name: audit-ticket
-description: Audit one ticket end to end and bring it back in sync — the tracker (Jira or GitHub ticket + sub-tasks), the local workspace (docs/work/<slug>/ state.json, issue-graph, step files, progress.md, checkboxes, prd.md ACs, 1-decisions.md) and the code on the branch. First migrates the workspace to the one-owner-per-fact layout (absorbs organize-ticket-docs), then checks tracker ↔ local alignment, then audits every step and acceptance criterion against the diff, and resolves every mismatch, gap and open item WITH the user, one question at a time — it never ends by printing a list. Use for "audit PROJ-123", "audit this ticket", "is the ticket in sync", "sync Jira with the plan", "what's really done on this ticket", "update the checkboxes/progress from the code", "organize / clean up the work folder", or before CR/QA hand-off, even when the user names only one of these.
+description: Audit one ticket end to end and bring it back in sync — the tracker (Jira or GitHub ticket + sub-tasks), the local workspace (docs/work/<slug>/ state.json, issue-graph, step files, progress.md, checkboxes, prd.md ACs, decisions.md) and the code on the branch. First migrates the workspace to the one-owner-per-fact layout (absorbs organize-ticket-docs), then checks tracker ↔ local alignment, then audits every step and acceptance criterion against the diff, and resolves every mismatch, gap and open item WITH the user, one question at a time — it never ends by printing a list. Use for "audit PROJ-123", "audit this ticket", "is the ticket in sync", "sync Jira with the plan", "what's really done on this ticket", "update the checkboxes/progress from the code", "organize / clean up the work folder", or before CR/QA hand-off, even when the user names only one of these.
 model: sonnet
 ---
 
@@ -41,14 +41,14 @@ A=<workspace>/audit          # every artifact of this run lives here
   brackets after. Same in questions, chat and the report.
 - **Never end with a list of gaps.** Every open item becomes a question
   (Gate 3). The run ends only when each item is fixed, deferred to
-  `1-decisions.md` `## Open`, or dropped, all by the user's choice.
+  `decisions.md` `## Open`, or dropped, all by the user's choice.
 - **Tracker writes: transitions only** (D9), each approved, picked by
   target status name via the repo's `docs/agents/*-tracker.md`. Never
   descriptions, labels, comments, or new sub-tasks. Any other tracker-side
   fix: tell the user exactly what to change, then re-snapshot.
 - **Local writes**: one approved fix → one `apply-fix.mjs` call. It
   refuses if the file changed under it; then re-snapshot and re-ask.
-  Writes the script cannot do (merges, new `1-decisions.md`, flattening
+  Writes the script cannot do (merges, new `decisions.md`, flattening
   `t*/`) go to one writer fork for the whole run (`Agent`,
   `subagent_type: "fork"`, named `audit-ticket-writer`; `SendMessage` it for
   later writes), with the exact final text in the brief.
@@ -80,7 +80,7 @@ worktree/branch from its `state.json`, not the current checkout. Migration
 
 Nothing listed → phase 2. Otherwise, per item, in this order (later
 items depend on earlier ones): sub-workspaces → `state.json` → off-layout
-files → missing `prd.md` / `1-decisions.md` → step `jira:` keys.
+files → missing `prd.md` / `decisions.md` → step `jira:` keys.
 
 - For an off-layout file, read its banner and headings only
   (`rg -n '^#{1,3} ' --max-count 25 <file>`, first ~15 lines), pick its
@@ -120,9 +120,9 @@ question:
 | `graph-missing` | none: rewrite `issue-graph.md` nodes and edges from the tracker (evidence-backed, D17) |
 | `title` | same scope with more local detail (keep), or real divergence (which side is right) |
 | `edges` | which dependency is true; tracker side → the user edits the links |
-| `ac-missing-local` / `ac-local-only` | add to `prd.md` tagged `[KEY · MM-DD]`, or drop, or a local-only detail (keep, move to `2-spec.md`) |
+| `ac-missing-local` / `ac-local-only` | add to `prd.md` tagged `[KEY · MM-DD]`, or drop, or a local-only detail (keep, move to `spec.md`) |
 
-A scope answer that is a decision → append to `1-decisions.md` (writer
+A scope answer that is a decision → append to `decisions.md` (writer
 fork). Also run the `fix` checks: `view.mjs checks … --severity fix`. They
 are internal drift (status off the ladder, `depends_on` drift, State
 column, supersede marks). Each is one question.
@@ -161,7 +161,7 @@ passed. From that, plus `view.mjs findings $A/align.json --gate 2`:
 Everything still open: partial/missing steps, unmet ACs, deferred
 migrations, `ticket-open`. Ask each: **do it now** (name the step and
 hand it to the user's implement flow; this skill does not write code),
-**defer** (append to `1-decisions.md` `## Open` with `blocked on …`),
+**defer** (append to `decisions.md` `## Open` with `blocked on …`),
 or **drop** (a decision with its reason). No item is left unanswered.
 
 ## Phase 7 — Close

@@ -1,6 +1,6 @@
 # Ticket decisions
 
-`<workspaceRoot>/1-decisions.md` — one per ticket, path in `state.json`'s `decisionsPath`.
+`<workspaceRoot>/decisions.md` — one per ticket, path in `state.json`'s `decisionsPath`.
 Every stage appends to it, from the first grill to the last review.
 
 **It holds every outcome of the conversation with the agent** — while designing, and later
@@ -18,10 +18,10 @@ It holds the outcome, never the conversation, and never the full design.
 
 | Kind | File |
 |---|---|
-| Outcomes of the conversation (above) | `1-decisions.md` |
+| Outcomes of the conversation (above) | `decisions.md` |
 | High-level architecture — types, contracts, file layout | `3-architecture.md` |
 | UI / visual design | `design.md` — written in `/to-spec` by a wired design skill (e.g. `figma:design-reference`) |
-| Behavior and edge-case rules | `2-spec.md` |
+| Behavior and edge-case rules | `spec.md` |
 | Proof — benchmarks, discovery, comparisons | `discovery/<topic>.md` |
 | Domain terms | `CONTEXT.md` |
 

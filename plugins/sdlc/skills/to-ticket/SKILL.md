@@ -213,7 +213,7 @@ Write `<workspace-root>/state.json` (substituting whichever root was decided abo
   "domainPath": "<domain-path>",
   "workspaceRoot": "<workspace-root>",
   "isComplex": null,
-  "decisionsPath": "<workspace-root>/1-decisions.md",
+  "decisionsPath": "<workspace-root>/decisions.md",
   "prdPath": "<resolved docs.prd path, or null>",
   "capabilityLogPath": "<the capability's decisions log, or null>",
   "figma": [],
@@ -230,7 +230,7 @@ Write `<workspace-root>/state.json` (substituting whichever root was decided abo
 to, when the project keeps them (`~/.claude/conventions/doc-contracts/decisions-log.md`; look for `docs/decisions/` or
 a pointer from the domain's `CLAUDE.md`). Set it at creation — `/grill-with-docs` reads it
 before its first question. `null` is the right value for work spanning more than one capability,
-and is a decision, not a skipped field; record why in `1-decisions.md`.
+and is a decision, not a skipped field; record why in `decisions.md`.
 
 `isComplex` and the doc paths start `null` — `/grill-with-docs` and `/to-spec` fill them in as
 the effort progresses. `units` holds the ticket's one unit when `prUnit` is `ticket` (shape in

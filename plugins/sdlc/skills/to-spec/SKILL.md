@@ -49,11 +49,11 @@ then skip the gate.
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the checklist template below. If the ticket workspace's `state.json` exists, also write it to `<workspaceRoot>/2-spec.md` (using `state.json`'s `workspaceRoot`) and update `state.json`'s `specPath` and `updatedAt`.
+3. Write the spec using the checklist template below. If the ticket workspace's `state.json` exists, also write it to `<workspaceRoot>/spec.md` (using `state.json`'s `workspaceRoot`) and update `state.json`'s `specPath` and `updatedAt`.
 
    **Documents from wired skills.** A wired skill may write a document beside the spec and set the
    `state.json` field it owns — `figma:design-reference` writes `design.md` and sets `designPath`.
-   When `designPath` is set, `2-spec.md` gets a **Design reference** section that links to it
+   When `designPath` is set, `spec.md` gets a **Design reference** section that links to it
    only.
 
    A decision settled while writing the spec is appended to `decisionsPath` as an entry per
@@ -150,7 +150,7 @@ Any further notes about the feature.
 </spec-template>
 
 5. **Commit.** Join the writer, then make one commit on `docs/<slug>`, staged by path:
-   `2-spec.md`, `design.md` (if written), `3-architecture.md` (if written), `prd.md` (if the gate
+   `spec.md`, `design.md` (if written), `3-architecture.md` (if written), `prd.md` (if the gate
    changed it), `state.json`, any capability-log row. Never `-A`. Commit per
    `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`, subject `spec <slug>`, issue =
    `ticketRef`. Do not push — `/ship` does, after `/to-issues`.

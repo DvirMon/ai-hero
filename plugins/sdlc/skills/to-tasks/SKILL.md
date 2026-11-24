@@ -242,7 +242,7 @@ the plan.
 #### Decisions
 
 Append every outcome this run settled with the user — a trade-off, an agreed how-to, a challenge
-that changed the plan — to `1-decisions.md` (`decisionsPath`) as it settles, phase `tasks`, per
+that changed the plan — to `decisions.md` (`decisionsPath`) as it settles, phase `tasks`, per
 `${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`. No workspace → no log.
 
 **Update the source issue's `## Pipeline` block** (contract: `${CLAUDE_PLUGIN_ROOT}/skills/to-issues/references/pipeline-block.md`):

@@ -43,7 +43,7 @@ Look for opportunities to prefactor the code to make the implementation easier. 
 
 ### 3. Draft vertical slices
 
-If `1-decisions.md` records a `decompose-by-dependency-graph` ranking from `grill-with-docs`, use
+If `decisions.md` records a `decompose-by-dependency-graph` ranking from `grill-with-docs`, use
 it as the starting point — don't re-derive the sub-feature structure from scratch. But re-check
 the edges at issue grain per `decompose-by-dependency-graph` § Execution grain: the grilling ranking ordered *discussion*
 (which decisions had no shared unknowns), not *build* (which issues share a schema, a file, or a

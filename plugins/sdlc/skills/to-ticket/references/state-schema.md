@@ -18,7 +18,7 @@ the validation routine inline.
   "domainPath": "<path to the owning domain, e.g. libs/shared/table>",
   "workspaceRoot": "<domainPath>/docs/work/<slug>",
   "isComplex": null,
-  "decisionsPath": "<workspaceRoot>/1-decisions.md",
+  "decisionsPath": "<workspaceRoot>/decisions.md",
   "prdPath": "<the docs.prd path, resolved>",
   "capabilityLogPath": "<path to the capability's decisions log, or null>",
   "figma": [],

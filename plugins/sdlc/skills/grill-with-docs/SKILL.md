@@ -30,7 +30,7 @@ never on the default branch.
 
 If a ticket workspace's `state.json` exists in context (created by `/to-ticket`; its root is `<domain-path>/docs/work/<slug>/` — see `/to-ticket`), validate it per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/state-schema.md`, then fetch the ticket it points at (`ticketRef`, via `docs/agents/ticket-tracker.md` `## Fetch`) and use it, with the PRD at `prdPath` (`${CLAUDE_PLUGIN_ROOT}/contracts/prd.md`), as the interview's starting material — this is what you're sharpening.
 
-If no `state.json` exists, grill without a workspace — never create one; only `/to-ticket` does. Ask the user where to keep the decisions log (e.g. `~/.claude/work/<slug>/1-decisions.md`) and append entries there per the ticket-decisions format. Steps that need the workspace — `state.json` updates, `prd.md`, tracker comments, readiness — are skipped.
+If no `state.json` exists, grill without a workspace — never create one; only `/to-ticket` does. Ask the user where to keep the decisions log (e.g. `~/.claude/work/<slug>/decisions.md`) and append entries there per the ticket-decisions format. Steps that need the workspace — `state.json` updates, `prd.md`, tracker comments, readiness — are skipped.
 
 ## Process
 
@@ -38,19 +38,19 @@ If no `state.json` exists, grill without a workspace — never create one; only 
    `decompose-by-dependency-graph` before interviewing anything: list the sub-features, map
    dependency edges between them, rank core/independent/dependent. Grill core and independent
    nodes fully now; dependent nodes only after their upstream settles. Record the ranking in
-   `1-decisions.md`'s `## Ranking` section (`${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`).
+   `decisions.md`'s `## Ranking` section (`${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`).
 
    **Move to Wayfinder when it outgrows one session.** If the ranking shows more core nodes
    than one session can settle (a rough guide: more than ~5), or a core node depends on
    investigation nobody has done yet, stop and offer `/wayfinder` with the ticket as its idea.
    Do the same later, at any point the grill clearly will not finish in this session. Decisions
-   already settled stay in `1-decisions.md`; the map links to them instead of re-deciding them.
+   already settled stay in `decisions.md`; the map links to them instead of re-deciding them.
    The user decides — continuing the grill is a valid answer.
 
 0b. **Grill per handoff aspect, not as one spec** (rule `lock-by-aspect-for-handoff`). Split the
    ticket by what one team consumes, e.g. backend contract (model + missing endpoints), FE
    behavior requirements, FE design check, email/content, audit events. Put an `## Aspects` table
-   (aspect, hand-off team, status) at the top of `1-decisions.md`, shaped per
+   (aspect, hand-off team, status) at the top of `decisions.md`, shaped per
    `${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md` § Aspects. Grill one aspect at a time,
    checking it against the **whole ticket**, and keep its open gaps as a `- [ ]` checklist under
    it. When the checklist is empty, mark it `locked <date>` and tell the user right away:
@@ -96,7 +96,7 @@ If no `state.json` exists, grill without a workspace — never create one; only 
 2. Ask one question at a time. Prefer questions that expose an edge case, a scenario the starting material didn't cover, or a decision that was left implicit. Keep going until you can't find another fuzzy edge — don't stop early just because the obvious questions are exhausted.
 3. The moment an answer settles something, write it down — don't wait until the end to reconstruct it from memory:
    - If it's project-wide (a term, a naming convention, an architectural stance that outlives this ticket) → invoke `/domain-modeling` to record it in the glossary or an ADR.
-   - If it's scoped to this ticket → append it to the workspace's `1-decisions.md` (its path is `state.json`'s `decisionsPath`; create the file if it doesn't exist yet) as an entry in the shape of `${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`, phase `grill` — the decision, not the discussion that led to it.
+   - If it's scoped to this ticket → append it to the workspace's `decisions.md` (its path is `state.json`'s `decisionsPath`; create the file if it doesn't exist yet) as an entry in the shape of `${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`, phase `grill` — the decision, not the discussion that led to it.
    - **If it outlives this ticket but binds only one capability** (how that feature behaves, a shape it committed to, a scope-out) → it *also* gets a row in that capability's decisions log, `state.json`'s `capabilityLogPath`. Write the row when the decision settles, not at the end: a log that is only filled in at archive time is the failure this log exists to prevent. Format and numbering: `~/.claude/conventions/doc-contracts/decisions-log.md`. The log row is one line that links to the ticket's entry, and the entry's `→` tail names the row id.
 
    The three are not exclusive — an architectural stance that binds one capability is an ADR *and* a log row pointing at it.
@@ -111,14 +111,14 @@ If no `state.json` exists, grill without a workspace — never create one; only 
      `/to-spec` stops until the marker clears. On a library / DS ticket the capability PRD
      has no AC line: put `⚠ <KEY> AC` on the proposed entry instead.
 
-   **Every `1-decisions.md`, capability-log, `prd.md` and `state.json` write goes to a `haiku` writer**,
+   **Every `decisions.md`, capability-log, `prd.md` and `state.json` write goes to a `haiku` writer**,
    per `${CLAUDE_PLUGIN_ROOT}/skills/to-ticket/references/file-writes.md` — you hand it the finished line, so the write is
    mechanical. The first write spawns it, every later one resumes it with `SendMessage`. Ask
    the next question straight away — don't wait on the write. Join the writer before step 6's
    readiness update, step 7's commit and the final message. `/domain-modeling` keeps its own writers.
 
    **That log is read before the first question** (step 1a). It is what stops the interview re-deciding something already settled, or reversing it without noticing.
-4. Before finishing, verify failure modes are exhausted. Don't use a fixed question list — first reason about what kind of system this is (UI component, form field, API endpoint, background job, state machine, webhook, etc.), then derive what can go wrong *for that specific domain*. A button has different failure surfaces than a file uploader, a Node.js job, or a multi-step wizard. Pull each failure thread until nothing is left fuzzy, then record the answers in `1-decisions.md`, one entry each, phase `grill`.
+4. Before finishing, verify failure modes are exhausted. Don't use a fixed question list — first reason about what kind of system this is (UI component, form field, API endpoint, background job, state machine, webhook, etc.), then derive what can go wrong *for that specific domain*. A button has different failure surfaces than a file uploader, a Node.js job, or a multi-step wizard. Pull each failure thread until nothing is left fuzzy, then record the answers in `decisions.md`, one entry each, phase `grill`.
 
 4b. **Before finishing, check the names.** The grill is not done while the feature is still
    described in loose words. List every noun the feature introduces or changes (an entity, a
@@ -130,7 +130,7 @@ If no `state.json` exists, grill without a workspace — never create one; only 
    whose definition conflicts with one already in the glossary (same word, other meaning; or
    a new word for an existing concept) is a question for the user, not a rename you make
    alone. The user may accept a term as provisional: log it under `## Open` in
-   `1-decisions.md`.
+   `decisions.md`.
 
 5. Before finishing, decide complexity: does implementing this safely need more than a PRD — new types/interfaces, a non-obvious file layout, a design that needs grounding against existing source before anyone builds it? If yes, set `isComplex: true`; otherwise `false`. This is about implementation risk, not ticket size — a small-sounding change to a shared abstraction can still need an architecture doc.
 6. If the ticket workspace's `state.json` exists, validate it per
@@ -151,10 +151,10 @@ added to `prd.md` this run (plus any open `⚠ Dn` question). Skip it when there
 `ticketRef` is `null`. **Never edit the ticket's description** — product owns that text.
 
 
-With a workspace, steps 3 and 5 always apply — write `1-decisions.md` and update `state.json` as you go. Without one, only the decisions log is written.
+With a workspace, steps 3 and 5 always apply — write `decisions.md` and update `state.json` as you go. Without one, only the decisions log is written.
 
 7. **Commit.** Join the writer (and any `/domain-modeling` writers), then make one commit for
-   this stage's artifacts, staged by path — `1-decisions.md`, `prd.md`, `state.json`, the capability-log
+   this stage's artifacts, staged by path — `decisions.md`, `prd.md`, `state.json`, the capability-log
    row, and any ADR/glossary files `/domain-modeling` wrote. Never `-A`. Commit per
    `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md`: type `docs`, subject `record <slug> decisions`,
    issue = the source item (none if there is none yet). Do not push — `/ship` does,

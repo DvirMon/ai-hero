@@ -62,7 +62,7 @@ Every requirement line (acceptance criterion, failure-behavior bullet) ends with
 | Source | Tag | Added by |
 |---|---|---|
 | remote ticket AC | `[PROJ-123 · MM-DD]` — ticket key, pull date | `/to-ticket` copies them (feature variant only) |
-| grill decision | `[Dn]` — entry in the ticket's `1-decisions.md` | `grill-with-docs` |
+| grill decision | `[Dn]` — entry in the ticket's `decisions.md` | `grill-with-docs` |
 
 A line with neither source (discovery-derived, in a capability PRD) takes no tag; its evidence
 is linked from **Design status**.
@@ -87,7 +87,7 @@ Product owns the AC. `/to-spec` stops while any `⚠` is open. It clears one of 
 - **The user overrides:** the override is its own entry `Dm`. The line is rewritten to the
   decision and tagged `[Dm]`; the marker is dropped.
 
-**Capability PRD:** there is no AC line to mark. The proposed entry in `1-decisions.md` carries
+**Capability PRD:** there is no AC line to mark. The proposed entry in `decisions.md` carries
 `⚠ <KEY> AC` instead, and clears the same two ways.
 
 ## Rules

@@ -11,8 +11,8 @@ One fact, one file. Every other copy is drift to migrate or delete.
 | tracker (remote) | slice list, sub-task state, ACs, Blocks links | — |
 | `state.json` (schema v5) | `units[]`: branch, worktree, MR, readiness rung, `assessed` | progress notes, removed keys |
 | `prd.md` | tagged copy of tracker ACs: `[KEY · MM-DD]` | local-only criteria |
-| `1-decisions.md` | every decision, `D<n>`, `replaces D<n>` / `superseded by D<n>`, `## Open` | status, conversation |
-| `2-spec.md` | behavior rules, design | decisions, checklists |
+| `decisions.md` | every decision, `D<n>`, `replaces D<n>` / `superseded by D<n>`, `## Open` | status, conversation |
+| `spec.md` | behavior rules, design | decisions, checklists |
 | `3-architecture.md`, `design.md` | as written by `to-spec` | status |
 | `issue-graph.md` | slice ↔ key, edges | State column, frontier |
 | `discovery/<topic>.md` | proof behind a decision (code audits, flow maps, comparisons, captures) | status |
@@ -32,16 +32,16 @@ folder. Use it when the slices are separate tickets, not sub-tasks.
 
 ```
 <epic-slug>/                    epic root: the D6 file set above
-  state.json  prd.md  1-decisions.md  discovery/  audit/
+  state.json  prd.md  decisions.md  discovery/  audit/
   t<N>-<key>-<slug>/            one slice = one linked ticket
     state.json                  its own unit (branch, MR, readiness)
-    2-spec.md                   slice spec with its checklist
+    spec.md                   slice spec with its checklist
     tasks/step-N-*.plan.md      no issue-<N>/ level
     tasks/progress.md           step status + AC coverage
     audit/                      this skill's artifacts for the slice
 ```
 
-- `prd.md` and `1-decisions.md` live only at the epic root. A slice
+- `prd.md` and `decisions.md` live only at the epic root. A slice
   never needs its own; decisions of a slice go to the root file.
 - Migration runs at two levels, each as its own run of
   `snapshot-local.mjs`: the epic root (the root file set; slice folders
@@ -50,8 +50,8 @@ folder. Use it when the slices are separate tickets, not sub-tasks.
 - A slice with no tracker key yet is fine; propose a key when the
   ticket is created.
 - Loose handoffs, plans and `N-progress.md` inside a slice are migrated
-  by the same buckets: facts go to the slice `2-spec.md`,
-  `tasks/progress.md`, the root `1-decisions.md`, or `discovery/`.
+  by the same buckets: facts go to the slice `spec.md`,
+  `tasks/progress.md`, the root `decisions.md`, or `discovery/`.
 - Tracker alignment: the root is compared with the epic ticket, each
   slice with its own linked ticket.
 
@@ -64,7 +64,7 @@ folder. Use it when the slices are separate tickets, not sub-tasks.
 | Duplicate status | `N-progress.md`, root `progress.md`, `pipeline.md`, sync lines | merge rows into `tasks/issue-<N>/progress.md`, then delete |
 | Durable record / proof | findings, flow maps, comparisons, captures | keep under `discovery/<topic>.md`; move a loose one there (a move needs a yes). The term is always "discovery", never "research" |
 | Tracker copy | `jira-snapshot.md`, `jira-ac-coverage.md` | ACs → `prd.md`; coverage → `progress.md` table; delete |
-| Decisions elsewhere | `decisions.md`, "Decisions made" in a spec, plan § Decisions | move to `1-decisions.md` with D-numbers |
+| Decisions elsewhere | `decisions.md`, "Decisions made" in a spec, plan § Decisions | move to `decisions.md` with D-numbers |
 | Sub-workspace | `t*/` with its own `state.json` that does not follow the epic layout below (no epic root, or a slice with no tracker key) | flatten into `tasks/issue-<N>/`, one per slice, one `state.json`. A `t<N>-<slug>/` folder under an epic root that follows the epic layout is accepted: do not flatten |
 | State | `state.json` below v5, removed keys | rewrite to v5, preserve unknown keys |
 | E2E artifact | `verify-ui*.md/json`, `test-data.md`, screenshot dirs, e2e configs at the root | move into `e2e-<KEY>/`. First `git grep` the old path in source: committed e2e code that reads it needs the same change, shown to the user as a separate diff |
@@ -79,5 +79,5 @@ folder. Use it when the slices are separate tickets, not sub-tasks.
 - Before deleting, move any unique fact (a finding, a measured number, a gap) to its D6 owner, one line with source.
 - Never commit, stash, revert, or edit source files. Never run builds or serves.
 - After a delete or rename: `rg -n '<name>' <workspace>` and fix dangling links only.
-- `1-decisions.md` rules: `ticket-decisions.md` in the sdlc plugin (`~/.claude/plugins/cache/ai-hero/sdlc/*/contracts/`).
+- `decisions.md` rules: `ticket-decisions.md` in the sdlc plugin (`~/.claude/plugins/cache/ai-hero/sdlc/*/contracts/`).
   Append only, never renumber. `state.json` fields: `skills/to-ticket/references/state-schema.md` in the same plugin.
