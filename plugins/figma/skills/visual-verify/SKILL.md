@@ -50,9 +50,14 @@ contract). One image dir per state: `<outDir>/<frame>-<state>/` with `figma.png`
 4. **`fromComponent`** (Angular emulated encapsulation): for the element at each cluster's
    centre, `page.evaluate` finds the nearest ancestor-or-self whose tag starts with
    `componentPrefix`.
-   - The element is that host, or carries `_ngcontent-<id>` equal to that host's
-     `_nghost-<id>` → the value is the component's own style → `fromComponent: "<tag>"`,
-     `component: "<tag>"`, `variant` from its inputs/classes (e.g. `primary`).
+   - The element is that host and the cluster's `property` places the host in the page —
+     `margin*`, `top`/`right`/`bottom`/`left`, `align-self`, `justify-self`, `flex`/`flex-*`,
+     `grid-area`/`grid-row`/`grid-column`, `order` → page layout, set by the page around the
+     tag → `fromComponent: null`. Still fill `component` and `variant`.
+   - The element is that host (any other property), or carries `_ngcontent-<id>` equal to
+     that host's `_nghost-<id>` → the value is the component's own style →
+     `fromComponent: "<tag>"`, `component: "<tag>"`, `variant` from its inputs/classes
+     (e.g. `primary`).
    - The element carries the page component's `_ngcontent-<id>` → `fromComponent: null`.
    - No encapsulation attributes found → `fromComponent: "unverified"`. The stage treats it as
      a component difference.
