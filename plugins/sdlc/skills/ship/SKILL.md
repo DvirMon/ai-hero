@@ -82,8 +82,8 @@ This is the pipeline's human gate (`/implement` commits per step without asking)
   every state line that is `needs approval` or `older difference`, and its `Artifact` link. Its
   fix commits landed before the review, so the review saw them. Say plainly when it is missing
   (expected with `stages.verify-visual.skill: "none"` or no Figma frames), `stopped`, `failed`,
-  or **stale** — a commit in `<Verified head>..HEAD` that isn't one of its verify commits
-  (`/verify-visual` § Re-running).
+  or **stale** — a commit in `<Verified head>..HEAD` that isn't a visual verify, review or
+  behaviour verify commit (`/verify-visual` § Re-running).
 
 None of these stops the gate; the developer decides with them in view.
 
