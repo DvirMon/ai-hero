@@ -2,7 +2,7 @@
 
 The body `sdlc:test-planner` returns and `/verify-behaviour` writes to
 `<tasks root>/verify-plan.md`. One Markdown block per case — no YAML, no schema. Steps are plain
-intent; the typed check lines under them decide pass or fail.
+intent; the typed check lines under them decide `passed` or `failed`.
 
 - **Steps** — a short sentence naming each control by its visible label in quotes. No selectors,
   no typed actions: the run finds the control itself.
