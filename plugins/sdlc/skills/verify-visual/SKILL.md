@@ -67,7 +67,9 @@ Each cluster, first match wins:
    `docs/agents/verify-visual.md` § Accepted differences or this ticket's `visual.md`
    § Approvals → `accepted`. A difference that grew or moved no longer matches: it is new.
 2. **From a component** — `fromComponent` is a tag or `"unverified"` → `needs approval`,
-   never fixed. Inner padding, height, font and colour of a `v-*` component all land here.
+   never fixed. Inner padding, height, font and colour of a `v-*` component all land here. A
+   margin or position on the component's outer tag is page layout: the comparer gives it
+   `fromComponent: null`, so it goes to rule 4.
 3. **Dynamic content** — inside a crop rule's selector or region → expected, not counted.
 4. **Page code** — `fromComponent: null` (position, spacing between elements, alignment,
    colour set by page code) → Figma wins → § 4.
