@@ -63,9 +63,13 @@ design-system component, the component wins and the developer approves the diffe
 
 Each cluster, first match wins:
 
-1. **Accepted** — matches an entry on component + variant + property + value, in
-   `docs/agents/verify-visual.md` § Accepted differences or this ticket's `visual.md`
-   § Approvals → `accepted`. A difference that grew or moved no longer matches: it is new.
+1. **Accepted** — matches an entry in `docs/agents/verify-visual.md` § Accepted differences or
+   this ticket's `visual.md` § Approvals → `accepted`. A match needs the same component +
+   variant + property + value, and, on the frame and state where the entry was approved
+   (its `Seen at`), a cluster that still sits there: its centre inside the recorded box and
+   its area at most 1.5× the box's. A difference that grew or moved no longer matches: it is
+   new. On other frames and states, a repo entry matches on the four fields alone (that is
+   the repo-wide reuse); a ticket entry never does.
 2. **From a component** — `fromComponent` is a tag or `"unverified"` → `needs approval`,
    never fixed. Inner padding, height, font and colour of a `v-*` component all land here. A
    margin or position on the component's outer tag is page layout: the comparer gives it
@@ -104,9 +108,9 @@ the Figma / App / Diff image paths. Options:
 
 - **Approve for the repo** — append a row to `docs/agents/verify-visual.md`
   § Accepted differences:
-  `| <component> | <variant> | <property> | <app value> | <reason> | <git user.name> | <date> |`.
-- **Approve for this ticket** — a line in `visual.md` § Approvals (same fields, plus frame and
-  state).
+  `| <component> | <variant> | <property> | <app value> | <seen at> | <reason> | <git user.name> | <date> |`,
+  where `<seen at>` = `<frame> · <state> · <x>,<y>,<w>,<h>` (the cluster box at 1x).
+- **Approve for this ticket** — a line in `visual.md` § Approvals with the same fields.
 - **Reject** — stays `needs approval` with `rejected` and the developer's reason: an open
   failure to fix.
 

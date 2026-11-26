@@ -18,7 +18,7 @@ Fields are read by `/verify-visual` § Re-running and `/ship` § 2 Gate — keep
 
 ## Approvals
 
-- <frame> · <state> · <component> · <variant> · <property> · <value> · <reason> · <approver> · <date> | none
+- <frame> · <state> · <x>,<y>,<w>,<h> · <component> · <variant> · <property> · <value> · <reason> · <approver> · <date> | none
 ```
 
 - **State line** — one per frame × state in `state.json` `figma_states[]`, in that order.
@@ -30,6 +30,8 @@ Fields are read by `/verify-visual` § Re-running and `/ship` § 2 Gate — keep
 - **`diffAreaPct`** — the measured number from the comparer's `report.json`; never omitted on a
   state that ran.
 - **`@<sha>`** — the head the state was compared at.
-- **Approvals** — this ticket's one-off approvals only. Repo-wide approvals live in
+- **Approvals** — this ticket's one-off approvals only. `<x>,<y>,<w>,<h>` is the cluster box
+  at 1x where it was approved: a difference that moves out of it or grows past 1.5× its area
+  is asked about again (`/verify-visual` § 3). Repo-wide approvals live in
   `docs/agents/verify-visual.md` § Accepted differences.
 - Images live under `.pipeline/visual/<branch, / → ->/` and are never committed.
