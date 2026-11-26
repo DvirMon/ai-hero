@@ -107,10 +107,13 @@ A teammate's `workflow.local.json` changes only what differs:
 | `stages.<stage>.skill` | skill name · `none` | the built-in stage skill |
 | `stages.<stage>.skills` | array of skill names | `[]` |
 | `stages.review.reviewer` | skill name | `code-review:review` |
+| `stages.verify-behaviour.browser` | `ego-browser` · `chrome` | `ego-browser` |
+| `stages.verify-behaviour.logins` | array of `{ role, signIn, credential }` — `credential` is a pointer to where the dev credential lives, never a value | `[]` |
+| `stages.verify-behaviour.db` | object `{ query }` — a read-only command template | — (DB checks off) |
 | `capabilities.commit.skill` | skill name | — (stages commit plain conventional) |
 
 `<stage>`: `to-intake` · `to-ticket` · `grill` · `to-spec` · `to-issues` · `to-tasks` · `implement` · `review` ·
-`ship`.
+`verify-behaviour` · `ship`.
 
 - **`intake.epic`** — what `/to-intake` does with the new item's parent epic: link an existing
   one, create a new one, or none.
@@ -123,6 +126,9 @@ A teammate's `workflow.local.json` changes only what differs:
 - **`stages.review.reviewer`** — the skill the built-in `/review` stage runs. Swapping it keeps
   the stage's commits, record and routing; `stages.review.skill` replaces the whole stage.
   What a reviewer receives and returns: [`review-stage.md`](review-stage.md).
+- **`stages.verify-behaviour.*`** — read only by `/verify-behaviour`; repo facts live in
+  `docs/agents/verify-behaviour.md`. The dev server URL is the project's `devUrl`; no new key.
+  Contract: the stage skill, [`verify-behaviour`](../skills/verify-behaviour/SKILL.md).
 
 ### Projects
 

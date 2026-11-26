@@ -13,7 +13,7 @@ A stage builds one intent per commit:
 | `scope` | `<project>[/<domain>]` — `<project>` is the step's project from the workflow config; the format per `docs/agents/issue-tracker.md` `## Issue references` |
 | `subject` | imperative, lower-case start |
 | `issue` | the item the commit belongs to, as a **ref** — the form `issue-tracker.md` `## Issue references` gives (`#42`, `PROJ-123`, `hello/01`), never an assumed `#N` — or none |
-| `stage` | story tag stage (`s<N>`, `plan`, `review`), or none |
+| `stage` | story tag stage (`s<N>`, `plan`, `review`, `verify`), or none |
 | `epic` | the epic, when known |
 | `ticketTitle` | the ticket's title, when known |
 | `paths` | staged by path — never `-A` / `.` |
