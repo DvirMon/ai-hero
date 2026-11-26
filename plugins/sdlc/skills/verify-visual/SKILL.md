@@ -83,8 +83,10 @@ is `older difference`: reported, never fixed here.
 
 **Small** = the same rule as `/verify-behaviour` § 6
 ([SKILL.md](../verify-behaviour/SKILL.md)), applied to a page-code or copy difference the branch
-caused. Fix it, then re-compare that state (the comparer's `compare` with only that state).
-Smaller `diffAreaPct` and the cluster gone → commit per
+caused. Fix it, then re-compare that state: the comparer's `compare` with only that state and
+`outDir` = `<run dir>/recheck/<state id>/`, so the full `report.json` is kept. Merge the new
+section (images, `diffAreaPct`, clusters) back into `<run dir>/report.json` in place of the old
+one. Smaller `diffAreaPct` and the cluster gone → commit per
 `${CLAUDE_PLUGIN_ROOT}/contracts/commit.md` — type `fix` (or `style` for a pure style value),
 stage `verify`, staged by path — and mark it `fixed`. Not gone → `git restore` your edits and
 treat it as big.
@@ -115,7 +117,8 @@ Approved clusters become `accepted`.
    `accepted` (any accepted cluster left) · `fixed` (fixed this run, nothing left) ·
    `matching` (no clusters). Write them into `report.json` (`verdict`, `note`), plus the fix
    list (`fixes`).
-2. **Verdict** — `all clear` when no state is `needs approval`; `open: N` (states
+2. **Verdict** — `all clear` when no state is `needs approval` and at least one state was
+   measured; `stopped — no state could run` when every state is `not run`; `open: N` (states
    `needs approval`); or `skipped — no Figma frames` · `stopped — <reason>` ·
    `failed — <reason>`.
 3. Write `<tasks root>/visual.md` beside `review.md`, replacing any earlier one, in the format
@@ -154,7 +157,12 @@ A re-run compares every state again at the current `HEAD` and keeps this ticket'
 § Approvals. `Fix commits` is cumulative: carry forward every earlier entry still in the
 branch's history, then add this run's.
 
-**Verify commits** and **Stale** follow `/verify-behaviour` § Re-running
+**Verify commits** follow `/verify-behaviour` § Re-running
 ([SKILL.md](../verify-behaviour/SKILL.md)), with `visual.md` as the record: its record commit
-changes only `visual.md` and `docs/agents/verify-visual.md`. `/ship` shows a stale record at
-its gate.
+changes only `visual.md` and `docs/agents/verify-visual.md`.
+
+**Stale** = a commit in `<Verified head>..HEAD` that is none of: a visual verify commit, a
+review commit (`/review` § Re-running: a listed review fix commit or the `review.md` commit),
+or a behaviour verify commit (`/verify-behaviour` § Re-running). Those stages run after this
+one by design. Judged by SHA and paths, never by subject. `/ship` shows a stale record at its
+gate.
