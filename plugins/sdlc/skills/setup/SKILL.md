@@ -149,6 +149,28 @@ file (`projectKind`) is rewritten: drop `projectKind`, carry the other keys over
 Also add to `.gitignore`: `.claude/workflow.local.json` (one teammate's overrides) and `.pipeline/`
 (task plans for issues with no workspace — `/to-tasks` § 5).
 
+**Section G — Behaviour verify.** Runs only for a project with `devUrl` (Section F). Skip it
+otherwise — `/verify-behaviour` needs a running app to test.
+
+Ask once, for the whole section:
+
+1. **Browser** — `ego-browser` (default) · `chrome`.
+2. **Logins** — one entry per role the app's checks need: `role`, `signIn` (how to sign in,
+   e.g. "email + password on /login"), `credential` — a pointer to where the dev credential
+   lives (a seed file, a password-manager entry). Never ask for a credential value, never write
+   one.
+3. **DB (optional, off by default)** — a read-only command template for the dev database, as
+   `db.query`. Leave it unset unless the user offers one.
+4. **Skip** — offer `"skill": "none"` on `stages.verify-behaviour` for a repo that verifies by
+   hand; then write nothing else for this section.
+
+Write `stages.verify-behaviour` (`browser` only when not the default) and
+`docs/agents/verify-behaviour.md`, starting from
+[verify-behaviour.md](./examples/verify-behaviour.md): fill `## Routes` from the app's router,
+`## Test data rules` from its validators, `## Not automatable` from its SSO or third-party
+sign-ins, `## Cleanup` and `## Database` from the user's answers. Keep the five headings.
+Re-runnable: edit both in place, keeping the user's edits.
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
@@ -157,6 +179,7 @@ Show the user a draft of:
 - The contents of `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
 - The contents of `docs/agents/ticket-tracker.md` (only when `to-ticket` is installed)
 - `.claude/workflow.json`, and the `.gitignore` lines for `.claude/workflow.local.json` and `.pipeline/`
+- `stages.verify-behaviour` and `docs/agents/verify-behaviour.md` (only when Section G ran)
 - The Section E change list (only when Section E ran)
 
 Let them edit before writing.
@@ -211,6 +234,7 @@ Write `.claude/workflow.json` (Section F) and the `.gitignore` line. Then write 
 - [ticket-tracker-local.md](./examples/ticket-tracker-local.md) — local-markdown ticket tracker (only if `to-ticket` is installed)
 - [triage-labels.md](./triage-labels.md) — label mapping (only if `triage` is installed)
 - [domain.md](./domain.md) — domain doc consumer rules + layout
+- [verify-behaviour.md](./examples/verify-behaviour.md) — behaviour verify repo facts, written to `docs/agents/verify-behaviour.md` (only when Section G ran)
 
 For other issue or ticket trackers, write the file from `tracker.md`'s operation list, filled as "Filling a tracker file" describes.
 
