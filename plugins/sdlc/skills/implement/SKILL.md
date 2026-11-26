@@ -52,7 +52,7 @@ Pass `stepFilePath`, the project's `typecheck` / `test`, and `specPath` / `archi
 
 **Wired skills extend routing.** A step type or frontmatter key not in this table belongs to the
 wired skill that defines it — e.g. `figma:implement` adds the project's `skills.ui` and a
-node-ID brief to `figma:` steps, and runs `verify-ui` steps inline. No wired skill claims it →
+node-ID brief to `figma:` steps. No wired skill claims it →
 plan defect: stop and name the step.
 
 - Files that match no project, or span two → plan defect: stop and name the files.

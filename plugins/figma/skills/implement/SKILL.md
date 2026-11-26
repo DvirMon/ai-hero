@@ -1,9 +1,9 @@
 ---
 name: implement
-description: "sdlc stage extension for /implement. Brief UI steps with design.md and node IDs, add the project's skills.ui to their dispatch, and run verify-ui steps inline. Wire it as `stages.implement.skills: [\"figma:implement\"]` in .claude/workflow.json."
+description: "sdlc stage extension for /implement. Brief UI steps with design.md and node IDs, and add the project's skills.ui to their dispatch. Wire it as `stages.implement.skills: [\"figma:implement\"]` in .claude/workflow.json."
 ---
 
-> **Wired into** `/implement` § 2 Route — `figma:` steps and the `verify-ui` step type, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
+> **Wired into** `/implement` § 2 Route — `figma:` steps, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
 > ticket (`state.json` `figma[]` empty, no frame URLs) → say so and do nothing.
 
 # Figma UI — `/implement`
@@ -38,8 +38,8 @@ the step's `files` include UI templates/styles under the frontend app).
    - Pass `figma: [{ fileKey, nodeId }, ...]` as the structured `figma` input (not prose).
      The implementer's Figma gate fetches every frame (`create_session`, `get_screenshot`,
      `get_metadata`, `get_design_context`) and diffs its markup against it.
-   - Instruction: build up to but not including the browser visual-verify step. That step
-     runs after the step lands, unless a `verify-ui` step follows (then it belongs to verify).
+   - Instruction: no browser visual verify. `/verify-visual` compares the frames against the
+     running app after `/implement`.
 
 ### Implementer dispatch
 
@@ -49,30 +49,14 @@ above. On a test-first step pass `figma` on the **green** dispatch (the red phas
 ### After implementer returns
 
 Check the report first: no `Figma: fetched …` line, or `layout drift` unlisted → the step is
-**not done**; send it back. Then, if there is **no** `verify-ui` step later in the plan, run
-**Visual verify** (below) for this step's `figma` nodes before marking the step done. If a
-`verify-ui` step exists, defer the browser comparison to it, but still review the diff against
-the implementer's metadata diff (structure, order, spacing) and `design.md` mappings (no
-i18n/token leaks).
+**not done**; send it back. Then review the diff against the implementer's metadata diff
+(structure, order, spacing) and `design.md` mappings (no i18n/token leaks). The browser
+comparison is `/verify-visual`'s.
 
-## `verify-ui` steps
+## Old plans
 
-Handled **inline by the dispatcher**, not an implementer.
-
-1. Node list = step `figma:` or union of all `figma:` on UI code steps this step `depends_on`.
-2. **`get_screenshot`** per node (`fileKey` from `figma[]`) after loading the project's `skills.ui`.
-3. **Browser** — screenshot the route/states named in the step's **Do** / issue acceptance
-   criteria on the developer's **already running** dev server — the URL the step names, else the
-   project's `devUrl`. Use browser MCP / Playwright MCP / built-in browser tools
-   available in the session.
-4. **Compare** Figma vs app in four groups: **layout**, **token/color**, **typography**, **copy**.
-5. **Fix** in-scope mismatches in a new commit (`fix` or `style` per change); **list** pre-existing
-   out-of-scope mismatches without fixing.
-6. **Never** start, stop, or restart the dev server. If nothing is listening on the expected port,
-   (or neither URL is set), stop the step: write a **checklist** of routes/states and frames still to compare manually.
-
-Optional: append a short comparison note to the step report; do not commit node IDs into product
-source.
+A step with `type: verify-ui` (a plan written before `/verify-visual`) → report "moved to
+`/verify-visual`" and mark it `⏭ skipped`.
 
 ## Stops (construction vs runtime)
 
@@ -84,4 +68,3 @@ source.
 | Implementer returns without a `Figma: fetched` line | Not done — send the step back |
 | Token in Figma not in `design.md` | Stop — spec gap |
 | `figma-project.json` missing in repo | Stop — config error |
-| Dev server not running at verify | Degrade to checklist (runtime) |

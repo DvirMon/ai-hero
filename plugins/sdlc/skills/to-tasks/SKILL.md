@@ -72,7 +72,7 @@ Rules for the steps:
 - **Right-size.** Fold setup, config, docs and chores into the step whose deliverable needs them. Split only where a reviewer could reject one step and approve its neighbour. Every step carries fixed overhead (frontmatter, sections, a graph node), so a step that is only a toast, a URL param or a doc pass is a candidate to fold.
 - Call out where tests should land, using the spec's Testing Decisions.
 - Wired skills may add frontmatter keys and step types — e.g. `figma:steps` binds `figma:` node
-  IDs on UI `code` steps and adds a terminal `verify-ui` step.
+  IDs on UI `code` steps and records frame states in `state.json` `figma_states[]`.
 
 **Self-review before the user sees it.** Fix what you find, inline:
 
