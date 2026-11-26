@@ -48,9 +48,11 @@ design-system component, the component wins and the developer approves the diffe
 
 `<run dir>` = `.pipeline/visual/<branch, / → ->/` (gitignored; images are never committed).
 
-1. **Dev server.** `curl -s -o /dev/null -w '%{http_code}' <devUrl>` — `000` → stop. Never
-   start the server. Print a manual checklist of frames × states, record per § 6 with
-   `Verdict: stopped — dev server not running` (no Artifact), then § 8.
+1. **Dev server.** `curl -s -o /dev/null -w '%{http_code}' <devUrl>` — `000` (nothing
+   listening), `404` or any `5xx` (e.g. a proxy's `502`) → stop. `2xx`, `3xx`, `401` and `403`
+   mean the app answers; go on. Never start or restart the server. Print a manual checklist of
+   frames × states, record per § 6 with `Verdict: stopped — dev server not running (<code>)`
+   (no Artifact), then § 8.
 2. Write `<run dir>/input.json` per the contract's **compare** input: `outDir` = `<run dir>`,
    `devUrl`, `componentPrefix`, `frames` from `figma[]` (`fileKey`, `nodeId`, `label` as
    `name`), `states` flattened from `figma_states[]`, `crop` from § Crop rules.
