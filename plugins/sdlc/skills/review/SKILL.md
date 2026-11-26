@@ -81,7 +81,7 @@ Name the next stage. The stage does not start it.
 
 | Outcome | Next |
 |---|---|
-| `no blocking findings` | `/ship` |
+| `no blocking findings` | `/verify-behaviour` — or `/ship` when `stages.verify-behaviour.skill` is `"none"` |
 | blocking, all `fix-side: code` or impact findings | fix them (`/implement` or by hand, as new commits), then `/review` again |
 | blocking `fix-side: docs` on a decision record, or a finding that changes a decided design | `/grill-with-docs` to revisit the decision |
 | `failed` | fix the cause, `/review` again — or `/ship`, where the gate shows the failure |
@@ -99,3 +99,7 @@ Idempotent per branch: each run reviews from the merge-base to the current `HEAD
 `Fix commits` nor changes only `review.md` — work landed after the review. Judged by SHA and
 paths, never by subject: the subject's shape depends on the repo's commit format. `/ship`
 shows a stale review at its gate.
+
+`/verify-behaviour` commits after the review without making it stale: a commit that changes only
+`verify.md`, or is listed under `verify.md`'s `Fix commits`, does not count. Those fixes are
+unreviewed; `/ship` shows them at its gate.
