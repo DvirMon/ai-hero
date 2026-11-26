@@ -70,6 +70,14 @@ class BuildReportTest(unittest.TestCase):
         html = build(report_with_verdicts(['not run'], images=False))
         self.assertIn('Not run', html)
 
+    def test_report_text_cannot_break_the_script(self):
+        report = report_with_verdicts(['needs approval'])
+        report['sections'][0]['copy'] = [
+            {'figma': 'Save', 'app': '<!--<script></script>'}]
+        html = build(report)
+        self.assertNotIn('<!--', html)
+        self.assertEqual(html.count('</script'), 1)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -61,6 +61,6 @@ for s in R['sections']:
 R['summary'] = [{'name': s['name'], 'pct': s['pct'], 'cls': s['cls'], 'label': s['label']}
                 for s in R['sections']]
 tpl = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'references', 'report-template.html')).read()
-html = tpl.replace('__TITLE__', R['title'].replace('<', '')).replace('__REPORT__', json.dumps(R).replace('</', '<\\/'))
+html = tpl.replace('__TITLE__', R['title'].replace('<', '')).replace('__REPORT__', json.dumps(R).replace('<', '\\u003c'))
 open(out, 'w').write(html)
 print(f'{out} {len(html)//1024}KB')
