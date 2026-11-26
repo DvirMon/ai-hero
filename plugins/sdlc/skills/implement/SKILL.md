@@ -137,8 +137,10 @@ Say plainly that tests haven't run locally: the work is green in CI or not green
 Report the wired skills loaded, then per step: executor, skills, files, `Done when` results, commit (`<sha> <subject>`), and
 anything inferred. Also any edge the overlap check added, and `git log --oneline origin/<default>..HEAD`.
 
-Last line, nothing after it — `/review`, or `/ship` when `stages.review.skill` is `none`:
+Last line, nothing after it — `/verify-visual`, unless `stages.verify-visual.skill` is `none` or
+`state.json` `figma[]` is empty; then `/review`, or `/ship` when `stages.review.skill` is also
+`none`:
 
 ```
-Next: /review <issue-#-or-slug>
+Next: /verify-visual <issue-#-or-slug>
 ```

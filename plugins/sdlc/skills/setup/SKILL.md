@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Configure this repo for the engineering skills — write its workflow config (`.claude/workflow.json`), set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/implement` → `/review` → `/verify-behaviour` → `/ship`. Model-invoked only by `/to-ticket` when the repo has no workflow config; otherwise run it when the user asks.
+description: Configure this repo for the engineering skills — write its workflow config (`.claude/workflow.json`), set up its issue tracker, ticket tracker, triage label vocabulary, domain doc layout, and the PR-branch workflow enforcement (git hooks, commitlint, PR template, GitHub Actions, rulesets). Run once before first use of the other engineering skills. Covers the pipeline `/to-ticket` → `/grill-with-docs` → `/to-spec` → `/to-issues` → `/to-tasks` → `/implement` → `/verify-visual` → `/review` → `/verify-behaviour` → `/ship`. Model-invoked only by `/to-ticket` when the repo has no workflow config; otherwise run it when the user asks.
 ---
 
 # Setup
@@ -116,7 +116,9 @@ Show the full list — every file diff and every `gh api` command — and apply 
    **Wired stage skills** (`stages.<stage>.skills`, `${CLAUDE_PLUGIN_ROOT}/contracts/stage-skills.md`):
    for a frontend with Figma (the `figma` plugin installed, a Figma MCP server connected, or
    `.claude/figma-project.json`), propose the six `figma:*` skills on that project's `stages`,
-   plus `skills.ui` (the repo's Figma implementation skills) and `devUrl`. For TypeScript source,
+   plus `skills.ui` (the repo's Figma implementation skills) and `devUrl`. `visual-verify` is
+   never one of them — it is the `/verify-visual` comparer (Section H); drop it from an existing
+   `stages.implement.skills`. For TypeScript source,
    propose `source-docs` on `stages.implement.skills`. Propose any other installed skill the
    user names for a stage — that is the point of the slot. A single-project repo gets one entry with `"path": "**"`. List more specific
    paths first. Ask once for the whole table, not per key; the user edits rows.
@@ -173,6 +175,26 @@ Write `stages.verify-behaviour` (`browser` only when not the default) and
 sign-ins, `## Cleanup` and `## Database` from the user's answers. Keep the five headings.
 Re-runnable: edit both in place, keeping the user's edits.
 
+**Section H — Visual verify.** Runs only for a project with Figma wired (Section F) and
+`devUrl`. Otherwise write nothing for it: `/verify-visual` skips a ticket with no Figma frames.
+
+Ask once, for the whole section:
+
+1. **Comparer** — `figma:visual-verify` (default) or another skill meeting
+   `${CLAUDE_PLUGIN_ROOT}/contracts/visual-comparer.md`.
+2. **Design system** — only when there is no `.claude/design-system.json`: the component tag
+   prefix (e.g. `v-`) and where the components' source lives.
+3. **Crop rules** — dynamic content the diff must ignore (dates, ids, user names), as a CSS
+   selector or a region, each with a reason.
+4. **Skip** — offer `"skill": "none"` on `stages.verify-visual` for a repo that checks visuals
+   by hand; then write nothing else for this section.
+
+Write `stages.verify-visual.comparer` only when not the default, and
+`docs/agents/verify-visual.md`, starting from [verify-visual.md](./examples/verify-visual.md):
+`## Design system` only when there is no `.claude/design-system.json` (one owner per value),
+`## Accepted differences` with the table header and no rows, `## Crop rules` from the answers.
+Re-runnable: edit both in place, keeping the user's edits and every accepted row.
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
@@ -182,6 +204,7 @@ Show the user a draft of:
 - The contents of `docs/agents/ticket-tracker.md` (only when `to-ticket` is installed)
 - `.claude/workflow.json`, and the `.gitignore` lines for `.claude/workflow.local.json` and `.pipeline/`
 - `stages.verify-behaviour` and `docs/agents/verify-behaviour.md` (only when Section G ran)
+- `stages.verify-visual` and `docs/agents/verify-visual.md` (only when Section H ran)
 - The Section E change list (only when Section E ran)
 
 Let them edit before writing.
@@ -237,6 +260,7 @@ Write `.claude/workflow.json` (Section F) and the `.gitignore` line. Then write 
 - [triage-labels.md](./triage-labels.md) — label mapping (only if `triage` is installed)
 - [domain.md](./domain.md) — domain doc consumer rules + layout
 - [verify-behaviour.md](./examples/verify-behaviour.md) — behaviour verify repo facts, written to `docs/agents/verify-behaviour.md` (only when Section G ran)
+- [verify-visual.md](./examples/verify-visual.md) — visual verify repo facts, written to `docs/agents/verify-visual.md` (only when Section H ran)
 
 For other issue or ticket trackers, write the file from `tracker.md`'s operation list, filled as "Filling a tracker file" describes.
 
