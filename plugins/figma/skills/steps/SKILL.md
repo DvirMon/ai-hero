@@ -1,9 +1,9 @@
 ---
 name: steps
-description: "sdlc stage extension for /to-tasks. Bind Figma node IDs to UI code steps (`figma:` frontmatter) and add a terminal `verify-ui` step. Wire it as `stages.to-tasks.skills: [\"figma:steps\"]` in .claude/workflow.json."
+description: "sdlc stage extension for /to-tasks. Bind Figma node IDs to UI code steps (`figma:` frontmatter) and record each frame's route and states in `state.json` `figma_states[]` for `/verify-visual`. Wire it as `stages.to-tasks.skills: [\"figma:steps\"]` in .claude/workflow.json."
 ---
 
-> **Wired into** `/to-tasks` § 3 and § 5 — step frontmatter and a verify-ui step, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
+> **Wired into** `/to-tasks` § 3 and § 5 — step frontmatter and the `figma_states[]` field it owns in `state.json`, per sdlc's `contracts/stage-skills.md`. No Figma frames on the
 > ticket (`state.json` `figma[]` empty, no frame URLs) → say so and do nothing.
 
 # Figma-aware task plans
@@ -50,38 +50,19 @@ Rules:
 - Every listed node is a **fetch target**: `/implement` fetches each one from Figma before
   writing UI.
 
-## Final step — visual verify
+## Frame states
 
-When the issue's **Figma frames** table is non-empty, add a **terminal** step:
+When the issue's **Figma frames** table is non-empty, write one `state.json` `figma_states[]`
+entry per frame (shape: sdlc `skills/to-ticket/references/state-schema.md`). No plan step:
+`/verify-visual` compares the frames after `/implement`.
 
-```yaml
----
-step: N
-type: verify-ui
-commit: chore
-depends_on: [<all UI code steps for this slice>]
-figma:
-  - "4275:4279"
-files: []
----
-# Step N — Visual verify (Figma)
-
-Compare rendered UI on the developer's running app to Figma for this slice's frames.
-
-## Do
-
-Follow `figma:implement` § `verify-ui` steps. Route and states come from the issue
-acceptance criteria and the preceding code steps.
-
-## Done when
-
-- [ ] Comparison recorded (pass, or in-scope fixes committed; pre-existing mismatches listed)
-- [ ] No dev server was started or restarted by the agent
-```
-
-- One `verify-ui` step per issue slice (not per frame), unless frames land in separate issues.
-- `files: []` — verify may touch only screenshots/checklist markdown under the tasks folder if
-  the plan asks to persist evidence; default is report-only in `/implement` final summary.
+- `nodeId`, `fileKey` — from the frames table and `figma[]`.
+- `route` — the page the frame renders, from the UI code steps' `files` and the app's routes.
+- `states` — `default` plus every state the acceptance criteria and UI code steps name (a
+  dialog open, a menu open, an empty list). `open` names controls by visible label, as a
+  person would click them. `role` is `null` unless the state needs another role than the
+  developer's session.
+- Replace this ticket's earlier entries for the same `nodeId`; leave other entries alone.
 
 ## Writer brief
 

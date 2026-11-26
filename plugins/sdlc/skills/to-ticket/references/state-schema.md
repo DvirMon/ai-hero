@@ -45,6 +45,22 @@ the validation routine inline.
 `screenshotPath` is optional when capture failed or not run yet; `label`, `fileKey`, and
 `nodeId` are required on each row.
 
+`figma_states[]` entry shape — added by `figma:steps` when the ticket has Figma frames; absent
+otherwise. One entry per frame; `open` is plain intent naming controls by visible label
+(`default` opens nothing), `role` is `null` for the signed-in user:
+
+```json
+{
+  "nodeId": "4275:4279",
+  "fileKey": "g7SaJ3BzmMA4yzStMWV48m",
+  "route": "/company/1",
+  "states": [
+    { "open": "default", "role": null },
+    { "open": "Turn off dialog open", "role": "full-admin" }
+  ]
+}
+```
+
 `units[]` entry shape — one per PR unit. What a unit is follows `prUnit` in
 `${CLAUDE_PLUGIN_ROOT}/contracts/workflow-config.md`: `sub-issue` → one entry per sub-issue; `ticket` → one entry
 for the ticket (its Jira sub-tasks are steps on that branch and are not units).
@@ -87,6 +103,7 @@ reads it, not just who writes it.
 | `decisionsPath` | `to-ticket` (path is fixed at creation; file itself is created lazily by the first stage that decides something). Format: `${CLAUDE_PLUGIN_ROOT}/contracts/ticket-decisions.md`. | Every stage appends entries tagged with its phase: `grill-with-docs` (`grill`), `to-spec` (`spec`), `to-tasks` (`tasks`), `implement` (`implement`), `review` (`review`). `to-spec` also synthesizes the spec from it. |
 | `capabilityLogPath` | `to-ticket`, at creation — the permanent decisions log for the capability this work belongs to (`~/.claude/conventions/doc-contracts/decisions-log.md`), if the project keeps them and this work belongs to exactly one capability. `null` otherwise, which is the correct value for cross-capability work, not a missing field. | `grill-with-docs` (reads it before the first question, so the interview does not re-decide something settled; appends a row per capability-scoped decision); `to-spec` (reads it as a second input alongside `decisionsPath` — the log carries what earlier efforts settled, which the workspace's own decisions file does not). |
 | `figma` | `figma:capture` (wired into `to-ticket`); `figma:design-check` may append frames the user supplies. Empty when no Figma skill is wired. | `grill-with-docs` (Design-check aspect frame list); `to-spec` (frame table in `design.md`); `to-issues` (node IDs on FE slices); `to-tasks` (step `figma:` binding); `implement` (which nodes to fetch per UI step). |
+| `figma_states` | `figma:steps` (wired into `to-tasks`), one entry per frame in the issue's Figma frames table. Absent when no Figma skill is wired. | `verify-visual` (route and states to compare per frame). |
 | `designPath` | a wired skill that writes a design reference — `figma:design-reference` in `to-spec`. `null` otherwise. | `to-issues`, `to-tasks`, `implement` (component/token/copy map — UI steps treat absent mapping as stop); `ship` (MR evidence link). |
 | `specPath` | `to-spec`. | `to-issues` (default source, read in full); `to-tasks` (read for consistency); `implement` (read only if a step is ambiguous); `ship` (linked as evidence in the PR body). |
 | `architecturePath` | `to-spec`, only when `isComplex` is `true`. | `to-issues`, `to-tasks`, `implement` — same read pattern as `specPath`. |
