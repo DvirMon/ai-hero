@@ -60,7 +60,7 @@ then the plan's `Not covered` list. The developer edits or drops cases; rewrite
 
 1. **Dev server.** `curl -s -o /dev/null -w '%{http_code}' <devUrl>` — `000` (nothing
    listening) → stop. Never start the server. Print `verify-plan.md` as a manual checklist,
-   write `verify.md` with `Verdict: stopped — dev server not running`, then § 9.
+   record per § 8 with `Verdict: stopped — dev server not running` (no Artifact), then § 9.
 2. **Preconditions.** List every check whose precondition is missing: a role with no
    `logins` entry, a credential the pointer cannot reach, a case marked `Blocked: <service>`,
    a `db:` line with `db` unset. Ask the developer once, for all of them. Whatever is not
@@ -82,7 +82,9 @@ as a user would, and resolve every check line under it:
 Evidence rule: one observed value per check line; a line with no observed value counts as
 failed, never as passed.
 
-A check that matches → `passed`. A check that does not → § 6.
+A check that matches → `passed`. A check whose observed value differs → § 6. A check with no
+observed value (the run could not read it) → `failed` with what was missing, never § 6: there is
+no code bug to fix yet.
 
 ## 6. Fix small / report big
 
@@ -115,14 +117,18 @@ Write `<tasks root>/verify.md` beside `review.md`, replacing any earlier one, in
 `.pipeline/verify/<branch, / → ->/` and are never committed; `verify.md` points to them by
 path. Text evidence goes inline.
 
-When the tasks root is in the repo, commit `verify.md` alone per `commit.md`: type `docs`,
-subject `record behaviour verify`, stage `verify`. Under the gitignored `.pipeline/` it is local
-only.
+Order: write `verify.md`, publish the Artifact, fill its `Artifact:` field, then commit.
 
-Publish the record as an Artifact for the developer (`icon: "check"`): verdict, every check
-with its status and evidence, the fix commits, blocked checks and data left behind. Re-runs
-publish from the same file path so the URL stays. Put the URL in `verify.md`'s `Artifact:`
-field before committing it.
+Publish the record as an Artifact for the developer (`icon: "check"`) from
+`.pipeline/verify/<branch, / → ->/verify.html`: verdict, every check with its status and
+evidence, the fix commits, blocked checks, data left behind, and `Requirement sources missing`
+when set. A re-run publishes with `url` = the earlier `verify.md`'s `Artifact:` URL, so the link
+stays across sessions.
+
+When the tasks root is in the repo, commit `verify.md` together with `verify-plan.md` — these
+two record files and nothing else — per `commit.md`: type `docs`, subject
+`record behaviour verify`, stage `verify`. Under the gitignored `.pipeline/` they are local
+only. Leaving `verify-plan.md` uncommitted would fail every later stage's clean-tree check.
 
 ## 9. Next
 
@@ -149,9 +155,15 @@ A re-run tests the current `HEAD` and reuses the approved `verify-plan.md`.
    code in `changedSince`. Approve the new ones (§ 3).
 2. Run again every check whose case `Code` path is in `changedSince`, plus the new cases. Every
    other check keeps its result, evidence and `@<sha>`.
-3. Write a fresh `verify.md` with `Verified head` = the new `HEAD`.
+3. Write a fresh `verify.md` with `Verified head` = the new `HEAD`. `Fix commits` is
+   cumulative: carry forward every earlier entry still in `<Reviewed head>..HEAD` (from
+   `review.md`), then add this run's. Dropping one would make `/review` stale and hide an
+   unreviewed fix from `/ship`.
 
-**Stale** = a commit in `<Verified head>..HEAD` that is neither listed under `Fix commits` nor
-changes only `verify.md` — work landed after the verify. Judged by SHA and paths,
+**Verify commits** = the commits listed under `Fix commits`, plus any commit that changes only
+`verify.md` and `verify-plan.md` (either or both). `/review` and `/ship` read this definition.
+
+**Stale** = a commit in `<Verified head>..HEAD` that is not a verify commit — work landed after
+the verify. Judged by SHA and paths,
 never by subject: the subject's shape depends on the repo's commit format. `/ship` shows a
 stale record at its gate.

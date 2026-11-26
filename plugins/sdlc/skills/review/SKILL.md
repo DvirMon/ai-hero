@@ -100,6 +100,7 @@ Idempotent per branch: each run reviews from the merge-base to the current `HEAD
 paths, never by subject: the subject's shape depends on the repo's commit format. `/ship`
 shows a stale review at its gate.
 
-`/verify-behaviour` commits after the review without making it stale: a commit that changes only
-`verify.md`, or is listed under `verify.md`'s `Fix commits`, does not count. Those fixes are
+`/verify-behaviour` commits after the review without making it stale: a **verify commit**
+(`/verify-behaviour` § Re-running — listed under `verify.md`'s `Fix commits`, or changing only
+`verify.md` / `verify-plan.md`) does not count. Same rule: SHA and paths, never subject. Those fixes are
 unreviewed; `/ship` shows them at its gate.

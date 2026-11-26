@@ -7,8 +7,8 @@ Fields are read by `/review` § Re-running and `/ship` § 2 Gate — keep their 
 # Behaviour verify — <branch>
 
 - Browser: <ego-browser | chrome><; net:/console: through Chrome DevTools MCP — when that fallback ran>
-- Verified head: <HEAD sha the run tested>
-- Fix commits: <sha subject, one per line | none>
+- Verified head: <HEAD sha at run start, before this run's fix commits>
+- Fix commits: <sha subject, one per line, cumulative since the review | none>
 - Verdict: all passed | failed: N | stopped — <reason>
 - Artifact: <claude.ai artifact URL | not published — <reason>>
 <- Requirement sources missing: no workspace — only when there is no workspace>
@@ -30,7 +30,8 @@ Fields are read by `/review` § Re-running and `/ship` § 2 Gate — keep their 
   `<step>` and `<line>` are the step number and the check line's position under it, from 1.
 - **Status** — exactly `passed`, `fixed`, `failed` or `blocked`.
 - **Observed value** — what the run saw: the ARIA state, the request and response field, the DB
-  value, the console line. No observed value → the line is `failed`, never `passed`.
+  value, the console line. No observed value → the line is `failed`, never `passed` — except
+  `blocked` lines, which never ran and give the missing precondition instead.
 - **Evidence path** — a screenshot under `.pipeline/verify/<branch, / → ->/`, never committed.
   Text evidence (a request/response excerpt, a DB row) goes inline in place of the path.
 - **`@<sha>`** — the head the check last ran at. A re-run that keeps a check's earlier result

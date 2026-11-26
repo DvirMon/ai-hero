@@ -149,8 +149,10 @@ file (`projectKind`) is rewritten: drop `projectKind`, carry the other keys over
 Also add to `.gitignore`: `.claude/workflow.local.json` (one teammate's overrides) and `.pipeline/`
 (task plans for issues with no workspace — `/to-tasks` § 5).
 
-**Section G — Behaviour verify.** Runs only for a project with `devUrl` (Section F). Skip it
-otherwise — `/verify-behaviour` needs a running app to test.
+**Section G — Behaviour verify.** Runs only for a project with `devUrl` (Section F). When no
+project has `devUrl`, write `stages.verify-behaviour.skill: "none"` without asking —
+`/verify-behaviour` needs a running app to test, and without it `/review` would point to a stage
+that can only stop.
 
 Ask once, for the whole section:
 
