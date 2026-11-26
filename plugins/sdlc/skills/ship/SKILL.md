@@ -71,7 +71,8 @@ This is the pipeline's human gate (`/implement` commits per step without asking)
   only with `stages.review.skill: "none"`), `failed`, or **stale** — a commit in
   `<Reviewed head>..HEAD` that isn't a listed review fix commit, the `review.md` commit, or a
   verify commit — listed under `verify.md`'s `Fix commits`, or changing only `verify.md` /
-  `verify-plan.md` (`/review` § Re-running; by SHA and paths, never subject).
+  `verify-plan.md` — or a visual record commit, changing only `visual.md` /
+  `docs/agents/verify-visual.md` (`/review` § Re-running; by SHA and paths, never subject).
 - The behaviour verify record, `verify.md` in the tasks root (`/verify-behaviour` § 8): its
   verdict, every check line that is not `passed`, its fix commits — marked **unreviewed — read
   these**, since no review saw them — and its `Artifact` link. Say plainly when it is missing
