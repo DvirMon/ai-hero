@@ -7,8 +7,8 @@ disable-model-invocation: true
 # Ship
 
 One issue = one branch = one PR. `/implement` leaves a feature branch with one commit per step;
-`/review` adds its fix commits and `review.md`; `/verify-behaviour` adds its fix commits and
-`verify.md`.
+`/verify-visual` adds its fix commits and `visual.md`; `/review` adds its fix commits and
+`review.md`; `/verify-behaviour` adds its fix commits and `verify.md`.
 This skill turns that branch into a PR that GitHub merges on its own once required checks pass.
 
 There is one mode. No push to the default branch, ever — the Claude hook, the repo's git hooks
@@ -78,6 +78,12 @@ This is the pipeline's human gate (`/implement` commits per step without asking)
   (no verify ran — expected only with `stages.verify-behaviour.skill: "none"`), `stopped`, or
   **stale** — a commit in `<Verified head>..HEAD` that isn't a verify commit
   (`/verify-behaviour` § Re-running).
+- The visual verify record, `visual.md` in the tasks root (`/verify-visual` § 6): its verdict,
+  every state line that is `needs approval` or `older difference`, and its `Artifact` link. Its
+  fix commits landed before the review, so the review saw them. Say plainly when it is missing
+  (expected with `stages.verify-visual.skill: "none"` or no Figma frames), `stopped`, `failed`,
+  or **stale** — a commit in `<Verified head>..HEAD` that isn't one of its verify commits
+  (`/verify-visual` § Re-running).
 
 None of these stops the gate; the developer decides with them in view.
 

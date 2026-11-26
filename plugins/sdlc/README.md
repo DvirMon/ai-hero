@@ -3,7 +3,7 @@
 The ticket-to-PR pipeline, as a plugin in the `ai-hero` marketplace.
 
 ```
-/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /implement → /review → /verify-behaviour → /ship
+/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /implement → /verify-visual → /review → /verify-behaviour → /ship
 ```
 
 `/to-ticket` sizes the change first: a small one takes the fast path straight to
@@ -40,7 +40,9 @@ Any stage can also load your own skills without being replaced: `stages.<stage>.
 ([`contracts/stage-skills.md`](contracts/stage-skills.md)). Figma support ships that way, as the
 `figma` plugin in this marketplace — one skill per stage (`figma:capture`, `figma:design-check`,
 `figma:design-reference`, `figma:slicing`, `figma:steps`, `figma:implement`), wired only in
-the projects that have designs.
+the projects that have designs. Its `figma:visual-verify` is the comparer `/verify-visual` runs
+(`stages.verify-visual.comparer`, [`contracts/visual-comparer.md`](contracts/visual-comparer.md));
+sdlc does not depend on the plugin.
 
 ## Local development
 
@@ -64,7 +66,7 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 - **Optional:** the `wayfinder` skill, for work too big for one session (`/to-ticket`
   § 3b, `/grill-with-docs` step 0)
 - **Agents:** doc-compressor, adr-writer
-- **Browser:** the `ego-browser` skill, for `/verify-behaviour` (default browser; Chrome
+- **Browser:** the `ego-browser` skill, for `/verify-behaviour` and the `/verify-visual` comparer (default browser; Chrome
   DevTools MCP is the alternative)
 - **Optional:** a skill that implements a tracker operation, e.g. `jira-grill-comment`
   for `## Post a comment` on Jira
