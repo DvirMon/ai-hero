@@ -7,7 +7,8 @@ disable-model-invocation: true
 # Ship
 
 One issue = one branch = one PR. `/implement` leaves a feature branch with one commit per step;
-`/review` adds its fix commits and `review.md`.
+`/review` adds its fix commits and `review.md`; `/verify-behaviour` adds its fix commits and
+`verify.md`.
 This skill turns that branch into a PR that GitHub merges on its own once required checks pass.
 
 There is one mode. No push to the default branch, ever — the Claude hook, the repo's git hooks
@@ -68,9 +69,16 @@ This is the pipeline's human gate (`/implement` commits per step without asking)
 - The review record, `review.md` in the tasks root (`/review` § 4): its reviewer, verdict and
   every line under **Still blocking**. Say plainly when it is missing (no review ran — expected
   only with `stages.review.skill: "none"`), `failed`, or **stale** — a commit in
-  `<Reviewed head>..HEAD` that isn't a listed fix commit or the `review.md` commit
-  (`/review` § Re-running). None of these
-  stops the gate; the developer decides with them in view.
+  `<Reviewed head>..HEAD` that isn't a listed fix commit, the `review.md` commit, or a
+  `/verify-behaviour` commit (`/review` § Re-running).
+- The behaviour verify record, `verify.md` in the tasks root (`/verify-behaviour` § 8): its
+  verdict, every check line that is not `passed`, its fix commits — marked **unreviewed — read
+  these**, since no review saw them — and its `Artifact` link. Say plainly when it is missing
+  (no verify ran — expected only with `stages.verify-behaviour.skill: "none"`), `stopped`, or
+  **stale** — a commit in `<Verified head>..HEAD` that isn't a listed fix commit or the
+  `verify.md` commit (`/verify-behaviour` § Re-running).
+
+None of these stops the gate; the developer decides with them in view.
 
 Wait for explicit approval. The developer may ask for fixes first — those become new commits
 (never `--amend`, never interactive rebase); then re-run from step 1.
