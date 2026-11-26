@@ -3,7 +3,7 @@
 The ticket-to-PR pipeline, as a plugin in the `ai-hero` marketplace.
 
 ```
-/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /implement → /review → /ship
+/to-intake → /to-ticket → /grill-with-docs → /to-spec → /to-issues → /to-tasks → /implement → /review → /verify-behaviour → /ship
 ```
 
 `/to-ticket` sizes the change first: a small one takes the fast path straight to
@@ -64,6 +64,8 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 - **Optional:** the `wayfinder` skill, for work too big for one session (`/to-ticket`
   § 3b, `/grill-with-docs` step 0)
 - **Agents:** doc-compressor, adr-writer
+- **Browser:** the `ego-browser` skill, for `/verify-behaviour` (default browser; Chrome
+  DevTools MCP is the alternative)
 - **Optional:** a skill that implements a tracker operation, e.g. `jira-grill-comment`
   for `## Post a comment` on Jira
 - **Optional:** a commit skill named in `capabilities.commit.skill`, e.g. `atomic-commit`;
@@ -75,5 +77,5 @@ These live outside the plugin, in `~/.claude`, and the pipeline calls them:
 .claude-plugin/plugin.json
 skills/      the stages, plus setup
 contracts/   ticket-decisions, prd, workflow-config, tracker, review-stage, branch-guard, stage-skills, commit
-agents/      implementer, test-implementer, tdd-planner
+agents/      implementer, test-implementer, tdd-planner, test-planner
 ```
