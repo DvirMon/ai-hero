@@ -1,0 +1,132 @@
+<title>__TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a verdict summary up top, then one comparer per frame (Figma / App / Diff / Blend) with the cluster list beside it. */
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --fg:#1b2230; --muted:#5d6678; --line:#dfe3ea;
+  --accent:#2f5bd8; --bad:#c2410c; --bad-bg:#fdeee3; --old:#6b7280; --old-bg:#eceef2; --na:#8a6d00; --na-bg:#f8f0cf;
+  --mark:#d6249f; --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; --head:'Space Grotesk','Inter',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151c; --surface:#1a1f2a; --fg:#e8ebf2; --muted:#9aa3b5; --line:#2b3242;
+  --accent:#7d9bff; --bad:#fb923c; --bad-bg:#3a2415; --old:#a3abbb; --old-bg:#262c3a; --na:#e6c34f; --na-bg:#37300f; --mark:#ff5cc8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151c; --surface:#1a1f2a; --fg:#e8ebf2; --muted:#9aa3b5; --line:#2b3242;
+  --accent:#7d9bff; --bad:#fb923c; --bad-bg:#3a2415; --old:#a3abbb; --old-bg:#262c3a; --na:#e6c34f; --na-bg:#37300f; --mark:#ff5cc8; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--font);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+main{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--head);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:1.9rem}
+h2{font-size:1.25rem}
+.sub{color:var(--muted);margin:6px 0 0;max-width:68ch}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:.85rem;margin-top:12px}
+.meta b{color:var(--fg);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 20px}
+.sumrow{display:grid;grid-template-columns:150px 1fr 140px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.sumrow:first-of-type{border-top:0}
+.bar{height:12px;background:var(--old-bg);border-radius:3px;overflow:hidden;min-width:0}
+.bar i{display:block;height:100%}
+.pct{font-variant-numeric:tabular-nums;font-weight:600;margin-left:8px}
+.pill{display:inline-block;font-size:.75rem;font-weight:600;padding:2px 9px;border-radius:99px;letter-spacing:.02em;white-space:nowrap}
+.pill.branch{background:var(--bad-bg);color:var(--bad)}
+.pill.older{background:var(--old-bg);color:var(--old)}
+.pill.na{background:var(--na-bg);color:var(--na)}
+.v-branch{background:var(--bad)} .v-older{background:var(--old)} .v-na{background:var(--na)}
+.head{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+.head .num{font-family:var(--head);font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;margin-top:14px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.tabs button{font:inherit;font-size:.85rem;padding:5px 12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:6px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tabs button:focus-visible,.tabs input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tabs label{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin-left:auto}
+.stage{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:repeating-conic-gradient(var(--old-bg) 0 25%,var(--surface) 0 50%) 0 0/16px 16px}
+.frame{position:relative;display:inline-block;line-height:0}
+.frame img{display:block;max-width:none}
+.frame img.over{position:absolute;inset:0}
+.box{position:absolute;border:1.5px solid var(--mark);background:color-mix(in srgb,var(--mark) 12%,transparent);pointer-events:none}
+.legend{font-size:.8rem;color:var(--muted);margin-top:6px}
+ul.cl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+ul.cl li{padding-left:12px;border-left:3px solid var(--bad)}
+ul.cl b{display:block;font-size:.9rem}
+ul.cl span{font-size:.82rem;color:var(--muted)}
+.note{margin:10px 0 0;color:var(--muted);font-size:.9rem;max-width:68ch}
+.foot{color:var(--muted);font-size:.85rem}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}.sumrow{grid-template-columns:1fr;gap:4px}}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .4s}}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap">
+<main>
+  <header><h1 id="ttl"></h1><p class="sub" id="sub"></p><div class="meta" id="meta"></div></header>
+  <section class="card" aria-label="Summary">
+    <h2>Result by state</h2>
+    <div id="sum" style="margin-top:8px"></div>
+    <p class="note" id="sumnote"></p>
+  </section>
+  <div id="secs" style="display:flex;flex-direction:column;gap:28px"></div>
+  <section class="card" aria-label="Fix list" id="fixcard"><h2>Fix list for the implement flow</h2><ul class="cl" id="fixes" style="margin-top:12px"></ul></section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+const REPORT=__REPORT__;
+const SECS=REPORT.sections;
+const OVERVIEW=REPORT.summary.map(s=>[s.name,s.pct,s.verdict,s.label]);
+const $=id=>document.getElementById(id);
+$("ttl").textContent=REPORT.title;$("sub").textContent=REPORT.subtitle||"";
+(REPORT.meta||[]).forEach(([k,v])=>{const s=document.createElement("span");const b=document.createElement("b");b.textContent=k;s.append(b," "+v);$("meta").append(s)});
+$("sumnote").textContent=REPORT.note||"";
+(REPORT.fixes||[]).forEach(([a,b])=>{const li=document.createElement("li");li.innerHTML="<b></b><span></span>";li.firstChild.textContent=a;li.lastChild.textContent=b;$("fixes").append(li)});
+if(!(REPORT.fixes||[]).length)$("fixcard").remove();
+$("foot").textContent=REPORT.source||"";
+const cls={branch:'v-branch',older:'v-older',na:'v-na'};
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e};
+const sum=document.getElementById('sum');
+OVERVIEW.forEach(([n,p,v,label])=>{
+  const r=el('div','sumrow');
+  r.append(el('b','',n));
+  const b=el('div','bar');const i=el('i',cls[v]);i.style.width=Math.min(p,100)+'%';b.append(i);
+  const wrap=el('div','');wrap.style.cssText='display:flex;align-items:center;min-width:0';b.style.flex='1';wrap.append(b,el('span','pct',p+'%'));
+  r.append(wrap,el('span','pill '+v,label));
+  sum.append(r);
+});
+const host=document.getElementById('secs');
+SECS.forEach(s=>{
+  const c=el('section','card');c.setAttribute('aria-label',s.name);
+  const lab={branch:'Branch-caused',older:'Older difference',na:'Not comparable'}[s.verdict];
+  c.append(el('div','head',`<h2>${s.name}</h2><span><span class="pill ${s.verdict}">${lab}</span> <span class="num">${s.pct}%</span></span>`));
+  c.append(el('p','note',s.note));
+  const g=el('div','grid');
+  const left=el('div','');
+  const tabs=el('div','tabs');
+  const modes=[['figma','Figma'],['local','App'],['diff','Diff'],['blend','Blend']];
+  const btns={};
+  modes.forEach(([k,t])=>{const b=el('button','',t);b.type='button';b.setAttribute('aria-pressed','false');btns[k]=b;b.onclick=()=>setMode(k);tabs.append(b)});
+  const range=el('input');range.type='range';range.min=0;range.max=100;range.value=50;range.setAttribute('aria-label','Blend '+s.name);range.style.display='none';
+  const rl=el('label','');rl.append(range);
+  let clBox=null;
+  if(!s.size){clBox=el('input');clBox.type='checkbox';clBox.id='cl-'+s.id;const l=el('label','');l.htmlFor=clBox.id;l.append(clBox,document.createTextNode('Show clusters'));tabs.append(l)}
+  tabs.append(rl);
+  const stage=el('div','stage');const frame=el('div','frame');
+  const base=el('img');const over=el('img','over');over.alt='';over.style.display='none';
+  base.width=s.w;base.height=s.h;
+  frame.append(base,over);
+  const boxes=[];
+  s.clusters.forEach(k=>{const b=el('div','box');b.style.cssText=`left:${k.x/s.w*100}%;top:${k.y/s.h*100}%;width:${Math.max(k.w/s.w*100,.4)}%;height:${Math.max(k.h/s.h*100,.4)}%;display:none`;frame.append(b);boxes.push(b)});
+  stage.append(frame);
+  left.append(tabs,stage,el('div','legend',`${s.w}x${s.h}px at 1x. Magenta in Diff marks the differences.`+(s.size?' Sizes differ, so only the top-left overlap is compared.':'')));
+  function setMode(k){
+    Object.entries(btns).forEach(([m,b])=>b.setAttribute('aria-pressed',String(m===k)));
+    range.style.display=k==='blend'?'':'none';
+    if(k==='blend'){base.src=s.figma;base.alt='Figma, '+s.name;over.src=s.local;over.alt='';over.style.display='';over.style.opacity=range.value/100}
+    else{over.style.display='none';base.src=s[k];base.alt=({figma:'Figma',local:'App',diff:'Diff'})[k]+', '+s.name}
+  }
+  range.oninput=()=>{over.style.opacity=range.value/100};
+  if(clBox)clBox.onchange=()=>boxes.forEach(b=>b.style.display=clBox.checked?'':'none');
+  const right=el('div','');
+  if(s.items.length){const ul=el('ul','cl');s.items.forEach(([a,b])=>ul.append(el('li','',`<b>${a}</b><span>${b}</span>`)));right.append(el('h3','','Differences'),ul);right.firstChild.style.marginBottom='10px'}
+  else right.append(el('h3','','Why not fixed'),el('p','note','Shared tooltip component. Text matches the locale string in both.'));
+  g.append(left,right);c.append(g);host.append(c);
+  setMode('diff');
+});
+</script>

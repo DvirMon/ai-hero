@@ -1,5 +1,5 @@
 {
   "name": "figma",
-  "description": "Figma extensions for the sdlc pipeline — one skill per stage, wired per repo through stages.<stage>.skills in .claude/workflow.json.",
+  "description": "Figma extensions for the sdlc pipeline — one skill per stage, wired per repo through stages.<stage>.skills in .claude/workflow.json, plus the visual comparer for /verify-visual (visual-verify, on figma-pixel-diff).",
   "author": { "name": "DvirMon" }
 }
