@@ -104,3 +104,7 @@ shows a stale review at its gate.
 (`/verify-behaviour` § Re-running — listed under `verify.md`'s `Fix commits`, or changing only
 `verify.md` / `verify-plan.md`) does not count. Same rule: SHA and paths, never subject. Those fixes are
 unreviewed; `/ship` shows them at its gate.
+
+A `/verify-visual` re-run after the review: its record commit (changing only `visual.md` and
+`docs/agents/verify-visual.md`, `/verify-visual` § 6) does not count — it changes no code. Its
+fix commits do count: no review saw them.
