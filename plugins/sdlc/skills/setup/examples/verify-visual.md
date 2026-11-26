@@ -16,12 +16,13 @@ exists.
 
 Differences between Figma and a design-system component that the team approved for the whole
 repo. `/verify-visual` appends a row when the developer picks "approve for the repo". A
-difference matches only on all of component, variant, property and value: one that grows or
-moves is asked about again.
+difference matches on component, variant, property and value. Where it was approved
+(`Seen at`: frame · state · cluster box at 1x), it must also still sit in that box: one that
+grows or moves there is asked about again.
 
-| Component | Variant | Property | Value | Reason | Approver | Date |
-|---|---|---|---|---|---|---|
-| `v-button` | primary | padding-left | 12px | component spacing wins over Figma | Dana Levi | 2026-11-26 |
+| Component | Variant | Property | Value | Seen at | Reason | Approver | Date |
+|---|---|---|---|---|---|---|---|
+| `v-button` | primary | padding-left | 12px | company-page · default · 840,96,120,36 | component spacing wins over Figma | Dana Levi | 2026-11-26 |
 
 ## Crop rules
 
